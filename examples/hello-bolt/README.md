@@ -1,35 +1,36 @@
-# Hello Bolt
+# Thunder Bolt playground
 
-A connected HTTP example for events, commands, actions, shortcuts, external options, and modal validation. It uses a Composer path repository pointing at this checkout.
-
-## Run locally
-
-Use PHP 8.5+ and install the framework's dependencies first. From this directory:
+Use this example with the framework checkout and a Slack app configured for Socket Mode. Register `/bolt` in your app manifest; mentions work too.
 
 ```sh
 composer install
 cp .env.example .env
-php bolt listener:list
-php bolt doctor
-php bolt serve
+php bolt socket:serve
 ```
 
-Set `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` in `.env`. Expose the development server through your HTTPS tunnel, replace every `https://example.test/slack/events` URL in `slack-manifest.yaml`, and use that manifest to configure your Slack app. Install or reinstall with the declared scopes, including `commands`, and invite the bot to a channel. `doctor` checks local configuration; it does not contact Slack.
+In a second terminal, from this directory:
 
-For OAuth installation across workspaces, fill the optional client ID, client secret, and HTTPS redirect URI fields in `.env`, configure that callback in Slack, then visit `/slack/install` through the same HTTPS host. The static bot token is unnecessary in OAuth mode. Keep the listed bot scopes and see the [OAuth guide](../../docs/oauth-and-authorization.md) for state, installation storage, and automatic token rotation.
+```sh
+php bolt demo:work
+```
 
-## Try the flow
+Set `SLACK_APP_TOKEN` and `SLACK_BOT_TOKEN` in `.env`. Set `SLACK_TERMINAL_ALLOWED_USERS` to the comma-separated Slack member IDs allowed to use the terminal, and `OPENAI_API_KEY` to enable AI. `OPENAI_MODEL` defaults to `gpt-5.5` and can be changed to a model available to your API project.
 
-1. Mention the bot in a channel. `GreetOnMention` posts a reply with an **Approve** button. Clicking it routes to `ApproveRequest`, which replaces that message through its response URL.
-2. Choose **Open request** from Slack's shortcuts. `OpenRequestModal` uses the shortcut's trigger ID to open a modal.
-3. Search the optional assignee field. `SearchAssignees` returns filtered demo choices for Ada, Grace, and Margaret.
-4. Submit the modal. `SubmitRequest` rejects a whitespace-only summary with an inline block error and acknowledges a valid summary. Add your application's persistence or workflow at that point.
-5. Run `/ping` to receive its initial ephemeral response.
+## Try it in Slack
 
-Keep handlers and outbound calls within Slack's three-second acknowledgement deadline. The example uses inline processing. See the [interactivity guide](../../docs/http-interactivity.md) for closure listeners, compound selectors, legacy forms, and response contracts.
+- `/bolt pet` — meet Boltling. Everyone can feed, play, clean, and rest using the buttons. Contributors earn credit, and Boltling levels up and evolves. Stats decay over elapsed time; neglect is recoverable. Refresh reloads current state.
+- `/bolt terminal` — start a local shell and reply in its thread to type. Ctrl+C and Close buttons control the session. Only its allowlisted owner can operate it.
+- `/bolt ai hello` — introduce the assistant. Ask questions, request web searches, or ask it to check/feed the pet. Continue in the answer's thread. Search status is based on actual Responses tool output, and sources are clickable.
+- `/bolt help` — show the available demos.
 
-`tests/Examples/HelloBoltInteractivityTest.php` exercises the connected flow with a recorded HTTP transport. A real workspace is only contacted when you run the configured example and invoke its Slack features.
+Mentions accept the same prefixes: `@Thunder Bolt pet`, `@Thunder Bolt terminal`, or `@Thunder Bolt ai what is the size of the Sun?`. Subscribe to `message.channels`, `message.groups`, `message.im`, and `message.mpim` with their history scopes for unmentioned thread replies. Invite the bot into the channel. If your manifest includes the `test_message` message shortcut, it asks the AI about the selected message.
 
-## Remember a conversation
+## Local state and execution
 
-`RememberConversation` is another `app_mention` listener. It injects `ConversationContext` to count mentions in the channel and uses `ThreadContext` when Slack supplied a known thread root. Both contexts are delivery-scoped and use the configured store, so the handler can update state without assembling channel or tenant keys itself.
+Pet state is JSON at `.thunder-bolt/demo/pet.json`, partitioned by workspace, updated under a separate file lock and atomic replacement. Care has cooldowns and delivery deduplication; audit history and contributor counts record who did what. AI thread history and thread routing use the framework's file conversation adapter under `.thunder-bolt/demo/threads/`.
+
+Handlers enqueue small JSON jobs before acknowledging Slack. The demo worker claims jobs in order; an interrupted claimed job stays in `running/` for inspection and is never automatically replayed. Completed-job identifiers are retained for up to 24 hours (at most 4,096) to suppress redelivery. This local spool demonstrates the seam for background work; it does not replace a production queue. Terminal/AI output updates are best-effort and coalesced; Slack requests have bounded timeouts.
+
+The terminal is a real shell on the worker host, with a dedicated initial working directory and a stripped child environment. It is **not a sandbox**. Its output is visible to the channel, so use a development host and an explicit allowlist. Sessions expire after inactivity and close with the worker; shell processes do not survive its restart. Pet and AI state do survive restarts. AI tools are limited to web search and pet care; the model has no terminal tool.
+
+Never commit `.env` or `.thunder-bolt/`. Neither demo code nor logs should print API credentials.

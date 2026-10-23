@@ -47,6 +47,8 @@ Until the package is published, generated apps use a local Composer path reposit
 
 The [hello-bolt example](examples/hello-bolt/) connects mentions, buttons, shortcuts, external options, modal validation, and stored conversation state.
 
+It also includes a [playground](examples/hello-bolt/README.md): a shared JSON-backed pet, an owner-restricted terminal, and an OpenAI Responses assistant with web search and scoped pet-care tools. Run `php bolt demo:work` alongside the Socket Mode worker to try `/bolt pet`, `/bolt terminal`, and `/bolt ai how big is the Sun?`.
+
 ### Run with Socket Mode
 
 Enable Socket Mode in your Slack app settings and create an app-level token with the `connections:write` scope. Set these values in your application's `.env`:

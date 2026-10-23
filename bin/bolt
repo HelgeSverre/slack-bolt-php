@@ -102,7 +102,8 @@ $allowedCommands = [
 ];
 $consoleConfig->commands = array_filter(
     $consoleConfig->commands,
-    static fn (ConsoleCommand $command): bool => in_array($command->getName(), $allowedCommands, true),
+    static fn (ConsoleCommand $command): bool => in_array($command->getName(), $allowedCommands, true)
+        || str_starts_with($command->handler->getDeclaringClass()->getName(), 'App\\'),
 );
 foreach (['generate', 'show', 'install', 'uninstall'] as $method) {
     $reflector = MethodReflector::fromParts(CompletionCommands::class, $method);

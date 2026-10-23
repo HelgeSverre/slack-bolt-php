@@ -19,7 +19,7 @@
         "phpunit/phpunit": "^12.5"
     },
     "autoload": {"psr-4": {"Thunder\\Bolt\\": "src/"}},
-    "autoload-dev": {"psr-4": {"Thunder\\Bolt\\Tests\\": "tests/"}},
+    "autoload-dev": {"psr-4": {"Thunder\\Bolt\\Tests\\": "tests/", "App\\": "examples/hello-bolt/app/"}},
     "bin": ["bin/bolt", "bin/bolt-complete"],
     "extra": {"branch-alias": {"dev-main": "0.1.x-dev"}},
     "scripts": {

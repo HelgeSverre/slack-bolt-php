@@ -11,6 +11,10 @@ features:
       callback_id: open_request_modal
       description: Start a request with an optional assignee
   slash_commands:
+    - command: /bolt
+      description: Run the pet, terminal, or AI demo
+      usage_hint: pet | terminal | ai your question
+      should_escape: false
     - command: /ping
       url: https://example.test/slack/events
       description: Reply with Pong

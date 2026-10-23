@@ -30,6 +30,9 @@ use Thunder\Bolt\OAuth\State\StateStore;
 use Thunder\Bolt\OAuth\Stores\FileInstallationStore;
 use Thunder\Bolt\OAuth\SystemClock;
 use Thunder\Bolt\OAuth\TokenRotator;
+use Thunder\Bolt\SocketMode\Config as SocketModeConfig;
+use Thunder\Bolt\SocketMode\Transport\AmpConnector;
+use Thunder\Bolt\SocketMode\Transport\Connector;
 use Thunder\Bolt\WebApi\Client as WebApiClient;
 
 /**
@@ -58,6 +61,19 @@ final class AppInitializer implements Initializer
         $client = new WebApiClient(http: $http, token: $config->oauth === null ? $config->token : '');
 
         $container->singleton(WebApiClient::class, $client);
+
+        $socketMode = $config->socketMode ?? new SocketModeConfig();
+        $container->singleton(SocketModeConfig::class, $socketMode);
+        if (!$container->has(Connector::class)) {
+            $container->singleton(
+                Connector::class,
+                new AmpConnector(
+                    connectTimeoutSeconds: $socketMode->helloTimeoutSeconds,
+                    tlsHandshakeTimeoutSeconds: $socketMode->helloTimeoutSeconds,
+                    maxMessageBytes: $socketMode->maxMessageBytes,
+                ),
+            );
+        }
 
         $authorizer = $container->has(Authorizer::class) ? $container->get(Authorizer::class) : null;
         if ($config->oauth !== null) {

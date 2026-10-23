@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Thunder\Bolt\BoltConfig;
 use Thunder\Bolt\OAuth\OAuthConfig;
+use Thunder\Bolt\SocketMode\Config as SocketModeConfig;
 
 use function Tempest\env;
 
@@ -40,4 +41,5 @@ return new BoltConfig(
     conversationStorePath: is_string($conversationStorePath) && $conversationStorePath !== ''
         ? $conversationStorePath
         : null,
+    socketMode: new SocketModeConfig((string) env('SLACK_APP_TOKEN', '')),
 );

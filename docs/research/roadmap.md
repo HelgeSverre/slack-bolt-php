@@ -7,7 +7,7 @@ Updated 23 October 2026. The target remains capability and protocol parity with 
 - PHP 8.5+, Tempest 3, and the provisional `Thunder\Bolt` namespace. Composer locks the tested dependency set, including Tempest 3.20.0.
 - Readonly payloads and message values, named factories, immutable builders, method attributes, and chainable listener registration. Application dependencies use constructor injection; delivery data is passed to handler methods.
 - A package-owned Slack Web API client and Block Kit implementation. Generated names preserve Slack's method hierarchy; endpoint models and specialized builders follow the pinned source schemas.
-- HTTP handlers execute inline by default. Commands and interactions return one response value from their own family; reply helpers make outbound Web API or response-URL calls. Optional workers and Socket Mode are later adapters.
+- HTTP and Socket Mode handlers execute inline by default. Commands and interactions return one response value from their own family; reply helpers make outbound Web API or response-URL calls. Durable background workers remain a later adapter.
 - A project-local CLI for application and listener scaffolding, discovery, diagnostics, development serving, and completions.
 
 ## Initial milestone: implemented and locally verified
@@ -61,9 +61,13 @@ The SDK now adds native endpoint request/response classes, nested response model
 
 See the [client guide](../web-api-client.md), [builder guide](../sdk-and-block-kit.md), [type coverage inventory](web-api-model-coverage.json), and [validation audit](sdk-block-kit-audit.md). Generated models do not imply exhaustive validation of every Slack cross-field constraint. Polymorphic and extensible raw values remain explicit; live Slack conformance and remaining SDK refinements stay release gates.
 
+## Socket Mode milestone
+
+`socket:serve` receives events, commands, and interactions through the same App dispatch pipeline. The runner handles Slack envelopes, hello/disconnect frames, bounded reconnect backoff, retry metadata, and shutdown. Amp provides TLS verification, WebSocket framing, message limits, and ping/pong health. Local tests cover lifecycle failures and installation/context isolation; live Slack conformance remains a release gate. See the [README](../../README.md#run-with-socket-mode) for setup; deeper documentation is deferred to the separate docs site.
+
 ## Remaining implementation order
 
-1. **Runtime adapters.** Add Socket Mode lifecycle/reconnect/acknowledgements, optional durable workers, serverless receiver equivalents, and configurable receiver lifecycle/error handling. Gate on adapter integration tests, including timeout, retry, reconnect, and shutdown paths.
+1. **Durable background execution.** Persist work before acknowledging and provide workers with retries and delivery deduplication. Gate on crash/restart, duplicate delivery, tenant isolation, and acknowledgement timing tests. Serverless receivers and configurable receiver lifecycle/error handling remain later adapter work.
 2. **Assistants and custom functions.** Add assistant listener families, metadata-backed thread context, streaming, and custom-function completion/failure. Gate on callback, authorization, acknowledgement, and streaming fixtures.
 3. **Compatibility and release validation.** Expand the upstream conformance matrix, finish migration documentation and CLI templates for new families, run Linux/macOS CI and controlled Slack-workspace smoke tests, and address measured CLI startup performance. Cached help currently measures about 0.36 seconds on Herd; the 50 ms target is still open.
 

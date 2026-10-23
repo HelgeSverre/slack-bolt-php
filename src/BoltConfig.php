@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thunder\Bolt;
 
 use Thunder\Bolt\OAuth\OAuthConfig;
+use Thunder\Bolt\SocketMode\Config as SocketModeConfig;
 
 final readonly class BoltConfig
 {
@@ -21,6 +22,7 @@ final readonly class BoltConfig
         public ?string $installationStorePath = null,
         public string $conversationStoreDriver = 'file',
         public ?string $conversationStorePath = null,
+        public ?SocketModeConfig $socketMode = null,
     ) {
         if ($maxBodyBytes < 1 || $maxTimestampSkewSeconds < 0) {
             throw new \InvalidArgumentException(

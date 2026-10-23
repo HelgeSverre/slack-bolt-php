@@ -12,14 +12,14 @@ The generated [Bolt surface](bolt-js-api-surface.md) lists every extracted expor
 | `client` Web API calls | `WebApi\Client` plus generated resource groups | 🟢 typed models, named resources, multipart, uploads, opt-in retries; [scope](sdk-block-kit-audit.md) |
 | shortcuts, actions, options, views | readonly payloads, attributes/fluent selectors, typed acknowledgements, response-URL replies | 🟢 implemented for HTTP; [scope and evidence](http-interactivity-audit.md) |
 | OAuth installation / token rotation | OAuth v2 installer, one-time state, file/memory stores, bot/user grant rotation and scoped authorizers | 🟢 HTTP milestone implemented; [scope](../oauth-and-authorization.md) and [source mapping](oauth-authorization.md) |
-| Socket Mode | optional WebSocket adapter | 🔴 unimplemented |
+| Socket Mode | `SocketMode\Runner`, Amp transport, `socket:serve` | 🟡 implemented with local protocol/transport tests; live Slack conformance pending |
 | assistants | assistant listener family, thread context store, streaming API | 🔴 unimplemented |
 | custom functions | typed function payload, complete/fail callbacks | 🔴 unimplemented |
 | conversation store / middleware | delivery-scoped conversation state plus thread extension; memory, file, SQLite adapters | 🟢 implemented; [guide](../conversation-and-thread-storage.md), [source mapping](conversation-storage.md), [audit](conversation-storage-audit.md) |
 
 The HTTP interaction matrix covers `block_actions`, `shortcut`, `message_action`, `block_suggestion`, `view_submission`, `view_closed`, and retained legacy `interactive_message`, `dialog_submission`, and `dialog_suggestion` forms. Selector normalization and classification follow pinned Bolt JS 5.1.0, including the first action, legacy suggestion precedence, and submission-only view shorthand. See the [source mapping](http-interactivity.md) and [PHP API guide](../http-interactivity.md). `dialog_cancellation` is unsupported by that upstream classifier and receives an explicit `501`.
 
-PHP handlers return response values; HTTP execution is inline and buffered. This milestone does not implement Socket Mode, automatic background processing, or a measured acknowledgement-deadline guarantee. Local signed tests and fresh-project HTTP checks cover the implemented protocol; a real-workspace smoke test remains pending.
+PHP handlers return response values; HTTP and Socket Mode execution are inline. Socket Mode reuses App dispatch and adds envelope acknowledgements, reconnects, connection health, and shutdown handling. Automatic background processing and a measured acknowledgement-deadline guarantee remain open. Local fixtures and transport tests cover implemented behavior; a real-workspace smoke test remains pending.
 
 ## Generated Web API contract — 🟢
 

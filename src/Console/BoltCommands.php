@@ -12,6 +12,7 @@ use Tempest\Console\ConsoleCommand;
 use Tempest\Console\ExitCode;
 use Thunder\Bolt\App;
 use Thunder\Bolt\BoltConfig;
+use Thunder\Bolt\SocketMode\Config as SocketModeConfig;
 
 final readonly class BoltCommands
 {
@@ -200,6 +201,7 @@ final readonly class BoltCommands
         }
         $configuration = [];
         $config = \Tempest\Container\get(BoltConfig::class);
+        $socketMode = $config->socketMode ?? new SocketModeConfig();
         if ($config->conversationStoreDriver === 'sqlite' && !extension_loaded('pdo_sqlite')) {
             $failures[] = 'The SQLite context adapter requires the pdo_sqlite extension.';
         }
@@ -228,6 +230,10 @@ final readonly class BoltCommands
                         'php' => PHP_VERSION,
                         'authorization' => $oauth ? 'oauth' : 'static-token',
                         'contextStore' => $config->conversationStoreDriver,
+                        'socketTokenConfigured' => $socketMode->isConfigured(),
+                        'socketAuthorizationConfigured' => $config->token !== '' || $oauth,
+                        'socketReady' =>
+                            $failures === [] && $socketMode->isConfigured() && ($config->token !== '' || $oauth),
                         'configuration' => $configuration,
                         'failures' => $failures,
                     ],

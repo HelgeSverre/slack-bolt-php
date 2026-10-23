@@ -43,6 +43,11 @@ final class ProjectScaffoldTest extends TestCase
             'vendor/thunder/bolt/bin/bolt',
             (string) file_get_contents($project . '/bolt'),
         );
+        self::assertStringContainsString('SLACK_APP_TOKEN=', (string) file_get_contents($project . '/.env.example'));
+        self::assertStringContainsString(
+            'socket_mode_enabled: false',
+            (string) file_get_contents($project . '/slack-manifest.yaml'),
+        );
     }
 
     public function test_refuses_existing_or_traversal_project_paths(): void

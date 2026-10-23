@@ -4,7 +4,7 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 
 Thunder Bolt is built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style. The `Thunder\Bolt` namespace and package name are provisional.
 
-**Experimental and unpublished.** The HTTP application runtime works, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet.
+**Experimental and unpublished.** HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet.
 
 ## A Slack app, one handler at a time
 
@@ -41,11 +41,28 @@ cp .env.example .env
 php bolt serve
 ```
 
-Set `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` in `.env`. Configure your Slack app's Events API and interactivity request URL as a publicly reachable HTTPS `/slack/events` endpoint, install the app with the scopes in the generated manifest, and invite it to a channel. Local development currently requires an HTTPS tunnel; Socket Mode is planned.
+Set `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` in `.env`. Configure your Slack app's Events API and interactivity request URL as a publicly reachable HTTPS `/slack/events` endpoint, install the app with the scopes in the generated manifest, and invite it to a channel. Use an HTTPS tunnel for local HTTP development.
 
 Until the package is published, generated apps use a local Composer path repository pointing at this checkout. Keep the checkout available. `serve` starts a development server; production serves `public/index.php` through your PHP host.
 
 The [hello-bolt example](examples/hello-bolt/) connects mentions, buttons, shortcuts, external options, modal validation, and stored conversation state.
+
+### Run with Socket Mode
+
+Enable Socket Mode in your Slack app settings and create an app-level token with the `connections:write` scope. Set these values in your application's `.env`:
+
+```dotenv
+SLACK_APP_TOKEN=xapp-your-app-token
+SLACK_BOT_TOKEN=xoxb-your-bot-token
+```
+
+```sh
+php bolt socket:serve
+```
+
+The same discovered handlers, middleware, installation authorization, and conversation stores work over Socket Mode. This runner needs no public request URL or signing secret. OAuth applications still need their HTTP installation and callback routes.
+
+The worker acknowledges Slack envelopes, reconnects with bounded backoff, monitors connection health, and stops cleanly on SIGINT/SIGTERM when PHP's `pcntl` extension is available. Handlers still execute inline and must finish within Slack's three-second acknowledgement window. Run one worker per process under your process supervisor.
 
 ## Compose messages and views
 
@@ -117,6 +134,7 @@ Calls send once by default. Background or CLI code can opt into bounded retries 
 ## Included today
 
 - Signed HTTP Events API, URL verification, typed event/message handlers, and middleware.
+- Socket Mode for events, commands, and interactions, with a CLI worker, heartbeat, reconnects, and envelope acknowledgements.
 - Commands, actions, shortcuts, options, view submissions/closures, and retained legacy interactions.
 - OAuth v2 installation, one-time state validation, installation stores, scoped authorization, and token rotation.
 - Conversation/thread state with memory, file, and SQLite adapters and atomic updates.
@@ -135,6 +153,7 @@ php bolt make:listener Approve --action=approve_deployment
 php bolt make:listener Submission --view=approve_deployment
 php bolt listener:list
 php bolt doctor
+php bolt socket:serve
 php bolt completion:show --shell=zsh
 ```
 
@@ -163,7 +182,7 @@ To regenerate from the pinned upstream archives, run `npm run sync:references`, 
 
 ## What's next
 
-The next milestone is **Socket Mode**: receive events and interactions over a managed WebSocket connection, reuse existing handlers, and add a CLI runner with reconnect and shutdown handling. Durable workers and assistant/custom-function support follow.
+The next milestone is **durable background execution**: acknowledge promptly, persist jobs, and run slow handlers through workers with retries and delivery deduplication. Assistant and custom-function support follow.
 
 Extended guides and API documentation will live on a separate docs site. Existing design notes and coverage inventories remain under `docs/` for maintainers. Controlled live-workspace tests and Linux/macOS CI are release gates; generated coverage alone does not establish full Bolt JS conformance.
 

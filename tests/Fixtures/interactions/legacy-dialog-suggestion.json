@@ -1,0 +1,11 @@
+{
+  "type": "dialog_suggestion",
+  "name": "manager",
+  "value": "ad",
+  "callback_id": "expense_report",
+  "action_ts": "1710000000.000100",
+  "team": {"id": "T123", "domain": "example"},
+  "user": {"id": "U123", "name": "ada"},
+  "channel": {"id": "C123", "name": "general"},
+  "token": "redacted"
+}

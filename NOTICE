@@ -1,0 +1,13 @@
+Thunder Bolt is an independent PHP implementation inspired by Slack Bolt for
+JavaScript. It is not an official Slack SDK or an endorsed Slack product.
+
+Generated declarations and method bindings derive from slackapi/bolt-js and
+slackapi/node-slack-sdk, both distributed under the MIT license. Original
+copyright notices and licenses are preserved under docs/research/reference/.
+The exact upstream versions, source locations, and hashes are recorded in
+docs/research/upstream-manifest.json and the API inventories.
+
+The shell completion stubs are adapted from Tempest 3.20.0's console package.
+Its copyright notice and MIT license are preserved under
+docs/research/reference/tempest/LICENSE.md. Other dependency licenses remain
+in vendor/ when installed with Composer.

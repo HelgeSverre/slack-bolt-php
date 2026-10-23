@@ -1,0 +1,12 @@
+{
+  "type": "block_suggestion",
+  "team": {"id": "T123", "domain": "example"},
+  "user": {"id": "U123", "name": "ada", "team_id": "T123"},
+  "api_app_id": "A123",
+  "container": {"type": "view", "view_id": "V123"},
+  "block_id": "assignee_block",
+  "action_id": "assignee_search",
+  "value": "ada",
+  "token": "redacted",
+  "view": {"id": "V123", "callback_id": "ticket_form", "type": "modal", "state": {"values": {}}}
+}

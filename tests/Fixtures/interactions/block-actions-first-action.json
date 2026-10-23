@@ -1,0 +1,14 @@
+{
+  "type": "block_actions",
+  "team": {"id": "T123", "domain": "example"},
+  "user": {"id": "U123", "username": "ada"},
+  "api_app_id": "A123",
+  "token": "redacted",
+  "container": {"type": "message", "message_ts": "1710000000.000100", "channel_id": "C123"},
+  "trigger_id": "1337.42.trigger",
+  "response_url": "https://hooks.slack.com/redacted/block-action",
+  "actions": [
+    {"action_id": "approve_order", "block_id": "orders", "type": "button", "value": "order-42", "action_ts": "1710000000.000200"},
+    {"action_id": "ignore_me_for_bolt_matching", "block_id": "orders", "type": "button", "value": "order-42", "action_ts": "1710000000.000201"}
+  ]
+}

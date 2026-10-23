@@ -1,0 +1,24 @@
+{
+  "name": "thunder-bolt-reference-tooling",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reference extraction and PHP scaffold generation for Thunder Bolt.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "help": "node scripts/help.mjs",
+    "sync:references": "node scripts/sync-references.mjs",
+    "extract:typescript": "node scripts/extract-typescript.mjs",
+    "generate:scaffold": "node scripts/generate-scaffold.mjs",
+    "generate": "npm run extract:typescript && npm run generate:web-api-models && npm run generate:scaffold",
+    "generate:web-api-models": "node scripts/generate-web-api-models.mjs",
+    "verify:generated": "node scripts/generate-web-api-models.mjs --verify && node scripts/generate-scaffold.mjs --verify",
+    "test:tooling": "node --test test/tooling/generator.test.mjs"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

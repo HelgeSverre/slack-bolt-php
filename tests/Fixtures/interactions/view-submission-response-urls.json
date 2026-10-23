@@ -1,0 +1,20 @@
+{
+  "type": "view_submission",
+  "team": {"id": "T123", "domain": "example"},
+  "user": {"id": "U123", "username": "ada"},
+  "api_app_id": "A123",
+  "token": "redacted",
+  "trigger_id": "1337.42.trigger",
+  "view": {
+    "id": "V123",
+    "type": "modal",
+    "callback_id": "ticket_form",
+    "state": {"values": {"summary": {"title": {"type": "plain_text_input", "value": "Broken printer"}}}},
+    "hash": "1710000000.hash",
+    "private_metadata": "ticket-42"
+  },
+  "response_urls": [
+    {"block_id": "notify_channel", "action_id": "channel", "channel_id": "C123", "response_url": "https://hooks.slack.com/redacted/first"},
+    {"block_id": "audit_channel", "action_id": "channel", "channel_id": "C999", "response_url": "https://hooks.slack.com/redacted/second"}
+  ]
+}

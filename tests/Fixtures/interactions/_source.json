@@ -1,0 +1,11 @@
+{
+  "note": "These are sanitized payload bodies after decoding Slack's application/x-www-form-urlencoded payload field. They are derived from the official Slack interaction payload and legacy dialog examples, plus the Bolt JS 5.1.0 source contract. They contain no usable tokens or webhook URLs.",
+  "sources": [
+    "https://docs.slack.dev/reference/interaction-payloads/block_actions-payload/",
+    "https://docs.slack.dev/reference/interaction-payloads/block_suggestion-payload/",
+    "https://docs.slack.dev/reference/interaction-payloads/shortcuts-interaction-payload/",
+    "https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/",
+    "https://docs.slack.dev/legacy/legacy-dialogs/#dialog-cancellations",
+    "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts"
+  ]
+}

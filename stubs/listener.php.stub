@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use Thunder\Bolt\Attributes\{{ attributeUse }};
+use Thunder\Bolt\Messages\Message;
+use Thunder\Bolt\Payloads\{{ payloadUse }};
+use Thunder\Bolt\Reply;
+
+final class {{ class }}
+{
+    #[{{ attribute }}({{ selector }})]
+    public function __invoke({{ payloadClass }} $payload, Reply $reply): void
+    {
+        $reply->inThread(Message::text('Hello from Thunder Bolt.'));
+    }
+}

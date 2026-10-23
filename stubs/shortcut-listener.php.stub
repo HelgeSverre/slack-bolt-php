@@ -1,0 +1,18 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use Thunder\Bolt\Attributes\Shortcut as ShortcutAttribute;
+use Thunder\Bolt\Payloads\Shortcut;
+use Thunder\Bolt\Responses\ShortcutResponse;
+
+final class {{ class }}
+{
+    #[ShortcutAttribute({{ selector }}{{ typeArgument }})]
+    public function __invoke(Shortcut $shortcut): ShortcutResponse
+    {
+        return ShortcutResponse::empty();
+    }
+}

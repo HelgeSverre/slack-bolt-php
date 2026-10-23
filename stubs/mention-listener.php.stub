@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use Thunder\Bolt\Attributes\Event;
+use Thunder\Bolt\Messages\Message;
+use Thunder\Bolt\Payloads\Events\AppMention;
+use Thunder\Bolt\Reply;
+
+final class GreetOnMention
+{
+    #[Event('app_mention')]
+    public function __invoke(AppMention $event, Reply $reply): void
+    {
+        $reply->inThread(Message::text("Hello <@{$event->userId}>!"));
+    }
+}

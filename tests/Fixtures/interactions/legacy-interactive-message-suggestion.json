@@ -1,0 +1,13 @@
+{
+  "type": "interactive_message",
+  "name": "legacy_picker",
+  "value": "ad",
+  "callback_id": "legacy_picker_callback",
+  "action_ts": "1710000000.000100",
+  "message_ts": "1710000000.000000",
+  "attachment_id": "1",
+  "team": {"id": "T123", "domain": "example"},
+  "channel": {"id": "C123", "name": "general"},
+  "user": {"id": "U123", "name": "ada"},
+  "token": "redacted"
+}

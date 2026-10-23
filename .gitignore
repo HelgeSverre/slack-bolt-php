@@ -1,0 +1,9 @@
+/vendor/
+/node_modules/
+/work/
+/.tempest/
+/.thunder-bolt/
+/.phpunit.cache/
+/.env
+/.DS_Store
+/.idea/

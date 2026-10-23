@@ -1,0 +1,3244 @@
+{
+  "schema": 1,
+  "generatedBy": "scripts/generate-scaffold.mjs",
+  "counts": {
+    "unresolved-re-export": 86,
+    "scaffold-options-dto": 13,
+    "declaration-only": 147,
+    "scaffold-interface": 85,
+    "scaffold-class": 28
+  },
+  "exports": [
+    {
+      "symbol": "ActionConstraints",
+      "kind": "re-export",
+      "file": "src/App.ts",
+      "line": 107,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L107"
+    },
+    {
+      "symbol": "OptionsConstraints",
+      "kind": "re-export",
+      "file": "src/App.ts",
+      "line": 107,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L107"
+    },
+    {
+      "symbol": "ShortcutConstraints",
+      "kind": "re-export",
+      "file": "src/App.ts",
+      "line": 107,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L107"
+    },
+    {
+      "symbol": "ViewConstraints",
+      "kind": "re-export",
+      "file": "src/App.ts",
+      "line": 107,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L107"
+    },
+    {
+      "symbol": "AppOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/App.ts",
+      "line": 122,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/App/AppOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L122"
+    },
+    {
+      "symbol": "Logger",
+      "kind": "re-export",
+      "file": "src/App.ts",
+      "line": 160,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L160"
+    },
+    {
+      "symbol": "LogLevel",
+      "kind": "re-export",
+      "file": "src/App.ts",
+      "line": 160,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L160"
+    },
+    {
+      "symbol": "Authorize",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/App.ts",
+      "line": 163,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L163"
+    },
+    {
+      "symbol": "AuthorizeSourceData",
+      "kind": "InterfaceDeclaration",
+      "file": "src/App.ts",
+      "line": 169,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/App/AuthorizeSourceData.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L169"
+    },
+    {
+      "symbol": "AuthorizeResult",
+      "kind": "InterfaceDeclaration",
+      "file": "src/App.ts",
+      "line": 178,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/App/AuthorizeResult.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L178"
+    },
+    {
+      "symbol": "ExtendedErrorHandlerArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/App.ts",
+      "line": 200,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/App/ExtendedErrorHandlerArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L200"
+    },
+    {
+      "symbol": "ErrorHandler",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/App.ts",
+      "line": 204,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L204"
+    },
+    {
+      "symbol": "ExtendedErrorHandler",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/App.ts",
+      "line": 206,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L206"
+    },
+    {
+      "symbol": "AnyErrorHandler",
+      "kind": "InterfaceDeclaration",
+      "file": "src/App.ts",
+      "line": 208,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/App/AnyErrorHandler.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L208"
+    },
+    {
+      "symbol": "App",
+      "kind": "ClassDeclaration",
+      "file": "src/App.ts",
+      "line": 233,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/App.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts#L233"
+    },
+    {
+      "symbol": "AssistantConfig",
+      "kind": "InterfaceDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 21,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Assistant/AssistantConfig.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L21"
+    },
+    {
+      "symbol": "AssistantThreadStartedMiddleware",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 67,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L67"
+    },
+    {
+      "symbol": "AssistantThreadContextChangedMiddleware",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 68,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L68"
+    },
+    {
+      "symbol": "AssistantUserMessageMiddleware",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 69,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L69"
+    },
+    {
+      "symbol": "AssistantMiddleware",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 71,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L71"
+    },
+    {
+      "symbol": "AssistantMiddlewareArgs",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 76,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L76"
+    },
+    {
+      "symbol": "AssistantThreadStartedMiddlewareArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 82,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Assistant/AssistantThreadStartedMiddlewareArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L82"
+    },
+    {
+      "symbol": "AssistantThreadContextChangedMiddlewareArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 85,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Assistant/AssistantThreadContextChangedMiddlewareArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L85"
+    },
+    {
+      "symbol": "AssistantUserMessageMiddlewareArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 89,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Assistant/AssistantUserMessageMiddlewareArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L89"
+    },
+    {
+      "symbol": "AllAssistantMiddlewareArgs",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 93,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L93"
+    },
+    {
+      "symbol": "Assistant",
+      "kind": "ClassDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 99,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Assistant.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L99"
+    },
+    {
+      "symbol": "enrichAssistantArgs",
+      "kind": "FunctionDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 170,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L170"
+    },
+    {
+      "symbol": "isAssistantEvent",
+      "kind": "FunctionDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 193,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L193"
+    },
+    {
+      "symbol": "matchesConstraints",
+      "kind": "FunctionDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 201,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L201"
+    },
+    {
+      "symbol": "isAssistantMessage",
+      "kind": "FunctionDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 209,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L209"
+    },
+    {
+      "symbol": "validate",
+      "kind": "FunctionDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 221,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L221"
+    },
+    {
+      "symbol": "processAssistantMiddleware",
+      "kind": "FunctionDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 286,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L286"
+    },
+    {
+      "symbol": "extractThreadInfo",
+      "kind": "FunctionDeclaration",
+      "file": "src/Assistant.ts",
+      "line": 392,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts#L392"
+    },
+    {
+      "symbol": "AssistantThreadContextStore",
+      "kind": "InterfaceDeclaration",
+      "file": "src/AssistantThreadContextStore.ts",
+      "line": 5,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/AssistantThreadContextStore.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/AssistantThreadContextStore.ts#L5"
+    },
+    {
+      "symbol": "GetThreadContextFn",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/AssistantThreadContextStore.ts",
+      "line": 10,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/AssistantThreadContextStore.ts#L10"
+    },
+    {
+      "symbol": "SaveThreadContextFn",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/AssistantThreadContextStore.ts",
+      "line": 12,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/AssistantThreadContextStore.ts#L12"
+    },
+    {
+      "symbol": "AssistantThreadContext",
+      "kind": "InterfaceDeclaration",
+      "file": "src/AssistantThreadContextStore.ts",
+      "line": 14,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/AssistantThreadContextStore/AssistantThreadContext.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/AssistantThreadContextStore.ts#L14"
+    },
+    {
+      "symbol": "DefaultThreadContextStore",
+      "kind": "ClassDeclaration",
+      "file": "src/AssistantThreadContextStore.ts",
+      "line": 20,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/AssistantThreadContextStore/DefaultThreadContextStore.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/AssistantThreadContextStore.ts#L20"
+    },
+    {
+      "symbol": "FunctionCompleteFn",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/CustomFunction.ts",
+      "line": 18,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/CustomFunction.ts#L18"
+    },
+    {
+      "symbol": "FunctionFailFn",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/CustomFunction.ts",
+      "line": 32,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/CustomFunction.ts#L32"
+    },
+    {
+      "symbol": "SlackCustomFunctionMiddlewareArgs",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/CustomFunction.ts",
+      "line": 40,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/CustomFunction.ts#L40"
+    },
+    {
+      "symbol": "CustomFunctionMiddleware",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/CustomFunction.ts",
+      "line": 43,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/CustomFunction.ts#L43"
+    },
+    {
+      "symbol": "AllCustomFunctionMiddlewareArgs",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/CustomFunction.ts",
+      "line": 46,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/CustomFunction.ts#L46"
+    },
+    {
+      "symbol": "matchCallbackId",
+      "kind": "FunctionDeclaration",
+      "file": "src/CustomFunction.ts",
+      "line": 53,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/CustomFunction.ts#L53"
+    },
+    {
+      "symbol": "CustomFunction",
+      "kind": "ClassDeclaration",
+      "file": "src/CustomFunction.ts",
+      "line": 62,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/CustomFunction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/CustomFunction.ts#L62"
+    },
+    {
+      "symbol": "validate",
+      "kind": "FunctionDeclaration",
+      "file": "src/CustomFunction.ts",
+      "line": 102,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/CustomFunction.ts#L102"
+    },
+    {
+      "symbol": "createFunctionComplete",
+      "kind": "FunctionDeclaration",
+      "file": "src/context/create-function-complete.ts",
+      "line": 6,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-function-complete.ts#L6"
+    },
+    {
+      "symbol": "createFunctionFail",
+      "kind": "FunctionDeclaration",
+      "file": "src/context/create-function-fail.ts",
+      "line": 6,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-function-fail.ts#L6"
+    },
+    {
+      "symbol": "createRespond",
+      "kind": "FunctionDeclaration",
+      "file": "src/context/create-respond.ts",
+      "line": 5,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-respond.ts#L5"
+    },
+    {
+      "symbol": "SayStreamArguments",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/context/create-say-stream.ts",
+      "line": 5,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-say-stream.ts#L5"
+    },
+    {
+      "symbol": "SayStreamFn",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/context/create-say-stream.ts",
+      "line": 7,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-say-stream.ts#L7"
+    },
+    {
+      "symbol": "createSayStream",
+      "kind": "FunctionDeclaration",
+      "file": "src/context/create-say-stream.ts",
+      "line": 9,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-say-stream.ts#L9"
+    },
+    {
+      "symbol": "createSay",
+      "kind": "FunctionDeclaration",
+      "file": "src/context/create-say.ts",
+      "line": 4,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-say.ts#L4"
+    },
+    {
+      "symbol": "SetStatusArguments",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/context/create-set-status.ts",
+      "line": 3,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-set-status.ts#L3"
+    },
+    {
+      "symbol": "SetStatusFn",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/context/create-set-status.ts",
+      "line": 5,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-set-status.ts#L5"
+    },
+    {
+      "symbol": "createSetStatus",
+      "kind": "FunctionDeclaration",
+      "file": "src/context/create-set-status.ts",
+      "line": 7,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-set-status.ts#L7"
+    },
+    {
+      "symbol": "createFunctionComplete",
+      "kind": "re-export",
+      "file": "src/context/index.ts",
+      "line": 1,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/index.ts#L1"
+    },
+    {
+      "symbol": "createFunctionFail",
+      "kind": "re-export",
+      "file": "src/context/index.ts",
+      "line": 2,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/index.ts#L2"
+    },
+    {
+      "symbol": "createRespond",
+      "kind": "re-export",
+      "file": "src/context/index.ts",
+      "line": 3,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/index.ts#L3"
+    },
+    {
+      "symbol": "createSay",
+      "kind": "re-export",
+      "file": "src/context/index.ts",
+      "line": 4,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/index.ts#L4"
+    },
+    {
+      "symbol": "SayStreamArguments",
+      "kind": "re-export",
+      "file": "src/context/index.ts",
+      "line": 5,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/index.ts#L5"
+    },
+    {
+      "symbol": "SayStreamFn",
+      "kind": "re-export",
+      "file": "src/context/index.ts",
+      "line": 5,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/index.ts#L5"
+    },
+    {
+      "symbol": "createSayStream",
+      "kind": "re-export",
+      "file": "src/context/index.ts",
+      "line": 6,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/index.ts#L6"
+    },
+    {
+      "symbol": "SetStatusArguments",
+      "kind": "re-export",
+      "file": "src/context/index.ts",
+      "line": 7,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/index.ts#L7"
+    },
+    {
+      "symbol": "SetStatusFn",
+      "kind": "re-export",
+      "file": "src/context/index.ts",
+      "line": 7,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/index.ts#L7"
+    },
+    {
+      "symbol": "createSetStatus",
+      "kind": "re-export",
+      "file": "src/context/index.ts",
+      "line": 8,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/index.ts#L8"
+    },
+    {
+      "symbol": "ConversationStore",
+      "kind": "InterfaceDeclaration",
+      "file": "src/conversation-store.ts",
+      "line": 8,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/ConversationStore.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/conversation-store.ts#L8"
+    },
+    {
+      "symbol": "MemoryStore",
+      "kind": "ClassDeclaration",
+      "file": "src/conversation-store.ts",
+      "line": 21,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/ConversationStore/MemoryStore.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/conversation-store.ts#L21"
+    },
+    {
+      "symbol": "conversationContext",
+      "kind": "FunctionDeclaration",
+      "file": "src/conversation-store.ts",
+      "line": 60,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/conversation-store.ts#L60"
+    },
+    {
+      "symbol": "CodedError",
+      "kind": "InterfaceDeclaration",
+      "file": "src/errors.ts",
+      "line": 4,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Errors/CodedError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L4"
+    },
+    {
+      "symbol": "isCodedError",
+      "kind": "FunctionDeclaration",
+      "file": "src/errors.ts",
+      "line": 14,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L14"
+    },
+    {
+      "symbol": "ErrorCode",
+      "kind": "EnumDeclaration",
+      "file": "src/errors.ts",
+      "line": 18,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L18"
+    },
+    {
+      "symbol": "UnknownError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 52,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/UnknownError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L52"
+    },
+    {
+      "symbol": "asCodedError",
+      "kind": "FunctionDeclaration",
+      "file": "src/errors.ts",
+      "line": 64,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L64"
+    },
+    {
+      "symbol": "AppInitializationError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 72,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/AppInitializationError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L72"
+    },
+    {
+      "symbol": "AssistantInitializationError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 76,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/AssistantInitializationError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L76"
+    },
+    {
+      "symbol": "AssistantMissingPropertyError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 80,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/AssistantMissingPropertyError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L80"
+    },
+    {
+      "symbol": "AuthorizationError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 84,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/AuthorizationError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L84"
+    },
+    {
+      "symbol": "ContextMissingPropertyError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 96,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/ContextMissingPropertyError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L96"
+    },
+    {
+      "symbol": "InvalidCustomPropertyError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 107,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/InvalidCustomPropertyError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L107"
+    },
+    {
+      "symbol": "CustomRouteInitializationError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 111,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/CustomRouteInitializationError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L111"
+    },
+    {
+      "symbol": "ReceiverMultipleAckError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 115,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/ReceiverMultipleAckError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L115"
+    },
+    {
+      "symbol": "ReceiverAuthenticityError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 123,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/ReceiverAuthenticityError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L123"
+    },
+    {
+      "symbol": "ReceiverInconsistentStateError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 127,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/ReceiverInconsistentStateError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L127"
+    },
+    {
+      "symbol": "HTTPReceiverDeferredRequestError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 131,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/HTTPReceiverDeferredRequestError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L131"
+    },
+    {
+      "symbol": "RespondError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 145,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/RespondError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L145"
+    },
+    {
+      "symbol": "MultipleListenerError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 156,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/MultipleListenerError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L156"
+    },
+    {
+      "symbol": "CustomFunctionInitializationError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 169,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/CustomFunctionInitializationError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L169"
+    },
+    {
+      "symbol": "CustomFunctionCompleteSuccessError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 173,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/CustomFunctionCompleteSuccessError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L173"
+    },
+    {
+      "symbol": "CustomFunctionCompleteFailError",
+      "kind": "ClassDeclaration",
+      "file": "src/errors.ts",
+      "line": 177,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Errors/CustomFunctionCompleteFailError.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts#L177"
+    },
+    {
+      "symbol": "IncomingEventType",
+      "kind": "EnumDeclaration",
+      "file": "src/helpers.ts",
+      "line": 18,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/helpers.ts#L18"
+    },
+    {
+      "symbol": "getTypeAndConversation",
+      "kind": "FunctionDeclaration",
+      "file": "src/helpers.ts",
+      "line": 39,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/helpers.ts#L39"
+    },
+    {
+      "symbol": "isBodyWithTypeEnterpriseInstall",
+      "kind": "FunctionDeclaration",
+      "file": "src/helpers.ts",
+      "line": 117,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/helpers.ts#L117"
+    },
+    {
+      "symbol": "isEventTypeToSkipAuthorize",
+      "kind": "FunctionDeclaration",
+      "file": "src/helpers.ts",
+      "line": 144,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/helpers.ts#L144"
+    },
+    {
+      "symbol": "assertNever",
+      "kind": "FunctionDeclaration",
+      "file": "src/helpers.ts",
+      "line": 149,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/helpers.ts#L149"
+    },
+    {
+      "symbol": "extractEventThreadTs",
+      "kind": "FunctionDeclaration",
+      "file": "src/helpers.ts",
+      "line": 156,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/helpers.ts#L156"
+    },
+    {
+      "symbol": "extractEventTs",
+      "kind": "FunctionDeclaration",
+      "file": "src/helpers.ts",
+      "line": 175,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/helpers.ts#L175"
+    },
+    {
+      "symbol": "extractEventChannelId",
+      "kind": "FunctionDeclaration",
+      "file": "src/helpers.ts",
+      "line": 189,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/helpers.ts#L189"
+    },
+    {
+      "symbol": "isRecord",
+      "kind": "FunctionDeclaration",
+      "file": "src/helpers.ts",
+      "line": 215,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/helpers.ts#L215"
+    },
+    {
+      "symbol": "hasStringProperty",
+      "kind": "FunctionDeclaration",
+      "file": "src/helpers.ts",
+      "line": 228,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/helpers.ts#L228"
+    },
+    {
+      "symbol": "Logger",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 5,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L5"
+    },
+    {
+      "symbol": "ActionConstraints",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 6,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L6"
+    },
+    {
+      "symbol": "AppOptions",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 6,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L6"
+    },
+    {
+      "symbol": "Authorize",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 6,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L6"
+    },
+    {
+      "symbol": "AuthorizeResult",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 6,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L6"
+    },
+    {
+      "symbol": "AuthorizeSourceData",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 6,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L6"
+    },
+    {
+      "symbol": "LogLevel",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 6,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L6"
+    },
+    {
+      "symbol": "App",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 16,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L16"
+    },
+    {
+      "symbol": "isValidSlackRequest",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 19,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L19"
+    },
+    {
+      "symbol": "verifySlackRequest",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 19,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L19"
+    },
+    {
+      "symbol": "Installation",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 31,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L31"
+    },
+    {
+      "symbol": "InstallationQuery",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 31,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L31"
+    },
+    {
+      "symbol": "InstallationStore",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 31,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L31"
+    },
+    {
+      "symbol": "InstallProviderOptions",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 31,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L31"
+    },
+    {
+      "symbol": "InstallURLOptions",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 31,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L31"
+    },
+    {
+      "symbol": "StateStore",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 31,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L31"
+    },
+    {
+      "symbol": "FileInstallationStore",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 40,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L40"
+    },
+    {
+      "symbol": "MemoryInstallationStore",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 40,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L40"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 41,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L41"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 42,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L42"
+    },
+    {
+      "symbol": "Assistant",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 43,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L43"
+    },
+    {
+      "symbol": "AssistantConfig",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 43,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L43"
+    },
+    {
+      "symbol": "AssistantThreadContextChangedMiddleware",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 43,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L43"
+    },
+    {
+      "symbol": "AssistantThreadStartedMiddleware",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 43,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L43"
+    },
+    {
+      "symbol": "AssistantUserMessageMiddleware",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 43,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L43"
+    },
+    {
+      "symbol": "SayStreamArguments",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 50,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L50"
+    },
+    {
+      "symbol": "SayStreamFn",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 50,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L50"
+    },
+    {
+      "symbol": "SetStatusArguments",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 51,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L51"
+    },
+    {
+      "symbol": "SetStatusFn",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 51,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L51"
+    },
+    {
+      "symbol": "ConversationStore",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 52,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L52"
+    },
+    {
+      "symbol": "MemoryStore",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 52,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L52"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 53,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L53"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 54,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L54"
+    },
+    {
+      "symbol": "AwsLambdaReceiverOptions",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 55,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L55"
+    },
+    {
+      "symbol": "BufferedIncomingMessage",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 56,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L56"
+    },
+    {
+      "symbol": "buildReceiverRoutes",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 57,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L57"
+    },
+    {
+      "symbol": "CustomRoute",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 57,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L57"
+    },
+    {
+      "symbol": "ReceiverRoutes",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 57,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L57"
+    },
+    {
+      "symbol": "ExpressReceiverOptions",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 62,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L62"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 63,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L63"
+    },
+    {
+      "symbol": "defaultBodyLimit",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 64,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L64"
+    },
+    {
+      "symbol": "isRawBodyError",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 64,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L64"
+    },
+    {
+      "symbol": "ReceiverDispatchErrorHandlerArgs",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 64,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L64"
+    },
+    {
+      "symbol": "ReceiverProcessEventErrorHandlerArgs",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 64,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L64"
+    },
+    {
+      "symbol": "ReceiverUnhandledRequestHandlerArgs",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 64,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L64"
+    },
+    {
+      "symbol": "RequestVerificationOptions",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 64,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L64"
+    },
+    {
+      "symbol": "HTTPReceiverOptions",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 72,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L72"
+    },
+    {
+      "symbol": "HTTPResponseAck",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 73,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L73"
+    },
+    {
+      "symbol": "defaultProcessEventErrorHandler",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 74,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L74"
+    },
+    {
+      "symbol": "SocketModeReceiverProcessEventErrorHandlerArgs",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 74,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L74"
+    },
+    {
+      "symbol": "SocketModeReceiverOptions",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 78,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L78"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 79,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L79"
+    },
+    {
+      "symbol": "AwsLambdaReceiver",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 80,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L80"
+    },
+    {
+      "symbol": "ExpressReceiver",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 80,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L80"
+    },
+    {
+      "symbol": "HTTPReceiver",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 80,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L80"
+    },
+    {
+      "symbol": "SocketModeReceiver",
+      "kind": "re-export",
+      "file": "src/index.ts",
+      "line": 80,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/index.ts#L80"
+    },
+    {
+      "symbol": "isSlackEventMiddlewareArgsOptions",
+      "kind": "FunctionDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 67,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L67"
+    },
+    {
+      "symbol": "onlyActions",
+      "kind": "VariableDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 76,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L76"
+    },
+    {
+      "symbol": "onlyShortcuts",
+      "kind": "VariableDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 85,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L85"
+    },
+    {
+      "symbol": "onlyCommands",
+      "kind": "VariableDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 94,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L94"
+    },
+    {
+      "symbol": "onlyOptions",
+      "kind": "VariableDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 103,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L103"
+    },
+    {
+      "symbol": "onlyEvents",
+      "kind": "VariableDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 113,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L113"
+    },
+    {
+      "symbol": "onlyViewActions",
+      "kind": "VariableDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 123,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L123"
+    },
+    {
+      "symbol": "autoAcknowledge",
+      "kind": "VariableDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 132,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L132"
+    },
+    {
+      "symbol": "matchConstraints",
+      "kind": "FunctionDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 142,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L142"
+    },
+    {
+      "symbol": "matchMessage",
+      "kind": "FunctionDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 230,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L230"
+    },
+    {
+      "symbol": "matchCommandName",
+      "kind": "FunctionDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 262,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L262"
+    },
+    {
+      "symbol": "matchEventType",
+      "kind": "FunctionDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 283,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L283"
+    },
+    {
+      "symbol": "ignoreSelf",
+      "kind": "VariableDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 312,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L312"
+    },
+    {
+      "symbol": "subtype",
+      "kind": "FunctionDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 346,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L346"
+    },
+    {
+      "symbol": "directMention",
+      "kind": "VariableDeclaration",
+      "file": "src/middleware/builtin.ts",
+      "line": 359,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts#L359"
+    },
+    {
+      "symbol": "processMiddleware",
+      "kind": "FunctionDeclaration",
+      "file": "src/middleware/process.ts",
+      "line": 5,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/process.ts#L5"
+    },
+    {
+      "symbol": "AwsEvent",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/receivers/AwsLambdaReceiver.ts",
+      "line": 11,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/AwsLambdaReceiver.ts#L11"
+    },
+    {
+      "symbol": "AwsEventV1",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/AwsLambdaReceiver.ts",
+      "line": 14,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/AwsLambdaReceiver/AwsEventV1.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/AwsLambdaReceiver.ts#L14"
+    },
+    {
+      "symbol": "AwsEventV2",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/AwsLambdaReceiver.ts",
+      "line": 31,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/AwsLambdaReceiver/AwsEventV2.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/AwsLambdaReceiver.ts#L31"
+    },
+    {
+      "symbol": "AwsCallback",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/receivers/AwsLambdaReceiver.ts",
+      "line": 59,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/AwsLambdaReceiver.ts#L59"
+    },
+    {
+      "symbol": "ReceiverInvalidRequestSignatureHandlerArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/AwsLambdaReceiver.ts",
+      "line": 61,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/AwsLambdaReceiver/ReceiverInvalidRequestSignatureHandlerArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/AwsLambdaReceiver.ts#L61"
+    },
+    {
+      "symbol": "AwsResponse",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/AwsLambdaReceiver.ts",
+      "line": 69,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/AwsLambdaReceiver/AwsResponse.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/AwsLambdaReceiver.ts#L69"
+    },
+    {
+      "symbol": "AwsHandler",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/receivers/AwsLambdaReceiver.ts",
+      "line": 82,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/AwsLambdaReceiver.ts#L82"
+    },
+    {
+      "symbol": "AwsLambdaReceiverOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/AwsLambdaReceiver.ts",
+      "line": 84,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Receivers/AwsLambdaReceiver/AwsLambdaReceiverOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/AwsLambdaReceiver.ts#L84"
+    },
+    {
+      "symbol": "AwsLambdaReceiver",
+      "kind": "ClassDeclaration",
+      "file": "src/receivers/AwsLambdaReceiver.ts",
+      "line": 131,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Receivers/AwsLambdaReceiver.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/AwsLambdaReceiver.ts#L131"
+    },
+    {
+      "symbol": "BufferedIncomingMessage",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/BufferedIncomingMessage.ts",
+      "line": 5,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/BufferedIncomingMessage.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/BufferedIncomingMessage.ts#L5"
+    },
+    {
+      "symbol": "respondToSslCheck",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/ExpressReceiver.ts",
+      "line": 74,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/ExpressReceiver.ts#L74"
+    },
+    {
+      "symbol": "respondToUrlVerification",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/ExpressReceiver.ts",
+      "line": 82,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/ExpressReceiver.ts#L82"
+    },
+    {
+      "symbol": "ExpressReceiverOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/ExpressReceiver.ts",
+      "line": 92,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Receivers/ExpressReceiver/ExpressReceiverOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/ExpressReceiver.ts#L92"
+    },
+    {
+      "symbol": "ExpressReceiver",
+      "kind": "ClassDeclaration",
+      "file": "src/receivers/ExpressReceiver.ts",
+      "line": 146,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Receivers/ExpressReceiver.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/ExpressReceiver.ts#L146"
+    },
+    {
+      "symbol": "verifySignatureAndParseRawBody",
+      "kind": "FunctionDeclaration",
+      "file": "src/receivers/ExpressReceiver.ts",
+      "line": 449,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/ExpressReceiver.ts#L449"
+    },
+    {
+      "symbol": "verifySignatureAndParseBody",
+      "kind": "FunctionDeclaration",
+      "file": "src/receivers/ExpressReceiver.ts",
+      "line": 563,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/ExpressReceiver.ts#L563"
+    },
+    {
+      "symbol": "buildBodyParserMiddleware",
+      "kind": "FunctionDeclaration",
+      "file": "src/receivers/ExpressReceiver.ts",
+      "line": 581,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/ExpressReceiver.ts#L581"
+    },
+    {
+      "symbol": "defaultBodyLimit",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 11,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L11"
+    },
+    {
+      "symbol": "isRawBodyError",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 13,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L13"
+    },
+    {
+      "symbol": "extractRetryNumFromHTTPRequest",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 21,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L21"
+    },
+    {
+      "symbol": "extractRetryReasonFromHTTPRequest",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 34,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L34"
+    },
+    {
+      "symbol": "parseHTTPRequestBody",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 51,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L51"
+    },
+    {
+      "symbol": "parseAndVerifyHTTPRequest",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 65,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L65"
+    },
+    {
+      "symbol": "isBufferedIncomingMessage",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 112,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L112"
+    },
+    {
+      "symbol": "getHeader",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 117,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L117"
+    },
+    {
+      "symbol": "bufferIncomingMessage",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 127,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L127"
+    },
+    {
+      "symbol": "buildNoBodyResponse",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 144,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L144"
+    },
+    {
+      "symbol": "buildUrlVerificationResponse",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 150,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L150"
+    },
+    {
+      "symbol": "buildSSLCheckResponse",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 155,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L155"
+    },
+    {
+      "symbol": "buildContentResponse",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 161,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L161"
+    },
+    {
+      "symbol": "defaultDispatchErrorHandler",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 181,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L181"
+    },
+    {
+      "symbol": "defaultAsyncDispatchErrorHandler",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 195,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L195"
+    },
+    {
+      "symbol": "defaultProcessEventErrorHandler",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 201,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L201"
+    },
+    {
+      "symbol": "defaultUnhandledRequestHandler",
+      "kind": "VariableDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 227,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L227"
+    },
+    {
+      "symbol": "RequestVerificationOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 242,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Receivers/HTTPModuleFunctions/RequestVerificationOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L242"
+    },
+    {
+      "symbol": "ReceiverDispatchErrorHandlerArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 251,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/HTTPModuleFunctions/ReceiverDispatchErrorHandlerArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L251"
+    },
+    {
+      "symbol": "ReceiverProcessEventErrorHandlerArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 260,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/HTTPModuleFunctions/ReceiverProcessEventErrorHandlerArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L260"
+    },
+    {
+      "symbol": "ReceiverUnhandledRequestHandlerArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/HTTPModuleFunctions.ts",
+      "line": 272,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/HTTPModuleFunctions/ReceiverUnhandledRequestHandlerArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts#L272"
+    },
+    {
+      "symbol": "HTTPReceiverOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/HTTPReceiver.ts",
+      "line": 76,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Receivers/HTTPReceiver/HTTPReceiverOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPReceiver.ts#L76"
+    },
+    {
+      "symbol": "HTTPReceiverInstallerOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/HTTPReceiver.ts",
+      "line": 104,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Receivers/HTTPReceiver/HTTPReceiverInstallerOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPReceiver.ts#L104"
+    },
+    {
+      "symbol": "HTTPReceiver",
+      "kind": "ClassDeclaration",
+      "file": "src/receivers/HTTPReceiver.ts",
+      "line": 129,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Receivers/HTTPReceiver.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPReceiver.ts#L129"
+    },
+    {
+      "symbol": "AckArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/HTTPResponseAck.ts",
+      "line": 7,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPResponseAck.ts#L7"
+    },
+    {
+      "symbol": "HTTResponseBody",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/receivers/HTTPResponseAck.ts",
+      "line": 19,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPResponseAck.ts#L19"
+    },
+    {
+      "symbol": "HTTPResponseAck",
+      "kind": "ClassDeclaration",
+      "file": "src/receivers/HTTPResponseAck.ts",
+      "line": 21,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Receivers/HTTPResponseAck.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPResponseAck.ts#L21"
+    },
+    {
+      "symbol": "ParamsIncomingMessage",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/ParamsIncomingMessage.ts",
+      "line": 4,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/ParamsIncomingMessage.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/ParamsIncomingMessage.ts#L4"
+    },
+    {
+      "symbol": "defaultProcessEventErrorHandler",
+      "kind": "FunctionDeclaration",
+      "file": "src/receivers/SocketModeFunctions.ts",
+      "line": 5,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeFunctions.ts#L5"
+    },
+    {
+      "symbol": "SocketModeReceiverProcessEventErrorHandlerArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/SocketModeFunctions.ts",
+      "line": 24,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/SocketModeFunctions/SocketModeReceiverProcessEventErrorHandlerArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeFunctions.ts#L24"
+    },
+    {
+      "symbol": "SocketModeReceiverOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/SocketModeReceiver.ts",
+      "line": 31,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Receivers/SocketModeReceiver/SocketModeReceiverOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeReceiver.ts#L31"
+    },
+    {
+      "symbol": "CustomRoute",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/SocketModeReceiver.ts",
+      "line": 53,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeReceiver.ts#L53"
+    },
+    {
+      "symbol": "SocketModeReceiver",
+      "kind": "ClassDeclaration",
+      "file": "src/receivers/SocketModeReceiver.ts",
+      "line": 83,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Receivers/SocketModeReceiver.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeReceiver.ts#L83"
+    },
+    {
+      "symbol": "SocketModeResponseBody",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/receivers/SocketModeResponseAck.ts",
+      "line": 5,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeResponseAck.ts#L5"
+    },
+    {
+      "symbol": "AckArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/SocketModeResponseAck.ts",
+      "line": 8,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/SocketModeResponseAck/AckArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeResponseAck.ts#L8"
+    },
+    {
+      "symbol": "SocketModeResponseAck",
+      "kind": "ClassDeclaration",
+      "file": "src/receivers/SocketModeResponseAck.ts",
+      "line": 13,
+      "status": "scaffold-class",
+      "scaffold": "src/Scaffold/Bolt/Receivers/SocketModeResponseAck.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeResponseAck.ts#L13"
+    },
+    {
+      "symbol": "CustomRoute",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/custom-routes.ts",
+      "line": 5,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/CustomRoutes/CustomRoute.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/custom-routes.ts#L5"
+    },
+    {
+      "symbol": "ReceiverRoutes",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/custom-routes.ts",
+      "line": 11,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Receivers/CustomRoutes/ReceiverRoutes.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/custom-routes.ts#L11"
+    },
+    {
+      "symbol": "buildReceiverRoutes",
+      "kind": "FunctionDeclaration",
+      "file": "src/receivers/custom-routes.ts",
+      "line": 17,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/custom-routes.ts#L17"
+    },
+    {
+      "symbol": "RedirectOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/verify-redirect-opts.ts",
+      "line": 8,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Receivers/VerifyRedirectOpts/RedirectOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/verify-redirect-opts.ts#L8"
+    },
+    {
+      "symbol": "verifyRedirectOpts",
+      "kind": "FunctionDeclaration",
+      "file": "src/receivers/verify-redirect-opts.ts",
+      "line": 13,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/verify-redirect-opts.ts#L13"
+    },
+    {
+      "symbol": "SlackRequestVerificationOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/receivers/verify-request.ts",
+      "line": 11,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Receivers/VerifyRequest/SlackRequestVerificationOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/verify-request.ts#L11"
+    },
+    {
+      "symbol": "verifySlackRequest",
+      "kind": "FunctionDeclaration",
+      "file": "src/receivers/verify-request.ts",
+      "line": 26,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/verify-request.ts#L26"
+    },
+    {
+      "symbol": "isValidSlackRequest",
+      "kind": "FunctionDeclaration",
+      "file": "src/receivers/verify-request.ts",
+      "line": 75,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/verify-request.ts#L75"
+    },
+    {
+      "symbol": "verifySigningSecret",
+      "kind": "FunctionDeclaration",
+      "file": "src/receivers/verify-signing-secret.ts",
+      "line": 3,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/verify-signing-secret.ts#L3"
+    },
+    {
+      "symbol": "BlockElementAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 11,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L11"
+    },
+    {
+      "symbol": "BasicElementAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 39,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/BasicElementAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L39"
+    },
+    {
+      "symbol": "ButtonAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 49,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/ButtonAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L49"
+    },
+    {
+      "symbol": "FeedbackButtonsAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 59,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/FeedbackButtonsAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L59"
+    },
+    {
+      "symbol": "IconButtonAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 67,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/IconButtonAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L67"
+    },
+    {
+      "symbol": "StaticSelectAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 76,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/StaticSelectAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L76"
+    },
+    {
+      "symbol": "MultiStaticSelectAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 89,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/MultiStaticSelectAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L89"
+    },
+    {
+      "symbol": "UsersSelectAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 102,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/UsersSelectAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L102"
+    },
+    {
+      "symbol": "MultiUsersSelectAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 112,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/MultiUsersSelectAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L112"
+    },
+    {
+      "symbol": "ConversationsSelectAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 122,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/ConversationsSelectAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L122"
+    },
+    {
+      "symbol": "MultiConversationsSelectAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 132,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/MultiConversationsSelectAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L132"
+    },
+    {
+      "symbol": "ChannelsSelectAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 142,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/ChannelsSelectAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L142"
+    },
+    {
+      "symbol": "MultiChannelsSelectAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 152,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/MultiChannelsSelectAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L152"
+    },
+    {
+      "symbol": "ExternalSelectAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 162,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/ExternalSelectAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L162"
+    },
+    {
+      "symbol": "MultiExternalSelectAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 173,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/MultiExternalSelectAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L173"
+    },
+    {
+      "symbol": "OverflowAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 184,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/OverflowAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L184"
+    },
+    {
+      "symbol": "DatepickerAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 195,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/DatepickerAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L195"
+    },
+    {
+      "symbol": "TimepickerAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 205,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/TimepickerAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L205"
+    },
+    {
+      "symbol": "RadioButtonsAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 215,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/RadioButtonsAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L215"
+    },
+    {
+      "symbol": "CheckboxesAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 224,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/CheckboxesAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L224"
+    },
+    {
+      "symbol": "PlainTextInputAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 233,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/PlainTextInputAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L233"
+    },
+    {
+      "symbol": "RichTextInputAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 240,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction/RichTextInputAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L240"
+    },
+    {
+      "symbol": "BlockAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 249,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/BlockAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L249"
+    },
+    {
+      "symbol": "BlockButtonAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 350,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L350"
+    },
+    {
+      "symbol": "BlockFeedbackButtonsAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 351,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L351"
+    },
+    {
+      "symbol": "BlockIconButtonAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 352,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L352"
+    },
+    {
+      "symbol": "BlockStaticSelectAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 353,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L353"
+    },
+    {
+      "symbol": "BlockUsersSelectAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 354,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L354"
+    },
+    {
+      "symbol": "BlockConversationsSelectAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 355,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L355"
+    },
+    {
+      "symbol": "BlockChannelsSelectAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 356,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L356"
+    },
+    {
+      "symbol": "BlockExternalSelectAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 357,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L357"
+    },
+    {
+      "symbol": "BlockOverflowAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 358,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L358"
+    },
+    {
+      "symbol": "BlockDatepickerAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 359,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L359"
+    },
+    {
+      "symbol": "BlockTimepickerAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 360,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L360"
+    },
+    {
+      "symbol": "BlockRadioButtonsAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 361,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L361"
+    },
+    {
+      "symbol": "BlockCheckboxesAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 362,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L362"
+    },
+    {
+      "symbol": "BlockPlainTextInputAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/block-action.ts",
+      "line": 363,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts#L363"
+    },
+    {
+      "symbol": "DialogSubmitAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/dialog-action.ts",
+      "line": 6,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/DialogAction/DialogSubmitAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/dialog-action.ts#L6"
+    },
+    {
+      "symbol": "DialogValidation",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/dialog-action.ts",
+      "line": 42,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/DialogAction/DialogValidation.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/dialog-action.ts#L42"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/actions/index.ts",
+      "line": 8,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/index.ts#L8"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/actions/index.ts",
+      "line": 9,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/index.ts#L9"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/actions/index.ts",
+      "line": 10,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/index.ts#L10"
+    },
+    {
+      "symbol": "SlackAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/index.ts",
+      "line": 26,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/index.ts#L26"
+    },
+    {
+      "symbol": "ActionConstraints",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/index.ts",
+      "line": 28,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/Index/ActionConstraints.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/index.ts#L28"
+    },
+    {
+      "symbol": "SlackActionMiddlewareArgs",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/index.ts",
+      "line": 46,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/index.ts#L46"
+    },
+    {
+      "symbol": "InteractiveAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/interactive-message.ts",
+      "line": 5,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/interactive-message.ts#L5"
+    },
+    {
+      "symbol": "ButtonClick",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/interactive-message.ts",
+      "line": 10,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/InteractiveMessage/ButtonClick.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/interactive-message.ts#L10"
+    },
+    {
+      "symbol": "MenuSelect",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/interactive-message.ts",
+      "line": 19,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/InteractiveMessage/MenuSelect.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/interactive-message.ts#L19"
+    },
+    {
+      "symbol": "InteractiveMessage",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/actions/interactive-message.ts",
+      "line": 32,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Actions/InteractiveMessage.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/interactive-message.ts#L32"
+    },
+    {
+      "symbol": "InteractiveButtonClick",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/interactive-message.ts",
+      "line": 74,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/interactive-message.ts#L74"
+    },
+    {
+      "symbol": "InteractiveMenuSelect",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/actions/interactive-message.ts",
+      "line": 75,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/interactive-message.ts#L75"
+    },
+    {
+      "symbol": "SlackCommandMiddlewareArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/command/index.ts",
+      "line": 6,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Command/Index/SlackCommandMiddlewareArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/command/index.ts#L6"
+    },
+    {
+      "symbol": "SlashCommand",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/command/index.ts",
+      "line": 20,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Command/Index/SlashCommand.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/command/index.ts#L20"
+    },
+    {
+      "symbol": "SlackEventMiddlewareArgsOptions",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/events/index.ts",
+      "line": 7,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/events/index.ts#L7"
+    },
+    {
+      "symbol": "SlackEventMiddlewareArgs",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/events/index.ts",
+      "line": 39,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/events/index.ts#L39"
+    },
+    {
+      "symbol": "BaseSlackEvent",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/events/index.ts",
+      "line": 68,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Events/Index/BaseSlackEvent.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/events/index.ts#L68"
+    },
+    {
+      "symbol": "EventTypePattern",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/events/index.ts",
+      "line": 71,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/events/index.ts#L71"
+    },
+    {
+      "symbol": "FunctionInputs",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/events/index.ts",
+      "line": 72,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/events/index.ts#L72"
+    },
+    {
+      "symbol": "EnvelopedEvent",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/events/index.ts",
+      "line": 79,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Events/Index/EnvelopedEvent.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/events/index.ts#L79"
+    },
+    {
+      "symbol": "EventFromType",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/events/index.ts",
+      "line": 108,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/events/index.ts#L108"
+    },
+    {
+      "symbol": "KnownEventFromType",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/events/index.ts",
+      "line": 110,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/events/index.ts#L110"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/index.ts",
+      "line": 1,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/index.ts#L1"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/index.ts",
+      "line": 2,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/index.ts#L2"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/index.ts",
+      "line": 3,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/index.ts#L3"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/index.ts",
+      "line": 4,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/index.ts#L4"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/index.ts",
+      "line": 5,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/index.ts#L5"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/index.ts",
+      "line": 6,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/index.ts#L6"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/index.ts",
+      "line": 7,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/index.ts#L7"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/index.ts",
+      "line": 8,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/index.ts#L8"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/index.ts",
+      "line": 9,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/index.ts#L9"
+    },
+    {
+      "symbol": "AnyMiddlewareArgs",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/middleware.ts",
+      "line": 12,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/middleware.ts#L12"
+    },
+    {
+      "symbol": "AllMiddlewareArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/middleware.ts",
+      "line": 20,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Middleware/AllMiddlewareArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/middleware.ts#L20"
+    },
+    {
+      "symbol": "Middleware",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/middleware.ts",
+      "line": 29,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/middleware.ts#L29"
+    },
+    {
+      "symbol": "Context",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/middleware.ts",
+      "line": 37,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Middleware/Context.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/middleware.ts#L37"
+    },
+    {
+      "symbol": "contextBuiltinKeys",
+      "kind": "VariableDeclaration",
+      "file": "src/types/middleware.ts",
+      "line": 103,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/middleware.ts#L103"
+    },
+    {
+      "symbol": "NextFn",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/middleware.ts",
+      "line": 117,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/middleware.ts#L117"
+    },
+    {
+      "symbol": "SlackOptionsMiddlewareArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 8,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/SlackOptionsMiddlewareArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L8"
+    },
+    {
+      "symbol": "SlackOptions",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 15,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L15"
+    },
+    {
+      "symbol": "OptionsConstraints",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 18,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/OptionsConstraints.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L18"
+    },
+    {
+      "symbol": "OptionsSource",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 30,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L30"
+    },
+    {
+      "symbol": "BasicOptionsPayload",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 33,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/BasicOptionsPayload.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L33"
+    },
+    {
+      "symbol": "OptionsPayloadFromType",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 38,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L38"
+    },
+    {
+      "symbol": "KnownOptionsPayloadFromType",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 40,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L40"
+    },
+    {
+      "symbol": "BlockSuggestion",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 45,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/BlockSuggestion.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L45"
+    },
+    {
+      "symbol": "InteractiveMessageSuggestion",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 82,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/InteractiveMessageSuggestion.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L82"
+    },
+    {
+      "symbol": "DialogSuggestion",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 118,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/DialogSuggestion.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L118"
+    },
+    {
+      "symbol": "BlockOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 160,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/BlockOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L160"
+    },
+    {
+      "symbol": "MessageOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 163,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/MessageOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L163"
+    },
+    {
+      "symbol": "DialogOptions",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 166,
+      "status": "scaffold-options-dto",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/DialogOptions.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L166"
+    },
+    {
+      "symbol": "OptionGroups",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 172,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/OptionGroups.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L172"
+    },
+    {
+      "symbol": "DialogOptionGroups",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/options/index.ts",
+      "line": 177,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Options/Index/DialogOptionGroups.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/options/index.ts#L177"
+    },
+    {
+      "symbol": "ReceiverEvent",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/receiver.ts",
+      "line": 5,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Receiver/ReceiverEvent.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/receiver.ts#L5"
+    },
+    {
+      "symbol": "Receiver",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/receiver.ts",
+      "line": 26,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Receiver.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/receiver.ts#L26"
+    },
+    {
+      "symbol": "ResponseAck",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/receiver.ts",
+      "line": 34,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Receiver/ResponseAck.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/receiver.ts#L34"
+    },
+    {
+      "symbol": "GlobalShortcut",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/shortcuts/global-shortcut.ts",
+      "line": 7,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Shortcuts/GlobalShortcut.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/shortcuts/global-shortcut.ts#L7"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/shortcuts/index.ts",
+      "line": 6,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/shortcuts/index.ts#L6"
+    },
+    {
+      "symbol": "*",
+      "kind": "re-export",
+      "file": "src/types/shortcuts/index.ts",
+      "line": 7,
+      "status": "unresolved-re-export",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/shortcuts/index.ts#L7"
+    },
+    {
+      "symbol": "SlackShortcut",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/shortcuts/index.ts",
+      "line": 12,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/shortcuts/index.ts#L12"
+    },
+    {
+      "symbol": "ShortcutConstraints",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/shortcuts/index.ts",
+      "line": 14,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Shortcuts/Index/ShortcutConstraints.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/shortcuts/index.ts#L14"
+    },
+    {
+      "symbol": "SlackShortcutMiddlewareArgs",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/shortcuts/index.ts",
+      "line": 24,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/shortcuts/index.ts#L24"
+    },
+    {
+      "symbol": "MessageShortcut",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/shortcuts/message-shortcut.ts",
+      "line": 7,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/Shortcuts/MessageShortcut.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/shortcuts/message-shortcut.ts#L7"
+    },
+    {
+      "symbol": "StringIndexed",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/utilities.ts",
+      "line": 7,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/utilities.ts#L7"
+    },
+    {
+      "symbol": "XOR",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/utilities.ts",
+      "line": 13,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/utilities.ts#L13"
+    },
+    {
+      "symbol": "isFulfilled",
+      "kind": "VariableDeclaration",
+      "file": "src/types/utilities.ts",
+      "line": 18,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/utilities.ts#L18"
+    },
+    {
+      "symbol": "isRejected",
+      "kind": "VariableDeclaration",
+      "file": "src/types/utilities.ts",
+      "line": 20,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/utilities.ts#L20"
+    },
+    {
+      "symbol": "SayArguments",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/utilities.ts",
+      "line": 28,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/utilities.ts#L28"
+    },
+    {
+      "symbol": "SayFn",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/utilities.ts",
+      "line": 32,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/utilities.ts#L32"
+    },
+    {
+      "symbol": "RespondArguments",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/utilities.ts",
+      "line": 34,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/utilities.ts#L34"
+    },
+    {
+      "symbol": "RespondFn",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/utilities.ts",
+      "line": 43,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/utilities.ts#L43"
+    },
+    {
+      "symbol": "AckFn",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/utilities.ts",
+      "line": 45,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/utilities.ts#L45"
+    },
+    {
+      "symbol": "SlackViewAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 8,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L8"
+    },
+    {
+      "symbol": "ViewConstraints",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 11,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewConstraints.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L11"
+    },
+    {
+      "symbol": "SlackViewMiddlewareArgs",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 19,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/SlackViewMiddlewareArgs.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L19"
+    },
+    {
+      "symbol": "ViewResponseUrl",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 34,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewResponseUrl.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L34"
+    },
+    {
+      "symbol": "ViewSubmitAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 47,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewSubmitAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L47"
+    },
+    {
+      "symbol": "ViewClosedAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 78,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewClosedAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L78"
+    },
+    {
+      "symbol": "ViewStateSelectedOption",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 103,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewStateSelectedOption.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L103"
+    },
+    {
+      "symbol": "UploadedFile",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 109,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/UploadedFile.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L109"
+    },
+    {
+      "symbol": "ViewStateValue",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 236,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewStateValue.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L236"
+    },
+    {
+      "symbol": "ViewOutput",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 254,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewOutput.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L254"
+    },
+    {
+      "symbol": "ViewUpdateResponseAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 288,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewUpdateResponseAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L288"
+    },
+    {
+      "symbol": "ViewPushResponseAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 293,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewPushResponseAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L293"
+    },
+    {
+      "symbol": "ViewClearResponseAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 298,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewClearResponseAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L298"
+    },
+    {
+      "symbol": "ViewErrorsResponseAction",
+      "kind": "InterfaceDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 302,
+      "status": "scaffold-interface",
+      "scaffold": "src/Scaffold/Bolt/Types/View/Index/ViewErrorsResponseAction.php",
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L302"
+    },
+    {
+      "symbol": "ViewResponseAction",
+      "kind": "TypeAliasDeclaration",
+      "file": "src/types/view/index.ts",
+      "line": 309,
+      "status": "declaration-only",
+      "scaffold": null,
+      "source": "https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts#L309"
+    }
+  ]
+}

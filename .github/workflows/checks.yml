@@ -1,0 +1,47 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nhedger/setup-mago@v2
+        with:
+          version: '1.50.0'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: dom, fileinfo, intl, mbstring, pdo, pdo_sqlite, readline, simplexml
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist
+      - run: php -l bin/bolt
+      - run: php bin/bolt --version
+      - run: composer test
+      - run: mago format --check
+      - run: mago lint
+        if: success() || failure()
+      - run: mago analyze
+        if: success() || failure()
+
+  generated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:tooling
+      - run: npm run verify:generated

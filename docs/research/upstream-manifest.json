@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "generatedBy": "scripts/sync-references.mjs",
+  "sources": [
+    {
+      "id": "bolt-js",
+      "repository": "slackapi/bolt-js",
+      "ref": "ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d",
+      "tag": "v5.1.0",
+      "archive": "https://codeload.github.com/slackapi/bolt-js/tar.gz/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d",
+      "archiveSha256": "6852ba8ba762a8512a2cf57671444ab689760f4d390387deeaeaeb563311911c",
+      "extractedRoot": "work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d",
+      "preserved": [
+        {
+          "source": "LICENSE",
+          "target": "docs/research/reference/bolt-js/LICENSE",
+          "sha256": "15176e011e9bc54df8e294719fb1552762dc5c1fb988dea064772c166b94def1"
+        },
+        {
+          "source": "package.json",
+          "target": "docs/research/reference/bolt-js/package.json",
+          "sha256": "a06c3b4eeeba1a4d00afdc8a0ab975351b79bbbe5ee363c8cad8f3101e3743c5"
+        }
+      ]
+    },
+    {
+      "id": "node-slack-sdk",
+      "repository": "slackapi/node-slack-sdk",
+      "ref": "e026671c42786248349feb6906d8ce45815f73c6",
+      "tag": "@slack/web-api@8.1.1",
+      "archive": "https://codeload.github.com/slackapi/node-slack-sdk/tar.gz/e026671c42786248349feb6906d8ce45815f73c6",
+      "package": {
+        "name": "@slack/web-api",
+        "version": "8.1.1",
+        "path": "packages/web-api"
+      },
+      "archiveSha256": "71a1b6b35a38518578fa746d52a8afe9213933cd9b2286206ccb21a368052f64",
+      "extractedRoot": "work/reference-sources/node-slack-sdk-e026671c42786248349feb6906d8ce45815f73c6/node-slack-sdk-e026671c42786248349feb6906d8ce45815f73c6",
+      "preserved": [
+        {
+          "source": "LICENSE",
+          "target": "docs/research/reference/node-slack-sdk/LICENSE",
+          "sha256": "3f09a5ab0f8c178fd227a5d5386e53f6350c2a536f6d462e36e69830bb615b8e"
+        },
+        {
+          "source": "package.json",
+          "target": "docs/research/reference/node-slack-sdk/package.json",
+          "sha256": "95caf808e943a81b09d902a8338fe37e009776eb608dfb5a0a67f04fb8425e35"
+        },
+        {
+          "package": "@slack/web-api@8.1.1",
+          "source": "packages/web-api/package.json",
+          "target": "docs/research/reference/node-slack-sdk/web-api-package.json",
+          "sha256": "6caca41dca424c23a61ddb49fe5082fe86771f8ba4676769fe4f4c8eb1ad2ccc"
+        }
+      ]
+    },
+    {
+      "id": "node-slack-oauth",
+      "repository": "slackapi/node-slack-sdk",
+      "ref": "70e15b8442745d215f9ae259a2c970b306aff51a",
+      "tag": "@slack/oauth@4.0.0",
+      "annotatedTag": "3162a88f13252a305213c2418f7524aa60ce4b3f",
+      "archive": "https://codeload.github.com/slackapi/node-slack-sdk/tar.gz/70e15b8442745d215f9ae259a2c970b306aff51a",
+      "package": {
+        "name": "@slack/oauth",
+        "version": "4.0.0",
+        "path": "packages/oauth"
+      },
+      "archiveSha256": "e8462d3e08b7fa3f8fc6081ad32142d4814da74be6451a54126324c45de664c5",
+      "extractedRoot": "work/reference-sources/node-slack-oauth-70e15b8442745d215f9ae259a2c970b306aff51a/node-slack-sdk-70e15b8442745d215f9ae259a2c970b306aff51a",
+      "preserved": [
+        {
+          "source": "LICENSE",
+          "target": "docs/research/reference/node-slack-oauth/LICENSE",
+          "sha256": "3f09a5ab0f8c178fd227a5d5386e53f6350c2a536f6d462e36e69830bb615b8e"
+        },
+        {
+          "source": "package.json",
+          "target": "docs/research/reference/node-slack-oauth/package.json",
+          "sha256": "46fed753a52dd3b9541ecd513629989d9868bd6e82a15793f5e03aa6309b595d"
+        },
+        {
+          "package": "@slack/oauth@4.0.0",
+          "source": "packages/oauth/package.json",
+          "target": "docs/research/reference/node-slack-oauth/oauth-package.json",
+          "sha256": "c28e9d714ed97d259f2815fe0d17ad3037fdae1dd28fb141336f6ce1b01dc918"
+        }
+      ]
+    },
+    {
+      "id": "node-slack-socket-mode",
+      "repository": "slackapi/node-slack-sdk",
+      "ref": "e0fa7455eedf8db98990c98ea6aa151a8b9f0597",
+      "tag": "@slack/socket-mode@3.0.1",
+      "archive": "https://codeload.github.com/slackapi/node-slack-sdk/tar.gz/e0fa7455eedf8db98990c98ea6aa151a8b9f0597",
+      "package": {
+        "name": "@slack/socket-mode",
+        "version": "3.0.1",
+        "path": "packages/socket-mode"
+      },
+      "archiveSha256": "4059c36ea606919fcb86eda9dfd49a6581f72f2d062ddf637a311cc70d65974f",
+      "extractedRoot": "work/reference-sources/node-slack-socket-mode-e0fa7455eedf8db98990c98ea6aa151a8b9f0597/node-slack-sdk-e0fa7455eedf8db98990c98ea6aa151a8b9f0597",
+      "preserved": [
+        {
+          "source": "LICENSE",
+          "target": "docs/research/reference/node-slack-socket-mode/LICENSE",
+          "sha256": "3f09a5ab0f8c178fd227a5d5386e53f6350c2a536f6d462e36e69830bb615b8e"
+        },
+        {
+          "source": "package.json",
+          "target": "docs/research/reference/node-slack-socket-mode/package.json",
+          "sha256": "95caf808e943a81b09d902a8338fe37e009776eb608dfb5a0a67f04fb8425e35"
+        },
+        {
+          "package": "@slack/socket-mode@3.0.1",
+          "source": "packages/socket-mode/package.json",
+          "target": "docs/research/reference/node-slack-socket-mode/socket-mode-package.json",
+          "sha256": "e501af3e80b7072120c40afc8a03c4f2fb0aba40e6c295c733e1fb90523027d3"
+        }
+      ]
+    },
+    {
+      "id": "node-slack-types",
+      "repository": "slackapi/node-slack-sdk",
+      "ref": "c663dc06c362cffbb11773cc85228eb4f943630c",
+      "tag": "@slack/types@3.1.0",
+      "annotatedTag": "cccc3b52a0645f620a1dffab54c2c1b044c56992",
+      "archive": "https://codeload.github.com/slackapi/node-slack-sdk/tar.gz/c663dc06c362cffbb11773cc85228eb4f943630c",
+      "package": {
+        "name": "@slack/types",
+        "version": "3.1.0",
+        "path": "packages/types"
+      },
+      "archiveSha256": "54ad04c109e6e3a413424ec07e8a1c10d779d299fec6eea10f901d59c339904a",
+      "extractedRoot": "work/reference-sources/node-slack-types-c663dc06c362cffbb11773cc85228eb4f943630c/node-slack-sdk-c663dc06c362cffbb11773cc85228eb4f943630c",
+      "preserved": [
+        {
+          "source": "LICENSE",
+          "target": "docs/research/reference/node-slack-types/LICENSE",
+          "sha256": "3f09a5ab0f8c178fd227a5d5386e53f6350c2a536f6d462e36e69830bb615b8e"
+        },
+        {
+          "source": "package.json",
+          "target": "docs/research/reference/node-slack-types/package.json",
+          "sha256": "7c9a697b5256ca4f05f5f69313947eb088b004a48127dbf7d1a13b1ab12cc627"
+        },
+        {
+          "package": "@slack/types@3.1.0",
+          "source": "packages/types/package.json",
+          "target": "docs/research/reference/node-slack-types/types-package.json",
+          "sha256": "c17ab46a4ed20816d46d3333fe9c6b6a53ca8878206c21a0d61255701d88aece"
+        }
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "label": "Slack docs index (llms.txt)",
+      "url": "https://docs.slack.dev/llms.txt",
+      "path": "docs/research/reference/slack-docs-llms.txt",
+      "sha256": "3e6f9c8406ee5ef833360f36d3d322b50d56174d277a8c3f080943612d99bb63"
+    },
+    {
+      "label": "Selected Markdown from pinned Bolt source",
+      "selected": [
+        {
+          "source": "README.md",
+          "target": "docs/research/reference/bolt-js/README.md",
+          "sha256": "661a8dcebe4d97423d65f5da99b8cfb46e90413b0d75ac5c8f3a2285566d310c"
+        }
+      ]
+    }
+  ],
+  "referenceUrls": [
+    {
+      "label": "Tempest 3.20.0 release",
+      "url": "https://github.com/tempestphp/tempest-framework/releases/tag/v3.20.0"
+    },
+    {
+      "label": "Tempest framework source",
+      "url": "https://github.com/tempestphp/tempest-framework/tree/v3.20.0"
+    },
+    {
+      "label": "Tempest documentation",
+      "url": "https://tempestphp.com/"
+    },
+    {
+      "label": "Laravel framework source",
+      "url": "https://github.com/laravel/framework"
+    },
+    {
+      "label": "Laravel documentation",
+      "url": "https://laravel.com/docs"
+    },
+    {
+      "label": "Slack Bolt JavaScript reference",
+      "url": "https://docs.slack.dev/tools/bolt-js/reference/"
+    }
+  ]
+}

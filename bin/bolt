@@ -1,0 +1,126 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Composer\InstalledVersions;
+use Tempest\Console\Actions\ExecuteConsoleCommand;
+use Tempest\Console\Console;
+use Tempest\Console\ConsoleCommand;
+use Tempest\Console\ConsoleConfig;
+use Tempest\Console\Input\ConsoleArgumentBag;
+use Tempest\Core\Kernel;
+use Tempest\Discovery\DiscoveryLocation;
+use Tempest\Highlight\Highlighter;
+use Tempest\Reflection\MethodReflector;
+use Thunder\Bolt\Console\CompletionCommands;
+use Thunder\Bolt\Console\PlainTheme;
+use Thunder\Bolt\Console\ProjectScaffold;
+
+if (PHP_VERSION_ID < 80500) {
+    fwrite(STDERR, "Thunder Bolt requires PHP 8.5 or newer.\n");
+    exit(1);
+}
+
+$arguments = array_slice($_SERVER['argv'] ?? [], 1);
+if (in_array('--version', $arguments, true) || in_array('-V', $arguments, true)) {
+    $version = '0.1.x-dev';
+    if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('thunder/bolt')) {
+        $version = InstalledVersions::getPrettyVersion('thunder/bolt') ?? $version;
+    }
+    fwrite(STDOUT, "Thunder Bolt {$version}\n");
+    exit(0);
+}
+
+$autoloads = [];
+if (is_string($_composer_autoload_path ?? null) && is_file($_composer_autoload_path)) {
+    $autoloads[] = $_composer_autoload_path;
+} else {
+    // A direct package checkout can always load itself. If this is also a
+    // project, register its autoloader so discovered App\ listeners resolve.
+    foreach ([dirname(__DIR__).'/vendor/autoload.php', getcwd().'/vendor/autoload.php'] as $autoload) {
+        if (is_file($autoload)) {
+            $autoloads[] = $autoload;
+        }
+    }
+}
+$autoloads = array_values(array_unique($autoloads));
+if ($autoloads === []) {
+    fwrite(STDERR, "Unable to locate Composer autoload.php. Run composer install first.\n");
+    exit(1);
+}
+foreach ($autoloads as $autoload) {
+    require_once $autoload;
+}
+
+$projectRoot = getcwd();
+$hasProject = is_file($projectRoot.'/composer.json');
+
+if (($arguments[0] ?? null) === 'new') {
+    $directory = $arguments[1] ?? null;
+    $flags = array_slice($arguments, 2);
+    if ($directory === '--help' || $directory === '-h') {
+        fwrite(STDOUT, "Usage: php /path/to/bolt new <directory> [--no-interaction]\n");
+        exit(0);
+    }
+    if (! is_string($directory) || $directory === '' || array_diff($flags, ['--no-interaction']) !== []) {
+        fwrite(STDERR, "Usage: php /path/to/bolt new <directory> [--no-interaction]\n");
+        exit(2);
+    }
+    try {
+        $project = (new ProjectScaffold(dirname(__DIR__)))->create($directory);
+    } catch (Throwable $exception) {
+        fwrite(STDERR, $exception->getMessage().PHP_EOL);
+        exit(2);
+    }
+    fwrite(STDOUT, "Created {$project}".PHP_EOL);
+    fwrite(STDOUT, "Next: cd {$directory} && composer install && php vendor/bin/bolt doctor".PHP_EOL);
+    exit(0);
+}
+
+if (! $hasProject && (($arguments[0] ?? null) === '--help' || ($arguments[0] ?? null) === '-h')) {
+    fwrite(STDOUT, "Thunder Bolt\n\nUsage:\n  php /path/to/bolt new <directory> [--no-interaction]\n\nAfter installing a project, use php vendor/bin/bolt --help for its local commands.\n");
+    exit(0);
+}
+
+if (! $hasProject) {
+    fwrite(STDERR, "Run this command from a Composer project, or use `php /path/to/bolt new <directory>`.\n");
+    exit(2);
+}
+
+$container = Tempest\Core\Tempest::boot(
+    root: $projectRoot,
+    discoveryLocations: is_dir($projectRoot.'/config') ? [new DiscoveryLocation('', $projectRoot.'/config')] : [],
+    internalStorage: $projectRoot.'/.thunder-bolt',
+);
+$consoleConfig = $container->get(ConsoleConfig::class);
+$consoleConfig->name = 'Thunder Bolt';
+$allowedCommands = [
+    'new', 'make:listener', 'serve', 'listener:list', 'doctor', 'routes', 'about',
+    'discovery:generate', 'discovery:clear', 'discovery:status',
+    'completion:generate', 'completion:install', 'completion:show', 'completion:uninstall',
+];
+$consoleConfig->commands = array_filter(
+    $consoleConfig->commands,
+    static fn (ConsoleCommand $command): bool => in_array($command->getName(), $allowedCommands, true),
+);
+foreach (['generate', 'show', 'install', 'uninstall'] as $method) {
+    $reflector = MethodReflector::fromParts(CompletionCommands::class, $method);
+    $command = $reflector->getAttribute(ConsoleCommand::class);
+    if ($command instanceof ConsoleCommand) {
+        $consoleConfig->addCommand($reflector, $command);
+    }
+}
+if (! function_exists('stream_isatty') || ! stream_isatty(STDOUT)) {
+    $container->unregister(Console::class);
+    $container->unregister(Highlighter::class, tagged: true);
+    $container->singleton(
+        Highlighter::class,
+        new Highlighter(new PlainTheme),
+        'console',
+    );
+}
+$exitCode = $container->get(ExecuteConsoleCommand::class)(
+    $container->get(ConsoleArgumentBag::class)->getCommandName(),
+);
+$container->get(Kernel::class)->shutdown(is_int($exitCode) ? $exitCode : $exitCode->value);

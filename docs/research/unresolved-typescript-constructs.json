@@ -1,0 +1,780 @@
+{
+  "schema": 1,
+  "generatedBy": "scripts/generate-scaffold.mjs",
+  "unresolved": [
+    {
+      "file": "src/App.ts",
+      "symbol": "ActionConstraints",
+      "from": "'./types'",
+      "location": {
+        "line": 107,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/App.ts",
+      "symbol": "OptionsConstraints",
+      "from": "'./types'",
+      "location": {
+        "line": 107,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/App.ts",
+      "symbol": "ShortcutConstraints",
+      "from": "'./types'",
+      "location": {
+        "line": 107,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/App.ts",
+      "symbol": "ViewConstraints",
+      "from": "'./types'",
+      "location": {
+        "line": 107,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/App.ts",
+      "symbol": "Logger",
+      "from": "'@slack/logger'",
+      "location": {
+        "line": 160,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/App.ts",
+      "symbol": "LogLevel",
+      "from": "'@slack/logger'",
+      "location": {
+        "line": 160,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/context/index.ts",
+      "symbol": "createFunctionComplete",
+      "from": "'./create-function-complete'",
+      "location": {
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/context/index.ts",
+      "symbol": "createFunctionFail",
+      "from": "'./create-function-fail'",
+      "location": {
+        "line": 2,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/context/index.ts",
+      "symbol": "createRespond",
+      "from": "'./create-respond'",
+      "location": {
+        "line": 3,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/context/index.ts",
+      "symbol": "createSay",
+      "from": "'./create-say'",
+      "location": {
+        "line": 4,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/context/index.ts",
+      "symbol": "SayStreamArguments",
+      "from": "'./create-say-stream'",
+      "location": {
+        "line": 5,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/context/index.ts",
+      "symbol": "SayStreamFn",
+      "from": "'./create-say-stream'",
+      "location": {
+        "line": 5,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/context/index.ts",
+      "symbol": "createSayStream",
+      "from": "'./create-say-stream'",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/context/index.ts",
+      "symbol": "SetStatusArguments",
+      "from": "'./create-set-status'",
+      "location": {
+        "line": 7,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/context/index.ts",
+      "symbol": "SetStatusFn",
+      "from": "'./create-set-status'",
+      "location": {
+        "line": 7,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/context/index.ts",
+      "symbol": "createSetStatus",
+      "from": "'./create-set-status'",
+      "location": {
+        "line": 8,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "Logger",
+      "from": "'./App'",
+      "location": {
+        "line": 5,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "ActionConstraints",
+      "from": "'./App'",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "AppOptions",
+      "from": "'./App'",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "Authorize",
+      "from": "'./App'",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "AuthorizeResult",
+      "from": "'./App'",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "AuthorizeSourceData",
+      "from": "'./App'",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "LogLevel",
+      "from": "'./App'",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "App",
+      "from": null,
+      "location": {
+        "line": 16,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "isValidSlackRequest",
+      "from": "'./receivers/verify-request'",
+      "location": {
+        "line": 19,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "verifySlackRequest",
+      "from": "'./receivers/verify-request'",
+      "location": {
+        "line": 19,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "Installation",
+      "from": "'@slack/oauth'",
+      "location": {
+        "line": 31,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "InstallationQuery",
+      "from": "'@slack/oauth'",
+      "location": {
+        "line": 31,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "InstallationStore",
+      "from": "'@slack/oauth'",
+      "location": {
+        "line": 31,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "InstallProviderOptions",
+      "from": "'@slack/oauth'",
+      "location": {
+        "line": 31,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "InstallURLOptions",
+      "from": "'@slack/oauth'",
+      "location": {
+        "line": 31,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "StateStore",
+      "from": "'@slack/oauth'",
+      "location": {
+        "line": 31,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "FileInstallationStore",
+      "from": "'@slack/oauth'",
+      "location": {
+        "line": 40,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "MemoryInstallationStore",
+      "from": "'@slack/oauth'",
+      "location": {
+        "line": 40,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "*",
+      "from": "'@slack/types'",
+      "location": {
+        "line": 41,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "*",
+      "from": "'@slack/web-api'",
+      "location": {
+        "line": 42,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "Assistant",
+      "from": "'./Assistant'",
+      "location": {
+        "line": 43,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "AssistantConfig",
+      "from": "'./Assistant'",
+      "location": {
+        "line": 43,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "AssistantThreadContextChangedMiddleware",
+      "from": "'./Assistant'",
+      "location": {
+        "line": 43,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "AssistantThreadStartedMiddleware",
+      "from": "'./Assistant'",
+      "location": {
+        "line": 43,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "AssistantUserMessageMiddleware",
+      "from": "'./Assistant'",
+      "location": {
+        "line": 43,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "SayStreamArguments",
+      "from": "'./context/create-say-stream'",
+      "location": {
+        "line": 50,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "SayStreamFn",
+      "from": "'./context/create-say-stream'",
+      "location": {
+        "line": 50,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "SetStatusArguments",
+      "from": "'./context/create-set-status'",
+      "location": {
+        "line": 51,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "SetStatusFn",
+      "from": "'./context/create-set-status'",
+      "location": {
+        "line": 51,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "ConversationStore",
+      "from": "'./conversation-store'",
+      "location": {
+        "line": 52,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "MemoryStore",
+      "from": "'./conversation-store'",
+      "location": {
+        "line": 52,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "*",
+      "from": "'./errors'",
+      "location": {
+        "line": 53,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "*",
+      "from": "'./middleware/builtin'",
+      "location": {
+        "line": 54,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "AwsLambdaReceiverOptions",
+      "from": "'./receivers/AwsLambdaReceiver'",
+      "location": {
+        "line": 55,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "BufferedIncomingMessage",
+      "from": "'./receivers/BufferedIncomingMessage'",
+      "location": {
+        "line": 56,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "buildReceiverRoutes",
+      "from": "'./receivers/custom-routes'",
+      "location": {
+        "line": 57,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "CustomRoute",
+      "from": "'./receivers/custom-routes'",
+      "location": {
+        "line": 57,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "ReceiverRoutes",
+      "from": "'./receivers/custom-routes'",
+      "location": {
+        "line": 57,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "ExpressReceiverOptions",
+      "from": "'./receivers/ExpressReceiver'",
+      "location": {
+        "line": 62,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "*",
+      "from": "'./receivers/HTTPModuleFunctions'",
+      "location": {
+        "line": 63,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "defaultBodyLimit",
+      "from": "'./receivers/HTTPModuleFunctions'",
+      "location": {
+        "line": 64,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "isRawBodyError",
+      "from": "'./receivers/HTTPModuleFunctions'",
+      "location": {
+        "line": 64,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "ReceiverDispatchErrorHandlerArgs",
+      "from": "'./receivers/HTTPModuleFunctions'",
+      "location": {
+        "line": 64,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "ReceiverProcessEventErrorHandlerArgs",
+      "from": "'./receivers/HTTPModuleFunctions'",
+      "location": {
+        "line": 64,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "ReceiverUnhandledRequestHandlerArgs",
+      "from": "'./receivers/HTTPModuleFunctions'",
+      "location": {
+        "line": 64,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "RequestVerificationOptions",
+      "from": "'./receivers/HTTPModuleFunctions'",
+      "location": {
+        "line": 64,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "HTTPReceiverOptions",
+      "from": "'./receivers/HTTPReceiver'",
+      "location": {
+        "line": 72,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "HTTPResponseAck",
+      "from": "'./receivers/HTTPResponseAck'",
+      "location": {
+        "line": 73,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "defaultProcessEventErrorHandler",
+      "from": "'./receivers/SocketModeFunctions'",
+      "location": {
+        "line": 74,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "SocketModeReceiverProcessEventErrorHandlerArgs",
+      "from": "'./receivers/SocketModeFunctions'",
+      "location": {
+        "line": 74,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "SocketModeReceiverOptions",
+      "from": "'./receivers/SocketModeReceiver'",
+      "location": {
+        "line": 78,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "*",
+      "from": "'./types'",
+      "location": {
+        "line": 79,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "AwsLambdaReceiver",
+      "from": null,
+      "location": {
+        "line": 80,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "ExpressReceiver",
+      "from": null,
+      "location": {
+        "line": 80,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "HTTPReceiver",
+      "from": null,
+      "location": {
+        "line": 80,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/index.ts",
+      "symbol": "SocketModeReceiver",
+      "from": null,
+      "location": {
+        "line": 80,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/actions/index.ts",
+      "symbol": "*",
+      "from": "'./block-action'",
+      "location": {
+        "line": 8,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/actions/index.ts",
+      "symbol": "*",
+      "from": "'./dialog-action'",
+      "location": {
+        "line": 9,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/actions/index.ts",
+      "symbol": "*",
+      "from": "'./interactive-message'",
+      "location": {
+        "line": 10,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/index.ts",
+      "symbol": "*",
+      "from": "'./actions'",
+      "location": {
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/index.ts",
+      "symbol": "*",
+      "from": "'./command'",
+      "location": {
+        "line": 2,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/index.ts",
+      "symbol": "*",
+      "from": "'./events'",
+      "location": {
+        "line": 3,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/index.ts",
+      "symbol": "*",
+      "from": "'./middleware'",
+      "location": {
+        "line": 4,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/index.ts",
+      "symbol": "*",
+      "from": "'./options'",
+      "location": {
+        "line": 5,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/index.ts",
+      "symbol": "*",
+      "from": "'./receiver'",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/index.ts",
+      "symbol": "*",
+      "from": "'./shortcuts'",
+      "location": {
+        "line": 7,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/index.ts",
+      "symbol": "*",
+      "from": "'./utilities'",
+      "location": {
+        "line": 8,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/index.ts",
+      "symbol": "*",
+      "from": "'./view'",
+      "location": {
+        "line": 9,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/shortcuts/index.ts",
+      "symbol": "*",
+      "from": "'./global-shortcut'",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    {
+      "file": "src/types/shortcuts/index.ts",
+      "symbol": "*",
+      "from": "'./message-shortcut'",
+      "location": {
+        "line": 7,
+        "column": 1
+      }
+    }
+  ]
+}

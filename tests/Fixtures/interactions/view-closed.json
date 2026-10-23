@@ -1,0 +1,9 @@
+{
+  "type": "view_closed",
+  "team": {"id": "T123", "domain": "example"},
+  "user": {"id": "U123", "name": "ada"},
+  "api_app_id": "A123",
+  "token": "redacted",
+  "is_cleared": false,
+  "view": {"id": "V123", "type": "modal", "callback_id": "ticket_form", "blocks": [], "state": {"values": {}}}
+}

@@ -1,0 +1,18 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use Thunder\Bolt\Attributes\Action as ActionAttribute;
+use Thunder\Bolt\Payloads\Action;
+use Thunder\Bolt\Responses\ActionResponse;
+
+final class {{ class }}
+{
+    #[ActionAttribute({{ selectorArgument }}{{ typeArgument }})]
+    public function __invoke(Action $action): ActionResponse
+    {
+        return ActionResponse::empty();
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "dialog_submission",
+  "callback_id": "expense_report",
+  "submission": {"amount": "12.50", "description": "Taxi"},
+  "state": "expense-42",
+  "team": {"id": "T123", "domain": "example"},
+  "user": {"id": "U123", "name": "ada"},
+  "channel": {"id": "C123", "name": "general"},
+  "action_ts": "1710000000.000100",
+  "token": "redacted",
+  "response_url": "https://hooks.slack.com/redacted/dialog-submission"
+}

@@ -1,0 +1,31 @@
+_metadata:
+  major_version: 1
+display_information:
+  name: Thunder Bolt App
+features:
+  bot_user:
+    display_name: Thunder Bolt
+  shortcuts:
+    - name: Open request
+      type: global
+      callback_id: open_request_modal
+      description: Start a request with an optional assignee
+  slash_commands:
+    - command: /ping
+      url: https://example.test/slack/events
+      description: Reply with Pong
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+      - chat:write
+      - commands
+settings:
+  interactivity:
+    is_enabled: true
+    request_url: https://example.test/slack/events
+  event_subscriptions:
+    request_url: https://example.test/slack/events
+    bot_events:
+      - app_mention

@@ -178,7 +178,7 @@ final class AiResponsesAgentTest extends TestCase
         $result = new ResponsesAgent($http, 'sk-test')->ask('Hello', [], static fn(): array => []);
 
         self::assertSame('openai_request_failed', $result->error);
-        self::assertSame('The assistant could not reach OpenAI right now. Please try again shortly.', $result->text);
+        self::assertSame('I could not complete the OpenAI request. Try again shortly.', $result->text);
     }
 
     public function test_it_bounds_input_and_output_without_sending_an_oversized_prompt(): void

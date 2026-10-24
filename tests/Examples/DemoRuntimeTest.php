@@ -59,7 +59,11 @@ final class DemoRuntimeTest extends TestCase
         $runtime->run(static fn(): bool => count($http->requests) >= 2);
 
         self::assertSame('1.001', $http->sentPayload(0)['thread_ts']);
-        self::assertStringContainsString('OPENAI_API_KEY', $http->sentPayload(1)['text']);
+        self::assertSame('chat.startStream', basename($http->requests[0]->getUri()->getPath()));
+        self::assertStringContainsString('OPENAI_API_KEY', $http->sentPayload(0)['chunks'][0]['text']);
+        self::assertSame('UOWNER', $http->sentPayload(0)['recipient_user_id']);
+        self::assertSame('T1', $http->sentPayload(0)['recipient_team_id']);
+        self::assertSame('chat.stopStream', basename($http->requests[1]->getUri()->getPath()));
         self::assertSame('ai', new ThreadState($this->directory)->get('T1', 'C1', '1.001')['mode']);
         self::assertNull($config->queue()->claim());
     }

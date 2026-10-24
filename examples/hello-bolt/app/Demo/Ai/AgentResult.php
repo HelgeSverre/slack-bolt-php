@@ -11,6 +11,7 @@ final readonly class AgentResult
         public string $text,
         public array $history,
         public ?string $error = null,
+        public array $citations = [],
     ) {}
 
     public function succeeded(): bool

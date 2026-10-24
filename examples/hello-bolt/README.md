@@ -34,3 +34,7 @@ Handlers enqueue small JSON jobs before acknowledging Slack. The demo worker cla
 The terminal is a real shell on the worker host, with a dedicated initial working directory and a stripped child environment. It is **not a sandbox**. Its output is visible to the channel, so use a development host and an explicit allowlist. Sessions expire after inactivity and close with the worker; shell processes do not survive its restart. Pet and AI state do survive restarts. AI tools are limited to web search and pet care; the model has no terminal tool.
 
 Never commit `.env` or `.thunder-bolt/`. Neither demo code nor logs should print API credentials.
+
+AI replies use OpenAI's Responses event stream and Slack's native message streaming APIs. Text is batched, and web searches and pet tools appear as task cards with running, complete, or error states. Answers include source links when available. New `/bolt ai` conversations create a root message and stream the answer in its thread; follow-ups stay in that thread. If Slack streaming fails, the worker posts the complete answer without replaying tools.
+
+The writing instructions live in `app/Demo/Ai/Voice.php`: compact plain English, brief context where needed, sparse formatting, meaningful symbols, and no emoji or fictional persona. Try `/bolt ai Search the web: how big is the Sun?`, then ask `How does that compare with Earth?` in the same thread.

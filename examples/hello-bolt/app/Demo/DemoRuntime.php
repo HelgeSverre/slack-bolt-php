@@ -6,6 +6,7 @@ namespace App\Demo;
 
 use Amp\DeferredCancellation;
 use App\Demo\Ai\ResponsesAgent;
+use App\Demo\Ai\SlackAnswerStream;
 use App\Demo\Pet\PetStore;
 use App\Demo\Pet\PetView;
 use Tempest\Console\Console;
@@ -87,10 +88,7 @@ final class DemoRuntime
                         ) {
                             $this->queue->fail($id, 'AI conversation is busy.');
                             try {
-                                $this->reply(
-                                    $job,
-                                    'Beep boop — still thinking. Please try again after the current answer.',
-                                );
+                                $this->reply($job, 'A response is still in progress. Try again when it finishes.');
                             } catch (\Throwable) {
                                 $this->console->info('Could not deliver the optional AI busy notice.');
                             }
@@ -166,14 +164,17 @@ final class DemoRuntime
     {
         $text = trim($job->text);
         if ($text === '') {
-            $text = 'Say hello, introduce yourself as an AI, and invite people to ask anything or help care for the shared pet.';
+            $text = 'Say hello briefly and invite questions or help caring for the shared pet.';
         }
-        $result = $this->reply($job, '🤖 Beep boop — thinking. I can search the web and help care for our pet.');
-        $ts = $result->get('ts');
-        if (!is_string($ts) || $ts === '') {
-            throw new \RuntimeException('Slack did not return the AI message timestamp.');
+        $thread = $job->thread;
+        if ($thread === null || $thread === '') {
+            $result = $this->reply($job, 'Ask here. I can search the web and care for our shared pet.');
+            $timestamp = $result->get('ts');
+            if (!is_string($timestamp) || $timestamp === '') {
+                throw new \RuntimeException('Slack did not return the AI thread timestamp.');
+            }
+            $thread = $timestamp;
         }
-        $thread = $job->thread ?? $ts;
         $state = $this->threads->get($job->team, $job->channel, $thread) ?? [];
         $conversationKey = ThreadState::id($job->team, $job->channel, $thread);
         $task = $this->task($id);
@@ -182,6 +183,7 @@ final class DemoRuntime
         }
         $this->threads->put($job->team, $job->channel, $thread, ['mode' => 'ai', 'history' => $state['history'] ?? []]);
         $history = $state['history'] ?? [];
+        $stream = new SlackAnswerStream($this->client, $job->channel, $thread, $job->user, $job->team);
         $answer = $this->agent->ask(
             $text,
             is_array($history) && array_is_list($history) ? $history : [],
@@ -192,29 +194,9 @@ final class DemoRuntime
                     default => throw new \InvalidArgumentException('Unknown AI tool.'),
                 };
             },
-            function (string $progress) use ($job, $ts): void {
-                try {
-                    $this->client
-                        ->chat()
-                        ->update([
-                            'channel' => $job->channel,
-                            'ts' => $ts,
-                            'text' => '🤖 Beep boop — searched the web. Putting the answer together …',
-                        ]);
-                } catch (\Throwable) {
-                    $this->console->info('Skipped an optional AI progress update.');
-                }
-            },
+            onEvent: $stream->accept(...),
         );
-        $this->client
-            ->chat()
-            ->update([
-                'channel' => $job->channel,
-                'ts' => $ts,
-                'text' => $answer->text,
-                'unfurl_links' => false,
-                'unfurl_media' => false,
-            ]);
+        $stream->finish($answer);
         if ($answer->succeeded()) {
             $this->threads->put($job->team, $job->channel, $thread, [
                 'mode' => 'ai',

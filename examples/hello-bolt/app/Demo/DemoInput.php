@@ -10,7 +10,7 @@ final class DemoInput
     public static function parse(string $text): ?array
     {
         $text = trim(preg_replace('/^\s*<@[A-Z0-9]+>\s*/', '', $text) ?? $text);
-        if (!preg_match('/^(pet|terminal|ai|help)(?:\s+(.*))?$/is', $text, $matches)) {
+        if (!preg_match('/^(pet|terminal|ai|work|help)(?:\s+(.*))?$/is', $text, $matches)) {
             return null;
         }
         return ['mode' => strtolower($matches[1]), 'text' => trim($matches[2] ?? '')];
@@ -23,6 +23,7 @@ final class DemoInput
             . "• `/bolt pet` — meet our shared pet. Feed, play, clean, and help it level up.\n"
             . "• `/bolt terminal` — open a persistent shell (configured users only). Reply in its thread to type.\n"
             . "• `/bolt ai your question` — ask the AI; continue chatting in its thread.\n"
+            . "• `/bolt work optional title` — share a Work Object with comments.\n"
             . 'You can also mention me with `pet`, `terminal`, or `ai …`.'
         );
     }

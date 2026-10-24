@@ -14,8 +14,8 @@ features:
       description: Start a request with an optional assignee
   slash_commands:
     - command: /bolt
-      description: Run the pet, terminal, or AI demo
-      usage_hint: pet | terminal | ai your question
+      description: Run the pet, terminal, AI, or work-item demo
+      usage_hint: pet | terminal | ai your question | work title
       should_escape: false
     - command: /ping
       url: https://example.test/slack/events
@@ -27,6 +27,8 @@ oauth_config:
       - app_mentions:read
       - chat:write
       - commands
+      - links:read
+      - links:write
 settings:
   # Set true before running `bolt socket:serve`; HTTP remains the default transport.
   socket_mode_enabled: false
@@ -38,3 +40,6 @@ settings:
     bot_events:
       - app_home_opened
       - app_mention
+      - entity_details_requested
+      - entity_comments_requested
+      - link_shared

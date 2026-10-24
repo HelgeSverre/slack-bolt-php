@@ -111,7 +111,7 @@ Register `/ping` in Slack with the same request URL. Actions, shortcuts, externa
 
 ## Use the Slack client
 
-The client preserves Slack's method hierarchy and returns endpoint-specific readonly responses. It includes 271 request/response model pairs and shared nested models derived from pinned upstream sources.
+The client preserves Slack's method hierarchy and returns endpoint-specific readonly responses. It includes 273 request/response model pairs: 271 from the pinned SDK and two Work Object comment methods from versioned Slack documentation inputs.
 
 ```php
 use Thunder\Bolt\Messages\Message;
@@ -133,6 +133,30 @@ The injected client also supports arrays, cursor pagination, streamed multipart 
 
 Calls send once by default. Background or CLI code can opt into bounded retries with `$client->retrying()`. OAuth exchanges, response URLs, and file-content transfers remain single-attempt. Supply a PSR-18 transport to configure timeouts or test outgoing requests.
 
+## Work Objects
+
+Publish external work as native Slack previews, open details, and synchronize comments with your application.
+
+```php
+use Thunder\Bolt\Messages\Message;
+use Thunder\Bolt\WorkObjects\{Entity, EntityField, ExternalReference};
+
+$task = Entity::task(
+    new ExternalReference('TASK-42', 'task'),
+    'https://example.com/tasks/42',
+    'Ship the PHP integration',
+)->field('status', EntityField::status('In progress', 'blue'))->comments(0);
+
+$client->chat()->postMessage([
+    'channel' => 'C123',
+    ...Message::text('Ready for review')->entities($task)->toArray(),
+]);
+```
+
+`$client->workObjects()` publishes details, unfurls, comment pages and mutation results. Typed `EntityDetailsRequested` and `EntityCommentsRequested` payloads work with ordinary event handlers. `Comments` connects a `CommentProvider` to an explicit application authorization policy; it checks permissions on every operation and derives Slack's edit/delete/reply flags from that policy. Providers own durable storage and must enforce permissions during writes. Event metadata and entity metadata have separate builders.
+
+Slack app configuration and feature availability are required. The [work-item demo](examples/hello-bolt/README.md#work-objects) includes JSON storage, threaded comments, pagination and delivery deduplication.
+
 ## Included today
 
 - Signed HTTP Events API, URL verification, typed event/message handlers, and middleware.
@@ -141,6 +165,7 @@ Calls send once by default. Background or CLI code can opt into bounded retries 
 - OAuth v2 installation, one-time state validation, installation stores, scoped authorization, and token rotation.
 - Conversation/thread state with memory, file, and SQLite adapters and atomic updates.
 - Typed Web API models, message/view builders, uploads, pagination, and opt-in retries.
+- Work Object entities, details, unfurls and bidirectional comments with application-owned storage and authorization.
 - Project/listener scaffolding, discovery, diagnostics, and shell completions.
 
 Capability parity is the goal; PHP handlers use native types, dependency injection, and explicit response values. Generated declaration scaffolds under `src/Scaffold/` are planning artifacts, excluded from discovery, and do not represent implemented runtime features.

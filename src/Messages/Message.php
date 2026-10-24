@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Thunder\Bolt\Messages;
 
 use Thunder\Bolt\BlockKit\Block;
+use Thunder\Bolt\WorkObjects\Entity;
+use Thunder\Bolt\WorkObjects\EntityMetadata;
 
 final readonly class Message implements \JsonSerializable
 {
@@ -16,7 +18,7 @@ final readonly class Message implements \JsonSerializable
         private array $messageAttachments = [],
         private ?string $threadTs = null,
         private ?bool $broadcastReply = null,
-        private ?MessageMetadata $messageMetadata = null,
+        private MessageMetadata|EntityMetadata|null $messageMetadata = null,
         private ?bool $unfurlTextLinks = null,
         private ?bool $unfurlMediaContent = null,
         private ?Parse $textParse = null,
@@ -130,9 +132,21 @@ final readonly class Message implements \JsonSerializable
     #[\NoDiscard]
     public function metadata(MessageMetadata|string $metadata, array $payload = []): self
     {
+        if ($this->messageMetadata instanceof EntityMetadata) {
+            throw new \LogicException('Event metadata and Work Object entities cannot share a message.');
+        }
         $metadata = is_string($metadata) ? MessageMetadata::event($metadata, $payload) : $metadata;
 
         return clone($this, ['messageMetadata' => $metadata]);
+    }
+
+    #[\NoDiscard]
+    public function entities(Entity ...$entities): self
+    {
+        if ($this->messageMetadata instanceof MessageMetadata) {
+            throw new \LogicException('Work Object entities and event metadata cannot share a message.');
+        }
+        return clone($this, ['messageMetadata' => EntityMetadata::make(...$entities)]);
     }
 
     #[\NoDiscard]

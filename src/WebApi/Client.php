@@ -15,6 +15,11 @@ final readonly class Client
 {
     use HasResources;
 
+    public function workObjects(): \Thunder\Bolt\WorkObjects\Publisher
+    {
+        return new \Thunder\Bolt\WorkObjects\Publisher($this);
+    }
+
     public function __construct(
         private ClientInterface $http,
         #[\SensitiveParameter]

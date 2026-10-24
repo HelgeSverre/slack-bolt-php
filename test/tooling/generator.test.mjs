@@ -65,7 +65,9 @@ test('Web API model generator is deterministic and covers every extracted method
     const catalog = JSON.parse(readFileSync(fixtureCatalog, 'utf8'));
     assert.deepEqual(new Set(catalog.sdk.webApiMethods), new Set(catalog.sdk.webApiModels.map((model) => model.method)));
     assert.match(readFileSync(join(fixture, 'src/Generated/WebApi/Models/Responses/ChatPostMessageResponse.php'), 'utf8'), /extends Response implements TypedResponse/);
-    assert.match(readFileSync(join(fixture, 'docs/research/web-api-model-coverage.json'), 'utf8'), /"methods": 271/);
+    const coverage = JSON.parse(readFileSync(join(fixture, 'docs/research/web-api-model-coverage.json'), 'utf8'));
+    assert.equal(coverage.methods, catalog.sdk.webApiMethods.length);
+    assert.match(readFileSync(join(fixture, 'src/Generated/WebApi/Models/Requests/EntityPresentCommentsRequest.php'), 'utf8'), /public array\|null \$comments = null/);
   } finally {
     rmSync(fixture, { recursive: true, force: true });
   }
@@ -107,12 +109,16 @@ test('generated resources preserve dotted Slack paths as nested PHP calls', () =
   const admin = readFileSync(join(generated, 'Admin.php'), 'utf8');
   const adminConversations = readFileSync(join(generated, 'AdminConversationsResource.php'), 'utf8');
   const conversations = readFileSync(join(generated, 'Conversations.php'), 'utf8');
+  const entity = readFileSync(join(generated, 'Entity.php'), 'utf8');
 
   assert.match(admin, /function conversations\(\): AdminConversationsResource/);
   assert.match(adminConversations, /function archive\(array\|RequestPayload \$arguments = \[\]\): AdminConversationsArchiveResponse/);
   assert.match(adminConversations, /callTyped\('admin\.conversations\.archive', \$arguments, AdminConversationsArchiveResponse::class\)/);
   assert.match(conversations, /function list\(array\|RequestPayload \$arguments = \[\]\): ConversationsListResponse/);
   assert.match(conversations, /callTyped\('conversations\.list', \$arguments, ConversationsListResponse::class\)/);
+  assert.match(entity, /function presentComments\(array\|RequestPayload \$arguments = \[\]\): EntityPresentCommentsResponse/);
+  assert.match(entity, /function acknowledgeCommentAction\(array\|RequestPayload \$arguments = \[\]\): EntityAcknowledgeCommentActionResponse/);
+  assert.match(entity, /docs\.slack\.dev\/reference\/methods\/entity\.presentComments/);
 });
 
 test('declaration scaffolds are excluded from Tempest discovery', () => {

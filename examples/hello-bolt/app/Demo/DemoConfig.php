@@ -13,6 +13,7 @@ final readonly class DemoConfig
         #[\SensitiveParameter]
         public string $openAiKey = '',
         public string $openAiModel = 'gpt-5.5',
+        public string $workObjectBaseUrl = 'https://example.com/thunder-bolt/work-items',
     ) {}
 
     public function queue(): Queue

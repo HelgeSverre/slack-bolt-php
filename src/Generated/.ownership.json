@@ -66,7 +66,7 @@
       "generator": "scripts/generate-scaffold.mjs"
     },
     "src/Generated/WebApi/Entity.php": {
-      "sha256": "6feaacec15aee9f7634b752659ae4de02e80072ce9828835a7fde28ae692b5a8",
+      "sha256": "c580b9dd2a5073cc9f9de1ab57020ad4ce0b6a17a08f16cd87f4b8f3ca0df224",
       "generator": "scripts/generate-scaffold.mjs"
     },
     "src/Generated/WebApi/Files.php": {
@@ -5627,6 +5627,22 @@
     },
     "src/Generated/WebApi/Models/Responses/Common/WorkflowsSteps.php": {
       "sha256": "3aa0752de9c7cd02ce5b08503a8e4dc119b76b4a19033373f82c4055ae92635f",
+      "generator": "scripts/generate-web-api-models.mjs"
+    },
+    "src/Generated/WebApi/Models/Requests/EntityAcknowledgeCommentActionRequest.php": {
+      "sha256": "9d630dcac514430d1d7d7aa474668abde11f5d2900d3827316e6c0602047bb02",
+      "generator": "scripts/generate-web-api-models.mjs"
+    },
+    "src/Generated/WebApi/Models/Responses/EntityAcknowledgeCommentActionResponse.php": {
+      "sha256": "483e0acbbb0ad2d46a6db0d652ba7b90e4be5b63e62c4092b08415a29fe4a761",
+      "generator": "scripts/generate-web-api-models.mjs"
+    },
+    "src/Generated/WebApi/Models/Requests/EntityPresentCommentsRequest.php": {
+      "sha256": "66a4d76374b13eb95036c7f08431ce5a1d44d52dfdc942cf179d5a7a4a298fc0",
+      "generator": "scripts/generate-web-api-models.mjs"
+    },
+    "src/Generated/WebApi/Models/Responses/EntityPresentCommentsResponse.php": {
+      "sha256": "fd536d05be92f0d80007d90d5258b323fb059c8ce0095e2957add28cd9163bbe",
       "generator": "scripts/generate-web-api-models.mjs"
     }
   }

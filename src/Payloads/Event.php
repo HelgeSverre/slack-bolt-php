@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Thunder\Bolt\Payloads;
 
-final readonly class Event
+readonly class Event
 {
     public function __construct(
         public string $type,

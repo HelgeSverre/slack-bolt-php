@@ -21,6 +21,7 @@ Set `SLACK_APP_TOKEN` and `SLACK_BOT_TOKEN` in `.env`. Set `SLACK_TERMINAL_ALLOW
 - `/bolt pet` — meet Boltling. Everyone can feed, play, clean, and rest using the buttons. Contributors earn credit, and Boltling levels up and evolves. Stats decay over elapsed time; neglect is recoverable. Refresh reloads current state.
 - `/bolt terminal` — start a local shell and reply in its thread to type. Ctrl+C and Close buttons control the session. Only its allowlisted owner can operate it.
 - `/bolt ai hello` — introduce the assistant. Ask questions, request web searches, or ask it to check/feed the pet. Continue in the answer's thread. Search status is based on actual Responses tool output, and sources are clickable.
+- `/bolt work Ship the PHP integration` — create a Work Object task preview with details and shared comments.
 - `/bolt help` — show the available demos.
 
 Mentions accept the same prefixes: `@Thunder Bolt pet`, `@Thunder Bolt terminal`, or `@Thunder Bolt ai what is the size of the Sun?`. Subscribe to `message.channels`, `message.groups`, `message.im`, and `message.mpim` with their history scopes for unmentioned thread replies. Invite the bot into the channel. If your manifest includes the `test_message` message shortcut, it asks the AI about the selected message.
@@ -42,3 +43,11 @@ The writing instructions live in `app/Demo/Ai/Voice.php`: compact plain English,
 Open the app in Slack and select **Home** for Boltling's dashboard: four stats, level and XP progress, the eight most recent care actions, and the top five caretakers. Feed, Play, Clean, Rest, and Refresh work directly in Home and use the same workspace pet as channel cards and AI tools. Care credit, cooldowns, and delivery deduplication apply on every surface. Each person's Home refreshes on opening or clicking a button; changes from other people appear on the next refresh.
 
 For a new Slack app, enable **App Home → Home Tab** and subscribe to the **`app_home_opened` bot event** under Event Subscriptions. Both are included in `slack-manifest.yaml`. Existing interactivity and the demo worker are also required. Home actions do not need a channel ID, extra OAuth scopes, or a new slash command.
+
+## Work Objects
+
+Enable **Work Object Previews** in your Slack app settings, add the **Task** entity type (`slack#/entities/task`), and subscribe to the `entity_details_requested` and `entity_comments_requested` bot events. Interactivity and both local workers must be running. Slack may restrict comment syncing by app or workspace availability.
+
+Run `/bolt work Ship the PHP integration`, then open its preview and Comments. The demo stores work items and rich-text comments in `.thunder-bolt/demo/work-items.json`, with file locking and atomic replacement. Members of the same workspace can read and post; only a comment's author can edit or delete it. The store checks those permissions again inside each write, partitions data by workspace and object, deduplicates deliveries, and supports paginated parent comments and threaded replies. This policy is intentionally simple; real applications should connect their own object access rules.
+
+`SLACK_WORK_OBJECT_BASE_URL` defaults to `https://example.com/thunder-bolt/work-items`. These are stable example identifiers; this demo does not host an external task website. Set it to your own task URL base to make external links useful. To test shared-link unfurls, also subscribe to `link_shared`, install with `links:read` and `links:write`, and register the base URL's domain under **App unfurl domains**. Only existing local work-item URLs are unfurled.

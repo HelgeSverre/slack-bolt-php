@@ -322,6 +322,8 @@
       "dnd.setSnooze",
       "dnd.teamInfo",
       "emoji.list",
+      "entity.acknowledgeCommentAction",
+      "entity.presentComments",
       "entity.presentDetails",
       "files.comments.delete",
       "files.completeUploadExternal",
@@ -414,7 +416,31 @@
       "workflows.featured.remove",
       "workflows.featured.set"
     ],
-    "webApiModelCount": 271,
+    "pinnedWebApiMethodCount": 271,
+    "webApiSupplemental": {
+      "schema": 1,
+      "source": "scripts/web-api-supplemental-schema.json",
+      "description": "Official Slack documentation supplements absent from the pinned @slack/web-api 8.1.1 TypeScript snapshot. These entries are deliberately separate from extracted SDK declarations.",
+      "methods": [
+        {
+          "method": "entity.presentComments",
+          "provenance": {
+            "kind": "official-current-docs",
+            "url": "https://docs.slack.dev/reference/methods/entity.presentComments/",
+            "retrievedAt": "2026-10-24"
+          }
+        },
+        {
+          "method": "entity.acknowledgeCommentAction",
+          "provenance": {
+            "kind": "official-current-docs",
+            "url": "https://docs.slack.dev/reference/methods/entity.acknowledgeCommentAction/",
+            "retrievedAt": "2026-10-24"
+          }
+        }
+      ]
+    },
+    "webApiModelCount": 273,
     "modelCatalog": "typescript-api-catalog.json#sdk.webApiModels",
     "convenienceHelpers": [
       {

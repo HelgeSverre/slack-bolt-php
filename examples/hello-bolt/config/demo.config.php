@@ -14,4 +14,5 @@ return new DemoConfig(
     )))),
     openAiKey: (string) env('OPENAI_API_KEY', ''),
     openAiModel: (string) env('OPENAI_MODEL', 'gpt-5.5'),
+    workObjectBaseUrl: (string) env('SLACK_WORK_OBJECT_BASE_URL', 'https://example.com/thunder-bolt/work-items'),
 );

@@ -1,8 +1,8 @@
 # Generated Web API model coverage
 
-Generated from the pinned Slack TypeScript declarations at https://github.com/slackapi/node-slack-sdk/blob/e026671c42786248349feb6906d8ce45815f73c6/packages/web-api/src/types.
+Generated from the pinned Slack TypeScript declarations at https://github.com/slackapi/node-slack-sdk/blob/e026671c42786248349feb6906d8ce45815f73c6/packages/web-api/src/types, plus explicit official-documentation supplements when listed below.
 
-- 271 endpoint request/response model pairs
+- 273 endpoint request/response model pairs
 - 636 interned nested structural DTO shapes across 8474 endpoint occurrences
 - 29 request fields and 6504 response fields deliberately remain raw
 

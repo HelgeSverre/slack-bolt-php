@@ -50,6 +50,9 @@ use Thunder\Bolt\Middleware\Middleware;
 use Thunder\Bolt\Payloads\Action;
 use Thunder\Bolt\Payloads\Event as GenericEvent;
 use Thunder\Bolt\Payloads\Events\AppMention;
+use Thunder\Bolt\Payloads\Events\EntityCommentsRequested;
+use Thunder\Bolt\Payloads\Events\EntityDetailsRequested;
+use Thunder\Bolt\Payloads\Events\EntityRequest;
 use Thunder\Bolt\Payloads\Events\Message as MessageEvent;
 use Thunder\Bolt\Payloads\Options;
 use Thunder\Bolt\Payloads\Shortcut;
@@ -494,6 +497,8 @@ final class App
         return match ($event['type'] ?? null) {
             'app_mention' => AppMention::fromArray($event),
             'message' => MessageEvent::fromArray($event),
+            'entity_details_requested' => EntityDetailsRequested::fromArray($event),
+            'entity_comments_requested' => EntityCommentsRequested::fromArray($event),
             default => GenericEvent::fromArray($event),
         };
     }
@@ -609,6 +614,8 @@ final class App
             default => match ($descriptor->selector) {
                 'app_mention' => AppMention::class,
                 'message' => MessageEvent::class,
+                'entity_details_requested' => EntityDetailsRequested::class,
+                'entity_comments_requested' => EntityCommentsRequested::class,
                 default => GenericEvent::class,
             },
         };
@@ -623,6 +630,9 @@ final class App
                         MessageEvent::class,
                         SlashCommand::class,
                         GenericEvent::class,
+                        EntityRequest::class,
+                        EntityDetailsRequested::class,
+                        EntityCommentsRequested::class,
                         Action::class,
                         Shortcut::class,
                         Options::class,
@@ -635,7 +645,13 @@ final class App
             }
         }
 
-        if ($declaredPayloadTypes === [] || in_array($expectedPayload, $declaredPayloadTypes, true)) {
+        if (
+            $declaredPayloadTypes === []
+            || array_any(
+                $declaredPayloadTypes,
+                static fn(string $type): bool => class_exists($type) && is_a($expectedPayload, $type, true),
+            )
+        ) {
             return;
         }
 

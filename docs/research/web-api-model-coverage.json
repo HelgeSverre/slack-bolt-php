@@ -1,10 +1,33 @@
 {
   "schema": 1,
   "source": "https://github.com/slackapi/node-slack-sdk/blob/e026671c42786248349feb6906d8ce45815f73c6/packages/web-api/src/types",
-  "methods": 271,
+  "supplemental": {
+    "schema": 1,
+    "source": "scripts/web-api-supplemental-schema.json",
+    "description": "Official Slack documentation supplements absent from the pinned @slack/web-api 8.1.1 TypeScript snapshot. These entries are deliberately separate from extracted SDK declarations.",
+    "methods": [
+      {
+        "method": "entity.presentComments",
+        "provenance": {
+          "kind": "official-current-docs",
+          "url": "https://docs.slack.dev/reference/methods/entity.presentComments/",
+          "retrievedAt": "2026-10-24"
+        }
+      },
+      {
+        "method": "entity.acknowledgeCommentAction",
+        "provenance": {
+          "kind": "official-current-docs",
+          "url": "https://docs.slack.dev/reference/methods/entity.acknowledgeCommentAction/",
+          "retrievedAt": "2026-10-24"
+        }
+      }
+    ]
+  },
+  "methods": 273,
   "generated": {
-    "requestModels": 271,
-    "responseModels": 271,
+    "requestModels": 273,
+    "responseModels": 273,
     "commonNestedShapes": 636,
     "nestedOccurrences": 8474
   },
@@ -13979,6 +14002,40 @@
         "nestedOccurrences": 2,
         "unresolved": [],
         "unknownFields": "Inherited $data preserves fields unknown to the pinned TypeScript declaration."
+      }
+    },
+    {
+      "method": "entity.acknowledgeCommentAction",
+      "source": "https://docs.slack.dev/reference/methods/entity.acknowledgeCommentAction/",
+      "request": {
+        "class": "Thunder\\Bolt\\Generated\\WebApi\\Models\\Requests\\EntityAcknowledgeCommentActionRequest",
+        "fields": 4,
+        "unresolved": [],
+        "unknownFields": "The $extra map preserves fields unknown to this source declaration."
+      },
+      "response": {
+        "class": "Thunder\\Bolt\\Generated\\WebApi\\Models\\Responses\\EntityAcknowledgeCommentActionResponse",
+        "fields": 6,
+        "nestedOccurrences": 0,
+        "unresolved": [],
+        "unknownFields": "Inherited $data preserves fields unknown to this source declaration."
+      }
+    },
+    {
+      "method": "entity.presentComments",
+      "source": "https://docs.slack.dev/reference/methods/entity.presentComments/",
+      "request": {
+        "class": "Thunder\\Bolt\\Generated\\WebApi\\Models\\Requests\\EntityPresentCommentsRequest",
+        "fields": 9,
+        "unresolved": [],
+        "unknownFields": "The $extra map preserves fields unknown to this source declaration."
+      },
+      "response": {
+        "class": "Thunder\\Bolt\\Generated\\WebApi\\Models\\Responses\\EntityPresentCommentsResponse",
+        "fields": 6,
+        "nestedOccurrences": 0,
+        "unresolved": [],
+        "unknownFields": "Inherited $data preserves fields unknown to this source declaration."
       }
     },
     {

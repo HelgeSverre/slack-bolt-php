@@ -10,6 +10,7 @@ use App\Demo\Ai\SlackAnswerStream;
 use App\Demo\Pet\PetHomeView;
 use App\Demo\Pet\PetStore;
 use App\Demo\Pet\PetView;
+use App\Demo\Work\WorkObjectsDemo;
 use Tempest\Console\Console;
 use Thunder\Bolt\Messages\Message;
 use Thunder\Bolt\WebApi\Client;
@@ -30,7 +31,7 @@ final class DemoRuntime
     private array $tasks = [];
 
     public function __construct(
-        DemoConfig $config,
+        private readonly DemoConfig $config,
         private readonly Client $client,
         private readonly Console $console,
     ) {
@@ -67,7 +68,7 @@ final class DemoRuntime
                 });
             }
         }
-        $this->console->info('Demo worker ready: pet, terminal, and AI. Press Ctrl+C to stop.');
+        $this->console->info('Demo worker ready: pet, terminal, AI, and work items. Press Ctrl+C to stop.');
         try {
             while (!$stop && ($shouldStop === null || !$shouldStop())) {
                 foreach ($this->tasks() as $key => $task) {
@@ -128,6 +129,7 @@ final class DemoRuntime
             match ($job->mode) {
                 'pet' => $this->pet($job, $id),
                 'pet_home' => $this->petHome($job, $id),
+                'work' => new WorkObjectsDemo($this->config, $this->client)->handle($job, $id),
                 'terminal' => $this->terminal->handle($job),
                 'ai' => $this->ai($job, $id),
                 default => throw new \InvalidArgumentException('Unknown demo job.'),
@@ -136,7 +138,14 @@ final class DemoRuntime
         } catch (\Throwable $exception) {
             $this->queue->fail($id, $exception::class);
             $this->console->error('Demo job failed: ' . $exception::class);
+            if ($exception instanceof \Thunder\Bolt\WebApi\SlackApiException) {
+                $code = preg_replace('/[^a-zA-Z0-9_]/', '', $exception->error);
+                $this->console->error('Slack API error: ' . substr($code ?? '', 0, 100));
+            }
             try {
+                if ($job->mode === 'work' && $job->channel === '') {
+                    return;
+                }
                 if ($job->mode === 'pet_home') {
                     $this->client
                         ->views()

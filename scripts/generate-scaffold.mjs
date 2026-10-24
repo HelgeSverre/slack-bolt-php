@@ -150,6 +150,12 @@ function resourceEntries(tree) {
 
 function resourceContent(entry, modelsByMethod) {
   const className = resourceClassName(entry.path);
+  const pinnedMethodsSource = 'https://github.com/slackapi/node-slack-sdk/blob/e026671c42786248349feb6906d8ce45815f73c6/packages/web-api/src/methods.ts';
+  const sources = [...new Set(entry.node.methods.map(({ method }) => (
+    modelsByMethod.get(method)?.provenance?.url
+      ?? pinnedMethodsSource
+  )))];
+  if (sources.length === 0) sources.push(pinnedMethodsSource);
   const imports = new Set([
     'use Thunder\\Bolt\\WebApi\\Client;',
     'use Thunder\\Bolt\\WebApi\\RequestPayload;',
@@ -168,7 +174,7 @@ function resourceContent(entry, modelsByMethod) {
   }).join('\n\n');
   const uploadV2 = className === 'Files' ? `    public function uploadV2(\\Thunder\\Bolt\\WebApi\\Uploads\\Upload ...$uploads): \\Thunder\\Bolt\\WebApi\\Uploads\\UploadResult\n    {\n        return $this->client->uploadMany(...$uploads);\n    }` : '';
   const body = [accessors, methods, uploadV2].filter(Boolean).join('\n\n');
-  return `${header(`https://github.com/slackapi/node-slack-sdk/blob/e026671c42786248349feb6906d8ce45815f73c6/packages/web-api/src/methods.ts`)}\nnamespace Thunder\\Bolt\\Generated\\WebApi;\n\n${[...imports].sort().join('\n')}\n\nfinal readonly class ${className}\n{\n    public function __construct(private Client $client)\n    {\n    }\n\n${body}\n}\n`;
+  return `${header(sources.join('\n * Source: '))}\nnamespace Thunder\\Bolt\\Generated\\WebApi;\n\n${[...imports].sort().join('\n')}\n\nfinal readonly class ${className}\n{\n    public function __construct(private Client $client)\n    {\n    }\n\n${body}\n}\n`;
 }
 
 function traitContent(groups) {

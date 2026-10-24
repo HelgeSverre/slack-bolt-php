@@ -754798,6 +754798,8 @@
       "dnd.setSnooze",
       "dnd.teamInfo",
       "emoji.list",
+      "entity.acknowledgeCommentAction",
+      "entity.presentComments",
       "entity.presentDetails",
       "files.comments.delete",
       "files.completeUploadExternal",
@@ -953804,6 +953806,169 @@
               "nested": []
             }
           ]
+        }
+      },
+      {
+        "method": "entity.acknowledgeCommentAction",
+        "provenance": {
+          "kind": "official-current-docs",
+          "url": "https://docs.slack.dev/reference/methods/entity.acknowledgeCommentAction/",
+          "retrievedAt": "2026-10-24"
+        },
+        "request": {
+          "name": "EntityAcknowledgeCommentActionArguments",
+          "properties": [
+            {
+              "name": "comment",
+              "optional": true,
+              "type": "Record<string, unknown>"
+            },
+            {
+              "name": "error",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "token",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "trigger_id",
+              "optional": false,
+              "type": "string"
+            }
+          ]
+        },
+        "response": {
+          "name": "EntityAcknowledgeCommentActionResponse",
+          "properties": [
+            {
+              "name": "error",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "needed",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "ok",
+              "optional": false,
+              "type": "boolean"
+            },
+            {
+              "name": "provided",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "response_metadata",
+              "optional": true,
+              "type": "Record<string, unknown>"
+            },
+            {
+              "name": "warning",
+              "optional": true,
+              "type": "string"
+            }
+          ],
+          "nested": []
+        }
+      },
+      {
+        "method": "entity.presentComments",
+        "provenance": {
+          "kind": "official-current-docs",
+          "url": "https://docs.slack.dev/reference/methods/entity.presentComments/",
+          "retrievedAt": "2026-10-24"
+        },
+        "request": {
+          "name": "EntityPresentCommentsArguments",
+          "properties": [
+            {
+              "name": "can_post_comment",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "comments",
+              "optional": true,
+              "type": "Array<Record<string, unknown>>"
+            },
+            {
+              "name": "cursor",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "delete_action_id",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "error",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "token",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "trigger_id",
+              "optional": false,
+              "type": "string"
+            },
+            {
+              "name": "user_auth_required",
+              "optional": true,
+              "type": "boolean"
+            },
+            {
+              "name": "user_auth_url",
+              "optional": true,
+              "type": "string"
+            }
+          ]
+        },
+        "response": {
+          "name": "EntityPresentCommentsResponse",
+          "properties": [
+            {
+              "name": "error",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "needed",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "ok",
+              "optional": false,
+              "type": "boolean"
+            },
+            {
+              "name": "provided",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "name": "response_metadata",
+              "optional": true,
+              "type": "Record<string, unknown>"
+            },
+            {
+              "name": "warning",
+              "optional": true,
+              "type": "string"
+            }
+          ],
+          "nested": []
         }
       },
       {
@@ -1225310,6 +1225475,29 @@
         }
       }
     ],
+    "webApiSupplemental": {
+      "schema": 1,
+      "source": "scripts/web-api-supplemental-schema.json",
+      "description": "Official Slack documentation supplements absent from the pinned @slack/web-api 8.1.1 TypeScript snapshot. These entries are deliberately separate from extracted SDK declarations.",
+      "methods": [
+        {
+          "method": "entity.presentComments",
+          "provenance": {
+            "kind": "official-current-docs",
+            "url": "https://docs.slack.dev/reference/methods/entity.presentComments/",
+            "retrievedAt": "2026-10-24"
+          }
+        },
+        {
+          "method": "entity.acknowledgeCommentAction",
+          "provenance": {
+            "kind": "official-current-docs",
+            "url": "https://docs.slack.dev/reference/methods/entity.acknowledgeCommentAction/",
+            "retrievedAt": "2026-10-24"
+          }
+        }
+      ]
+    },
     "convenienceHelpers": [
       {
         "name": "files.uploadV2",

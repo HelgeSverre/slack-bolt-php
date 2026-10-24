@@ -15,14 +15,31 @@ final readonly class DemoJob
         public ?string $thread = null,
         public string $operation = 'open',
         public ?string $message = null,
+        public array $payload = [],
     ) {
         if (
-            !in_array($mode, ['pet', 'pet_home', 'terminal', 'ai'], true)
+            !in_array($mode, ['pet', 'pet_home', 'terminal', 'ai', 'work'], true)
             || $team === ''
             || $user === ''
-            || $channel === '' && $mode !== 'pet_home'
+            || $channel === '' && $mode !== 'pet_home' && !($mode === 'work' && $operation !== 'open')
             || strlen($text) > 8000
-            || !in_array($operation, ['open', 'input', 'care', 'interrupt', 'close'], true)
+            || !in_array(
+                $operation,
+                [
+                    'open',
+                    'input',
+                    'care',
+                    'interrupt',
+                    'close',
+                    'details',
+                    'comments',
+                    'post_comment',
+                    'edit_comment',
+                    'delete_comment',
+                    'unfurl',
+                ],
+                true,
+            )
         ) {
             throw new \InvalidArgumentException('Invalid demo job.');
         }
@@ -40,6 +57,9 @@ final readonly class DemoJob
                 throw new \InvalidArgumentException('Invalid optional demo job field: ' . $key);
             }
         }
+        if (isset($data['payload']) && !is_array($data['payload'])) {
+            throw new \InvalidArgumentException('Invalid demo work payload.');
+        }
         return new self(
             self::string($data, 'mode'),
             self::string($data, 'text'),
@@ -49,6 +69,7 @@ final readonly class DemoJob
             self::optionalString($data, 'thread'),
             self::string($data, 'operation'),
             self::optionalString($data, 'message'),
+            $data['payload'] ?? [],
         );
     }
 

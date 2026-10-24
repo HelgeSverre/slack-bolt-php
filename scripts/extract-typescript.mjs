@@ -7,6 +7,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const references = join(root, 'work', 'reference-sources');
 const output = join(root, 'docs', 'research');
 const catalogPath = join(output, 'typescript-api-catalog.json');
+const supplementalWebApiPath = join(root, 'scripts', 'web-api-supplemental-schema.json');
 const boltCommit = 'ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d';
 const sdkCommit = 'e026671c42786248349feb6906d8ce45815f73c6';
 const typesCommit = 'c663dc06c362cffbb11773cc85228eb4f943630c';
@@ -289,6 +290,31 @@ function extractWebApiModels(projectRoot) {
   return models.sort((left, right) => left.method.localeCompare(right.method));
 }
 
+function loadSupplementalWebApiModels() {
+  if (!existsSync(supplementalWebApiPath)) throw new Error(`Missing ${supplementalWebApiPath}.`);
+  const schema = JSON.parse(readFileSync(supplementalWebApiPath, 'utf8'));
+  if (schema.schema !== 1 || !Array.isArray(schema.supplements)) {
+    throw new Error('The supplemental Web API schema must be version 1 with a supplements array.');
+  }
+  const methods = new Set();
+  for (const supplement of schema.supplements) {
+    if (
+      typeof supplement?.method !== 'string'
+      || !/^[a-z][A-Za-z0-9]*(?:\.[A-Za-z0-9]+)+$/.test(supplement.method)
+      || methods.has(supplement.method)
+      || typeof supplement?.provenance?.url !== 'string'
+      || !Array.isArray(supplement?.request?.properties)
+      || !Array.isArray(supplement?.response?.properties)
+      || !Array.isArray(supplement?.response?.nested)
+    ) {
+      throw new Error('The supplemental Web API schema contains an invalid method model.');
+    }
+    methods.add(supplement.method);
+  }
+
+  return schema;
+}
+
 function markdownBoltSummary(inventory) {
   const app = inventory.classes.App;
   const options = inventory.interfaces.AppOptions;
@@ -324,8 +350,22 @@ function main() {
   const bolt = parseTree(findExtractedRoot(`bolt-js-${boltCommit}`), 'bolt-js@5.1.0');
   const sdkRoot = join(findExtractedRoot(`node-slack-sdk-${sdkCommit}`), 'packages', 'web-api');
   const sdk = parseTree(sdkRoot, '@slack/web-api@8.1.1');
-  sdk.webApiMethods = extractWebApiMethods(sdkRoot);
-  sdk.webApiModels = extractWebApiModels(sdkRoot);
+  const pinnedWebApiMethods = extractWebApiMethods(sdkRoot);
+  const pinnedWebApiModels = extractWebApiModels(sdkRoot);
+  const supplementalWebApi = loadSupplementalWebApiModels();
+  for (const supplement of supplementalWebApi.supplements) {
+    if (pinnedWebApiMethods.includes(supplement.method)) {
+      throw new Error(`Supplemental Web API method already exists in the pinned SDK: ${supplement.method}`);
+    }
+  }
+  sdk.webApiMethods = [...pinnedWebApiMethods, ...supplementalWebApi.supplements.map((supplement) => supplement.method)].sort();
+  sdk.webApiModels = [...pinnedWebApiModels, ...supplementalWebApi.supplements].sort((left, right) => left.method.localeCompare(right.method));
+  sdk.webApiSupplemental = {
+    schema: supplementalWebApi.schema,
+    source: 'scripts/web-api-supplemental-schema.json',
+    description: supplementalWebApi.description,
+    methods: supplementalWebApi.supplements.map((supplement) => ({ method: supplement.method, provenance: supplement.provenance })),
+  };
   sdk.convenienceHelpers = [{ name: 'files.uploadV2', status: 'convenience-helper', reason: 'SDK-side upload orchestration; PHP exposes Client::upload()/uploadMany() and files()->uploadV2(), never a direct endpoint.' }];
   const typesRoot = join(findExtractedRoot(`node-slack-types-${typesCommit}`), 'packages', 'types');
   const sdkTypes = parseTree(typesRoot, '@slack/types@3.1.0');
@@ -335,13 +375,13 @@ function main() {
     generatedBy: 'scripts/extract-typescript.mjs',
     catalog: 'typescript-api-catalog.json',
     bolt: { label: bolt.label, files: bolt.files.length, exports: bolt.exports.length, classes: Object.keys(bolt.classes).sort(), interfaces: Object.keys(bolt.interfaces).sort() },
-    sdk: { label: sdk.label, files: sdk.files.length, exportedSymbols: sdk.exports.length, webApiMethods: sdk.webApiMethods, webApiModelCount: sdk.webApiModels.length, modelCatalog: 'typescript-api-catalog.json#sdk.webApiModels', convenienceHelpers: sdk.convenienceHelpers },
+    sdk: { label: sdk.label, files: sdk.files.length, exportedSymbols: sdk.exports.length, webApiMethods: sdk.webApiMethods, pinnedWebApiMethodCount: pinnedWebApiMethods.length, webApiSupplemental: sdk.webApiSupplemental, webApiModelCount: sdk.webApiModels.length, modelCatalog: 'typescript-api-catalog.json#sdk.webApiModels', convenienceHelpers: sdk.convenienceHelpers },
     sdkTypes: { label: sdkTypes.label, files: sdkTypes.files.length, exportedSymbols: sdkTypes.exports.length, classes: Object.keys(sdkTypes.classes).sort(), interfaces: Object.keys(sdkTypes.interfaces).sort() },
   };
   writeFileSync(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
   writeFileSync(join(output, 'api-parity-inventory.json'), `${JSON.stringify(inventory, null, 2)}\n`);
   writeFileSync(join(output, 'bolt-js-api-surface.md'), markdownBoltSummary(bolt));
-  writeFileSync(join(output, 'node-sdk-api-surface.json'), `${JSON.stringify({ schema: 1, catalog: 'typescript-api-catalog.json', label: sdk.label, files: sdk.files.length, webApiMethods: sdk.webApiMethods, convenienceHelpers: sdk.convenienceHelpers }, null, 2)}\n`);
+  writeFileSync(join(output, 'node-sdk-api-surface.json'), `${JSON.stringify({ schema: 1, catalog: 'typescript-api-catalog.json', label: sdk.label, files: sdk.files.length, webApiMethods: sdk.webApiMethods, pinnedWebApiMethodCount: pinnedWebApiMethods.length, webApiSupplemental: sdk.webApiSupplemental, convenienceHelpers: sdk.convenienceHelpers }, null, 2)}\n`);
   console.log(`Extracted ${bolt.files.length} Bolt, ${sdk.files.length} Web API, and ${sdkTypes.files.length} Slack Types TypeScript files.`);
 }
 

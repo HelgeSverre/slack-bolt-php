@@ -1,6 +1,6 @@
 # Implementation plan
 
-Updated 23 October 2026. The target remains capability and protocol parity with the pinned Bolt JS framework, expressed through idiomatic PHP. HTTP events, interactivity, installation, authorization, and conversation/thread storage now run alongside a broad source scaffold; this does not establish full framework parity.
+Current ordering refreshed 24 October 2026; earlier milestone sections below retain their historical scope. The target remains capability and protocol parity with the pinned Bolt JS framework, expressed through idiomatic PHP. HTTP events, interactivity, installation, authorization, conversation/thread storage, Socket Mode, Work Objects, assistant threads and custom functions now run alongside the reference scaffold. See the [current inventory and evidence](codebase-inventory-2026-10-24.md); this does not establish full framework parity.
 
 ## Agreed foundation
 
@@ -67,8 +67,8 @@ See the [client guide](../web-api-client.md), [builder guide](../sdk-and-block-k
 
 ## Remaining implementation order
 
-1. **Durable background execution.** Persist work before acknowledging and provide workers with retries and delivery deduplication. Gate on crash/restart, duplicate delivery, tenant isolation, and acknowledgement timing tests. Serverless receivers and configurable receiver lifecycle/error handling remain later adapter work.
-2. **Assistants and custom functions.** Add assistant listener families, metadata-backed thread context, streaming, and custom-function completion/failure. Gate on callback, authorization, acknowledgement, and streaming fixtures.
-3. **Compatibility and release validation.** Expand the upstream conformance matrix, finish migration documentation and CLI templates for new families, run Linux/macOS CI and controlled Slack-workspace smoke tests, and address measured CLI startup performance. Cached help currently measures about 0.36 seconds on Herd; the 50 ms target is still open.
+1. **Durable background execution.** Persist eligible work before acknowledging; add tenant-scoped delivery deduplication, claims/leases, bounded retries, failed-job inspection and explicit uncertain-outcome recovery. Preserve synchronous interaction responses. Gate on crash/restart, duplicate delivery, competing workers, credential expiry, tenant isolation and acknowledgement timing tests. Extract reusable behavior from the demo without moving its business logic into the framework.
+2. **Modern agent sessions and cancellation.** Build on the completed assistant-thread/function runtimes and existing generated `agents.sessions` methods. Add typed stop/title-change events, lifecycle helpers, cooperative worker cancellation and streaming session status while retaining the assistant compatibility interface.
+3. **Compatibility and release validation.** Maintain a behavior matrix, targeted live-workspace checks and package-install/release verification. Linux/macOS CI already passes; custom-function live validation still needs an eligible workspace. Triage Mago advisories explicitly. General event and assistant CLI scaffolds are a small independent task; startup performance needs a fresh measurement before optimization.
 
-Each milestone updates the [parity map](api-parity.md) with implemented behavior and its evidence. Full parity requires behavior coverage for every retained feature family; generated symbol counts alone cannot close a milestone. The initial implementation has Linux/macOS CI configuration, but no remote CI run or release has been performed from this checkout.
+Each milestone updates the [parity map](api-parity.md) with implemented behavior and its evidence. Full parity requires behavior coverage for every retained feature family; generated symbol counts alone cannot close a milestone. Remote Linux/macOS CI is verified in the current inventory. A release/publish operation remains outstanding.

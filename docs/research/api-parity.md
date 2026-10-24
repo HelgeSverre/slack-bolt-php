@@ -1,5 +1,7 @@
 # API parity map
 
+Current inventory: [24 October 2026 codebase audit](codebase-inventory-2026-10-24.md). This summary distinguishes handwritten runtime behavior from generated migration declarations.
+
 ## Bolt application surface — 🟢 inventory, 🟡 implementation status
 
 The generated [Bolt surface](bolt-js-api-surface.md) lists every extracted export grouped by source module, and every public `App` member and `AppOptions` property with its source type. The source-of-truth machine catalog is [typescript-api-catalog.json](typescript-api-catalog.json); [api-parity-inventory.json](api-parity-inventory.json) is a small index for tools and reviews.
@@ -12,18 +14,19 @@ The generated [Bolt surface](bolt-js-api-surface.md) lists every extracted expor
 | `client` Web API calls | `WebApi\Client` plus generated resource groups | 🟢 typed models, named resources, multipart, uploads, opt-in retries; [scope](sdk-block-kit-audit.md) |
 | shortcuts, actions, options, views | readonly payloads, attributes/fluent selectors, typed acknowledgements, response-URL replies | 🟢 implemented for HTTP; [scope and evidence](http-interactivity-audit.md) |
 | OAuth installation / token rotation | OAuth v2 installer, one-time state, file/memory stores, bot/user grant rotation and scoped authorizers | 🟢 HTTP milestone implemented; [scope](../oauth-and-authorization.md) and [source mapping](oauth-authorization.md) |
-| Socket Mode | `SocketMode\Runner`, Amp transport, `socket:serve` | 🟡 implemented with local protocol/transport tests; live Slack conformance pending |
-| assistants | assistant listener family, thread context store, streaming API | 🔴 unimplemented |
-| custom functions | typed function payload, complete/fail callbacks | 🔴 unimplemented |
+| Socket Mode | `SocketMode\Runner`, Amp transport, `socket:serve` | 🟡 implemented and used by the playground; full protocol conformance and durable execution remain open |
+| assistants | assistant lifecycle listeners, scoped context stores, status/title/prompts and native streaming | 🟢 pinned assistant-thread contract implemented; modern agent-session lifecycle/cancellation remains open |
+| custom functions | callback listeners, typed inputs/DTOs, execution context and complete/fail | 🟢 runtime and protected example async handoff implemented; core durable workers and live paid-plan workflow validation remain open |
+| Work Objects | entity builders, details/unfurls, comments and mutation-provider interface | 🟢 implemented with fixtures and a playground; provider authorization and external storage remain application responsibilities |
 | conversation store / middleware | delivery-scoped conversation state plus thread extension; memory, file, SQLite adapters | 🟢 implemented; [guide](../conversation-and-thread-storage.md), [source mapping](conversation-storage.md), [audit](conversation-storage-audit.md) |
 
 The HTTP interaction matrix covers `block_actions`, `shortcut`, `message_action`, `block_suggestion`, `view_submission`, `view_closed`, and retained legacy `interactive_message`, `dialog_submission`, and `dialog_suggestion` forms. Selector normalization and classification follow pinned Bolt JS 5.1.0, including the first action, legacy suggestion precedence, and submission-only view shorthand. See the [source mapping](http-interactivity.md) and [PHP API guide](../http-interactivity.md). `dialog_cancellation` is unsupported by that upstream classifier and receives an explicit `501`.
 
-PHP handlers return response values; HTTP and Socket Mode execution are inline. Socket Mode reuses App dispatch and adds envelope acknowledgements, reconnects, connection health, and shutdown handling. Automatic background processing and a measured acknowledgement-deadline guarantee remain open. Local fixtures and transport tests cover implemented behavior; a real-workspace smoke test remains pending.
+PHP handlers return response values; HTTP and Socket Mode execution are inline. Socket Mode reuses App dispatch and adds envelope acknowledgements, reconnects, connection health, and shutdown handling. Framework-level durable execution and a measured acknowledgement-deadline guarantee remain open. Local fixtures, transport tests and selected playground demonstrations cover implemented behavior; these do not establish exhaustive live-workspace conformance.
 
 ## Generated Web API contract — 🟢
 
-`Client` uses `Generated\WebApi\HasResources`. Its 35 pure root accessors return fresh readonly resource groups; dotted paths become nested resource calls. The generator creates 98 resources covering 271 direct pinned endpoints, including the 12 `slackLists` endpoints missed by the initial camel-case-root extraction. Named methods retain `array|RequestPayload` compatibility and return endpoint-specific native response models through `Client::callTyped()`.
+`Client` uses `Generated\WebApi\HasResources`. Its 35 pure root accessors return fresh readonly resource groups; dotted paths become nested resource calls. The generator creates 98 resources covering 273 endpoints: 271 direct pinned endpoints plus two official-documentation Work Objects supplements. This includes the 12 `slackLists` endpoints missed by the initial camel-case-root extraction. Named methods retain `array|RequestPayload` compatibility and return endpoint-specific native response models through `Client::callTyped()`.
 
 The generated request classes cover each endpoint's flattened arguments. Responses expose native properties and recursively hydrated shared object models where the source can be represented soundly. Polymorphic, indexed, and unresolved TypeScript constructs remain raw; all future response fields remain in `data`. The [model coverage inventory](web-api-model-coverage.json) records resolved models and individual fallback paths. This is distinct from exhaustive Slack cross-field validation.
 

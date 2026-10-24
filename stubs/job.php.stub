@@ -1,0 +1,12 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Jobs;
+
+use Thunder\Bolt\Jobs\Job;
+
+final readonly class {{ class }} implements Job
+{
+    public function __construct(public string $text) {}
+}

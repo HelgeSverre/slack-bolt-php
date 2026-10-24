@@ -99,6 +99,7 @@ $allowedCommands = [
     'new', 'make:listener', 'make:assistant', 'serve', 'socket:serve', 'listener:list', 'doctor', 'routes', 'about',
     'discovery:generate', 'discovery:clear', 'discovery:status',
     'command:monitor', 'command:handle',
+    'make:job', 'jobs:work', 'jobs:list', 'jobs:show', 'jobs:cancel', 'jobs:recover', 'jobs:retry',
     'completion:generate', 'completion:install', 'completion:show', 'completion:uninstall',
 ];
 $consoleConfig->commands = array_filter(

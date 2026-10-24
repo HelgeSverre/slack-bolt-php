@@ -1,5 +1,7 @@
 # Durable execution, context and application composition
 
+Implementation update: the user selected explicit named jobs and SQLite. The [implementation audit](durable-execution-audit.md) and README now describe the shipped interface. The conceptual explanation below remains useful; it does not promise whole-listener deferral or concurrent blocking I/O.
+
 ## The problem this solves
 
 A Slack delivery is an incoming message to our application: an event, a slash command, a button action or a modal submission. Slack expects a prompt transport acknowledgement. That acknowledgement confirms receipt; a later Slack message is the user-facing answer. A custom function has a third outcome: explicitly completing or failing its workflow step.
@@ -137,7 +139,7 @@ For custom commands, the project already uses Tempest's `#[ConsoleCommand]`; `bi
 4. Add modern agent-session lifecycle and cooperative stop handling on that foundation. The generated SDK methods and typed events are separate from a complete execution/cancellation runtime.
 5. Revisit a small bootstrap builder after one worker and one fresh project share actual setup. Do not add a broad application superclass now.
 
-The pending user choice is explicit jobs versus deferred event listeners for the first execution interface. Both can eventually coexist; selecting the first keeps the initial interface and recovery contract understandable. API spellings in the per-system research notes are proposals, not shipped methods.
+The user selected explicit jobs and SQLite. Deferred event listeners remain outside this implementation. API spellings in the earlier per-system research notes are proposals; use the README for shipped names and commands.
 
 ## Source reports
 

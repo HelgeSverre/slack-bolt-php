@@ -133,6 +133,66 @@ The injected client also supports arrays, cursor pagination, streamed multipart 
 
 Calls send once by default. Background or CLI code can opt into bounded retries with `$client->retrying()`. OAuth exchanges, function completion, response URLs, and file-content transfers remain single-attempt. Supply a PSR-18 transport to configure timeouts or test outgoing requests.
 
+## Durable named jobs
+
+Keep listener responses fast and explicitly queue slow business work. Named jobs are readonly constructor data; Tempest discovers their ordinary `#[CommandHandler]` methods.
+
+```php
+use Tempest\CommandBus\CommandHandler;
+use Thunder\Bolt\Attributes\Event;
+use Thunder\Bolt\Jobs;
+use Thunder\Bolt\Jobs\{Job, JobExecution};
+use Thunder\Bolt\Payloads\Events\AppMention;
+use Thunder\Bolt\Reply;
+
+final readonly class PublishNote implements Job
+{
+    public function __construct(public string $text) {}
+}
+
+final readonly class QueueNote
+{
+    #[Event('app_mention')]
+    public function __invoke(AppMention $event, Jobs $jobs): void
+    {
+        $jobs->dispatch(new PublishNote($event->text));
+    }
+}
+
+final readonly class PublishNoteHandler
+{
+    public function __construct(private Reply $reply, private JobExecution $execution) {}
+
+    #[CommandHandler]
+    public function handle(PublishNote $job): void
+    {
+        $this->execution->checkpoint();
+        $this->reply->inThread($job->text);
+    }
+}
+```
+
+Dispatch commits to SQLite before returning. Default duplicate keys use the Events API event ID, partitioned by installation and job class; pass `key:` for commands/interactions or an explicit business identity. Reusing a key with different inputs or destinations fails. The worker resolves current credentials and conversation state in a fresh scope; it does not serialize a live client or delivery.
+
+```sh
+php bolt make:job PublishNote
+php bolt jobs:work
+php bolt jobs:work --once
+php bolt jobs:list
+php bolt jobs:show JOB_ID
+php bolt jobs:cancel JOB_ID
+php bolt jobs:recover
+php bolt jobs:retry JOB_ID --allow-repeat
+```
+
+Requires `pdo_sqlite` when used. The default file is `.thunder-bolt/jobs/queue.sqlite`; `SLACK_JOB_STORE_PATH` or a typed `Jobs\JobConfig` selects another private local path. On POSIX, an existing custom parent directory must be private (`0700`); the factory will not change shared-directory permissions. Help/discovery do not open the database. Run the worker under your process supervisor; `--max-jobs=100` bounds a worker's lifetime and `--lease=120` selects its claim duration.
+
+The default is **one attempt**. Opt into bounded retries and expired-lease recovery with `Jobs\RetryPolicy::idempotent(maxAttempts: 3)` only when repeating the **whole handler** is safe. Posting a new Slack message is not inherently idempotent. Unsafe abandoned attempts become `uncertain`; inspect them before explicitly allowing a repeat. Records and duplicate keys are retained; archive them deliberately rather than deleting deduplication history blindly.
+
+Cancellation is cooperative: call `checkpoint()` between steps and `heartbeat()` before the lease expires. Pending jobs are cancelled immediately; running jobs stop when they check. A delivery-bound `$jobs->cancelThread()` targets the current installation/channel/root, useful for `agent_session_stopped`; application listeners still enforce business permissions and session UI/status changes. Blocking I/O needs bounded timeouts. Cancellation never rolls back a completed external action.
+
+Modal validation, option choices and expiring triggers remain synchronous. Temporary workflow credentials require an explicit protected execution reference, as in the custom-function example; normal job dispatch rejects ambient function context. The queue reuses Tempest discovery and DI, with its own SQLite lifecycle rather than Tempest's experimental `#[Async]` queue. [Execution details and validation](docs/research/durable-execution-audit.md).
+
 ## Custom workflow functions
 
 Match a Workflow Builder function by its manifest callback ID, then explicitly complete or fail the execution:
@@ -268,6 +328,8 @@ php bolt make:listener Approve --action=approve_deployment
 php bolt make:listener Submission --view=approve_deployment
 php bolt make:listener FormatMessage --function=format_message
 php bolt make:assistant WorkspaceAssistant
+php bolt make:job PublishNote
+php bolt jobs:work
 php bolt listener:list
 php bolt doctor
 php bolt socket:serve

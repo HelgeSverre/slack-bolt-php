@@ -60,6 +60,14 @@ When Slack sends `assistant_thread_started`, the demo queues a greeting, title a
 
 Assistant handlers own IM thread replies. Run the other playground demos in channels when testing this mode. To use ordinary IM-thread listeners instead, remove the assistant config. Slow model execution stays in the worker; lifecycle events and message deliveries are deduplicated by the local queue.
 
+## Durable named-job showcase
+
+Run `php bolt jobs:work` in another terminal, then mention the app with `durable hello from SQLite`. `Listeners\DurableJobs` saves a named `PublishNote` job; its Tempest-discovered handler posts the note in the original thread. Existing mention listeners may also greet you immediately. Use `jobs:list`, `jobs:show`, `jobs:cancel`, `jobs:recover` and `jobs:retry` to inspect the lifecycle. The note uses the default single attempt because sending a new message is not safe to repeat automatically.
+
+The default database is `.thunder-bolt/jobs/queue.sqlite`, separate from conversation and playground storage. Set `SLACK_JOB_STORE_PATH` for another private local file. This worker requires `pdo_sqlite`; help and discovery remain usable without opening the database.
+
+The optional `agent_session_stopped` listener demonstrates thread-scoped cancellation of **these named jobs** when that event is subscribed. It does not migrate or cancel the older AI/terminal/pet spool. Those demos still use `demo:work`, and the protected custom-function example below uses `command:monitor`. A running named job must checkpoint/heartbeat to observe cancellation; native session status/stream cleanup remains application code.
+
 ## Custom functions and Tempest async
 
 The manifest declares `demo_format_message`: one required string input, `message`, and one string output with the same name. Configure remote function execution, org-readiness and the `function_executed` subscription in Slack. Add **Format a message** to a Workflow Builder workflow, provide its input, and use its output in a later step. Slack rejected creating custom functions in our free development workspace; these settings require an eligible workspace before a live workflow run is possible.

@@ -26,6 +26,8 @@ final class CompletionTest extends TestCase
                     'description' => 'Create a configured Slack assistant listener',
                     'flags' => [],
                 ],
+                'make:job' => ['hidden' => false, 'description' => 'Create a durable named job', 'flags' => []],
+                'jobs:work' => ['hidden' => false, 'description' => 'Run the durable worker', 'flags' => []],
             ],
         ], JSON_THROW_ON_ERROR));
     }
@@ -68,5 +70,6 @@ final class CompletionTest extends TestCase
         self::assertIsString($output);
         self::assertStringContainsString('make:listener', $output);
         self::assertStringContainsString('make:assistant', $output);
+        self::assertStringContainsString('make:job', $output);
     }
 }

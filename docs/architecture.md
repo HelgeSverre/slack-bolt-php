@@ -18,6 +18,10 @@ flowchart LR
     Listeners --> Invoke[Typed handler invocation]
     Invoke --> Initial[Returned command or interaction response]
     Invoke --> Reply[Delivery-local reply helper]
+    Invoke --> Queue[Commit named job to SQLite]
+    Queue --> Worker[Independent worker]
+    Worker --> FreshScope[Current authorization and fresh job scope]
+    FreshScope --> Client
     Reply --> Client[Web API bindings or response URL]
     Client --> HTTP[Injected PSR-18 transport]
 ```
@@ -32,6 +36,7 @@ flowchart LR
 - `Integration\BoltDiscovery` converts method attributes to cacheable descriptors. Production uses Tempest's existing discovery cache; runtime closures are ordinary bootstrap registrations and are not serialized.
 - `Reply` hides channel, user, parent-thread, and response-URL selection. Missing context fails explicitly, including channel replies from a global shortcut. It does not contain arbitrary application services or mutate payload values.
 - `WebApi\Client` hides request serialization, token selection, typed result decoding, response-URL delivery, streaming multipart bodies, bounded retries, and pagination. Upload helpers hide reservation/transfer/completion behind immutable upload values and preserve partial progress on failure. Response URLs receive no bot bearer token. Its external seam is PSR-18, which tests replace with a recorded transport.
+- `Jobs` commits named JSON data with portable installation/destination identity; `SqliteJobStore` owns duplicate intake, claim tokens, leases, retries and recovery. `Worker` reuses Tempest handler discovery/DI and creates a fresh scope with current credentials/state per attempt. `JobExecution` exposes cooperative checkpoint/heartbeat cancellation. This execution ledger is separate from conversation state and Tempest's experimental async repository.
 
 ## Deliberate differences from Bolt JS
 
@@ -40,7 +45,7 @@ The target is capability and protocol parity. PHP source compatibility with Java
 1. Handler methods receive readonly payload objects and narrow reply capabilities. Container-resolved application dependencies belong in constructors.
 2. Registration methods are chainable. Attribute and fluent registrations feed the same descriptor representation.
 3. Commands and interactions return a response value: `CommandResponse`, `ActionResponse`, `ShortcutResponse`, `OptionsResponse`, or `ViewResponse`. Wrong-family, missing, and multiple responses fail clearly.
-4. HTTP execution is inline and response emission is buffered. Processing must fit Slack's three-second deadline. The playground explicitly persists slow work; framework-wide durable execution is being designed separately from in-process concurrency.
+4. HTTP listener execution is inline and response emission is buffered. Listeners must fit Slack's three-second deadline; they can commit explicit named jobs before responding, then independent workers perform slow work. Failed intake remains an error even after a returning app error hook. This is separate from in-process concurrency.
 5. Matching listeners run sequentially. Global middleware runs once. Errors from matching listeners are collected rather than losing later listeners after an earlier failure. An Amp-backed Socket Mode transport does not make handlers or the default PSR-18 HTTP client non-blocking.
 6. Reply helpers derive a thread root from `thread_ts ?? ts`. Outbound message factories make block fallback text explicit.
 7. Known event/payload mismatches and duplicate registrations fail at boot. Unsupported capabilities remain visible in the inventory without being silently acknowledged.
@@ -57,4 +62,4 @@ The full Tempest foundation is intentional: discovery, container, console, HTTP 
 
 ## Port order
 
-HTTP interactivity, retained legacy families, OAuth installation/authorization, conversation/thread storage, and Socket Mode are implemented. SDK models, Block Kit builders, retries, and upload protocols are implemented against pinned sources. Work Objects, assistant-thread lifecycle/context/streaming, and custom-function input/completion runtimes are also implemented. Framework-wide durable execution, modern agent-session cancellation and release conformance remain open. See the [current inventory](research/codebase-inventory-2026-10-24.md), [parity map](research/api-parity.md), and [application/async research brief](research/application-and-async-brief.md).
+HTTP interactivity, retained legacy families, OAuth installation/authorization, conversation/thread storage, and Socket Mode are implemented. SDK models, Block Kit builders, retries, and upload protocols are implemented against pinned sources. Work Objects, assistant-thread lifecycle/context/streaming, custom-function input/completion, and durable named-job execution are also implemented. Full native agent-session lifecycle/stream cleanup and release conformance remain open. See the [durable execution audit](research/durable-execution-audit.md), [parity map](research/api-parity.md), and [application/async explanation](research/durable-execution-explained.md).

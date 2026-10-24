@@ -39,7 +39,7 @@ final readonly class ProjectScaffold
         ]);
         $this->write(
             "{$project}/.env.example",
-            "SLACK_BOT_TOKEN=xoxb-replace-me\nSLACK_SIGNING_SECRET=replace-me\nSLACK_BOT_USER_ID=\nSLACK_IGNORE_SELF=true\n\n# Optional Socket Mode. An app-level xapp token is required only for `bolt socket:serve`.\nSLACK_APP_TOKEN=\n\n# Optional multi-workspace OAuth. Set all three to enable.\nSLACK_CLIENT_ID=\nSLACK_CLIENT_SECRET=\nSLACK_OAUTH_REDIRECT_URI=\nSLACK_BOT_SCOPES=app_mentions:read,chat:write\nSLACK_USER_SCOPES=\n# Store outside public/. Default: .thunder-bolt/oauth\nSLACK_INSTALLATION_STORE_PATH=\n\n# Context: file (default), sqlite, memory, or disabled.\nSLACK_CONTEXT_STORE=file\n# File directory or SQLite database path; default storage stays outside public/.\nSLACK_CONTEXT_STORE_PATH=\n",
+            "SLACK_BOT_TOKEN=xoxb-replace-me\nSLACK_SIGNING_SECRET=replace-me\nSLACK_BOT_USER_ID=\nSLACK_IGNORE_SELF=true\n\n# Optional Socket Mode. An app-level xapp token is required only for `bolt socket:serve`.\nSLACK_APP_TOKEN=\n\n# Optional multi-workspace OAuth. Set all three to enable.\nSLACK_CLIENT_ID=\nSLACK_CLIENT_SECRET=\nSLACK_OAUTH_REDIRECT_URI=\nSLACK_BOT_SCOPES=app_mentions:read,chat:write\nSLACK_USER_SCOPES=\n# Store outside public/. Default: .thunder-bolt/oauth\nSLACK_INSTALLATION_STORE_PATH=\n\n# Context: file (default), sqlite, memory, or disabled.\nSLACK_CONTEXT_STORE=file\n# File directory or SQLite database path; default storage stays outside public/.\nSLACK_CONTEXT_STORE_PATH=\n\n# Durable named jobs; default .thunder-bolt/jobs/queue.sqlite. Requires pdo_sqlite.\nSLACK_JOB_STORE_PATH=\n",
         );
         $this->write("{$project}/.gitignore", "/vendor/\n/.env\n/.thunder-bolt/\n");
         $this->write(
@@ -112,6 +112,24 @@ final readonly class ProjectScaffold
         $this->write($target, $contents);
 
         return $target;
+    }
+
+    /** @return array{job: string, handler: string} */
+    public function job(string $root, string $name): array
+    {
+        $class = $this->normalizeClassName($name);
+        $directory = rtrim($root, DIRECTORY_SEPARATOR) . '/app/Jobs';
+        $job = "{$directory}/{$class}.php";
+        $handler = "{$directory}/{$class}Handler.php";
+        foreach ([$job, $handler] as $target) {
+            if (file_exists($target)) {
+                throw new RuntimeException("Refusing to overwrite existing job scaffold {$target}.");
+            }
+        }
+        $this->makeDirectory($directory);
+        $this->write($job, strtr($this->stub('job.php.stub'), ['{{ class }}' => $class]));
+        $this->write($handler, strtr($this->stub('job-handler.php.stub'), ['{{ class }}' => $class]));
+        return ['job' => $job, 'handler' => $handler];
     }
 
     /** @return array{listener: string, config: string} */

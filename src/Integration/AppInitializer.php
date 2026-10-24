@@ -42,6 +42,7 @@ use Thunder\Bolt\WebApi\Client as WebApiClient;
  */
 final class AppInitializer implements Initializer
 {
+    #[\Tempest\Container\Singleton]
     public function initialize(Container $container): App
     {
         $routeConfig = $container->get(RouteConfig::class);
@@ -125,7 +126,11 @@ final class AppInitializer implements Initializer
             $authorizer,
             $contextStore,
             $container->has(LoggerInterface::class) ? $container->get(LoggerInterface::class) : null,
+            jobs: $container->get(\Thunder\Bolt\Jobs::class),
         );
+        if ($authorizer !== null) {
+            $container->singleton(Authorizer::class, $authorizer);
+        }
         if ($container->has(\Thunder\Bolt\Assistant::class)) {
             $app->assistant($container->get(\Thunder\Bolt\Assistant::class));
         }

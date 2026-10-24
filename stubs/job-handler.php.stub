@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Jobs;
+
+use Tempest\CommandBus\CommandHandler;
+use Thunder\Bolt\Jobs\JobExecution;
+
+final readonly class {{ class }}Handler
+{
+    public function __construct(private JobExecution $execution) {}
+
+    #[CommandHandler]
+    public function handle({{ class }} $job): void
+    {
+        $this->execution->checkpoint();
+        // Handle the named job's data. Checkpoint between steps; heartbeat before the lease expires.
+    }
+}

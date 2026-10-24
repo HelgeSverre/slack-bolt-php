@@ -33,5 +33,11 @@ final readonly class Delivery
         public ?ThreadContext $thread = null,
         public ?\Thunder\Bolt\Assistant\Thread $assistant = null,
         public ?\Thunder\Bolt\Functions\Execution $execution = null,
+        public ?\Thunder\Bolt\Jobs $jobs = null,
     ) {}
+
+    public function withJobs(\Thunder\Bolt\Jobs $jobs): self
+    {
+        return clone($this, ['jobs' => $jobs]);
+    }
 }

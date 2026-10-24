@@ -117,9 +117,12 @@ final class App
         private ?Authorizer $authorizer = null,
         ConversationStore|false|null $conversationStore = null,
         ?LoggerInterface $logger = null,
+        private readonly ?Jobs $jobs = null,
     ) {
-        if ($authorizer !== null && !$container instanceof GenericContainer) {
-            throw new \InvalidArgumentException('Delivery-scoped authorization requires Tempest GenericContainer.');
+        if (($authorizer !== null || $jobs !== null) && !$container instanceof GenericContainer) {
+            throw new \InvalidArgumentException(
+                'Delivery-scoped authorization and jobs require Tempest GenericContainer.',
+            );
         }
         $this->invoker = new HandlerInvoker($container);
         $this->pipeline = new InvocationPipeline();
@@ -157,7 +160,7 @@ final class App
         return $this->use(fn(Delivery $delivery, Closure $next): mixed => $runtime->handle(
             $delivery,
             $next,
-            $this->authorizer !== null,
+            $this->authorizer !== null || $this->jobs !== null,
         ));
     }
 
@@ -187,6 +190,20 @@ final class App
             || $this->config->token !== ''
             || $body !== null
             && ExecutionContext::fromArray($body)?->workflowToken() !== null
+        );
+    }
+
+    /** @internal Deferred work resolves the current authorizer, never an old client. */
+    public function authorizeSource(AuthorizationSource $source): Authorization
+    {
+        return (
+            $this->authorizer?->authorize($source) ?? new Authorization(
+                botToken: $this->config->token,
+                botUserId: $this->config->botUserId,
+                teamId: $source->teamId,
+                enterpriseId: $source->enterpriseId,
+                isEnterpriseInstall: $source->isEnterpriseInstall,
+            )
         );
     }
 
@@ -421,6 +438,9 @@ final class App
      */
     public function dispatch(array $body, array $metadata = []): ?Acknowledgement
     {
+        if (is_string($body['event_id'] ?? null) && $body['event_id'] !== '') {
+            $metadata['eventId'] = $body['event_id'];
+        }
         $payload = $this->payloadFrom($body);
         $functionContext = $payload instanceof FunctionExecuted
             ? $payload->execution
@@ -436,10 +456,7 @@ final class App
                     enterpriseId: $source->enterpriseId,
                     isEnterpriseInstall: $source->isEnterpriseInstall,
                 )
-                : $this->authorizer?->authorize($source) ?? new Authorization(
-                    botToken: $this->config->token,
-                    botUserId: $this->config->botUserId,
-                );
+                : $this->authorizeSource($source);
             $client = $this->client->withToken(
                 $lifecycle ? '' : $functionContext?->workflowToken() ?? $authorization->token(),
             );
@@ -461,7 +478,7 @@ final class App
         $conversation = new ConversationContext($store, $context->conversation, $this->logger);
         $thread = new ThreadContext($store, $context->thread, $this->logger);
         $scope =
-            $this->authorizer === null && $functionContext?->workflowToken() === null
+            $this->authorizer === null && $functionContext?->workflowToken() === null && $this->jobs === null
                 ? null
                 : InvocationScope::create($this->container, $client, $authorization);
         $execution = $functionContext === null ? null : new Execution($client, $functionContext);
@@ -471,17 +488,19 @@ final class App
         try {
             $globalResult = $this->pipeline->run(
                 $this->globalMiddleware,
-                new Delivery(
-                    $payload,
-                    $reply,
-                    $metadata,
-                    null,
-                    client: $client,
-                    authorization: $authorization,
-                    authorizationSource: $source,
-                    conversation: $conversation,
-                    thread: $thread,
-                    execution: $execution,
+                $this->withJobs(
+                    new Delivery(
+                        $payload,
+                        $reply,
+                        $metadata,
+                        null,
+                        client: $client,
+                        authorization: $authorization,
+                        authorizationSource: $source,
+                        conversation: $conversation,
+                        thread: $thread,
+                        execution: $execution,
+                    ),
                 ),
                 function () use (
                     $payload,
@@ -504,20 +523,25 @@ final class App
                         }
 
                         try {
-                            $delivery = new Delivery(
-                                $payload,
-                                $reply,
-                                $metadata,
-                                $listener,
-                                $matches['matches'],
-                                $matches['constraintMatches'],
-                                $client,
-                                $authorization,
-                                $source,
-                                $conversation,
-                                $thread,
-                                execution: $execution,
+                            $delivery = $this->withJobs(
+                                new Delivery(
+                                    $payload,
+                                    $reply,
+                                    $metadata,
+                                    $listener,
+                                    $matches['matches'],
+                                    $matches['constraintMatches'],
+                                    $client,
+                                    $authorization,
+                                    $source,
+                                    $conversation,
+                                    $thread,
+                                    execution: $execution,
+                                ),
                             );
+                            if ($scope !== null && $delivery->jobs !== null) {
+                                $scope->singleton(Jobs::class, $delivery->jobs);
+                            }
                             $result = $this->pipeline->run(
                                 $listener->middleware,
                                 $delivery,
@@ -591,6 +615,11 @@ final class App
         }
 
         return [$handler, $middleware];
+    }
+
+    private function withJobs(Delivery $delivery): Delivery
+    {
+        return $this->jobs === null ? $delivery : $delivery->withJobs($this->jobs->forDelivery($delivery));
     }
 
     private function payloadFrom(array $body): object
@@ -718,6 +747,11 @@ final class App
             ($this->errorHandler)($aggregate, $payload, $metadata);
         } catch (Throwable $handlerFailure) {
             throw new HandlerFailures([...$failures, $handlerFailure]);
+        }
+        foreach ($failures as $failure) {
+            if ($failure instanceof \Thunder\Bolt\Jobs\IntakeFailed) {
+                throw $failure;
+            }
         }
     }
 

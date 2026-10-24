@@ -20,6 +20,43 @@ use Thunder\Bolt\WebApi\Client;
 
 final class ProjectScaffoldTest extends TestCase
 {
+    public function test_named_job_scaffold_uses_tempest_discovery_and_executes_in_a_worker(): void
+    {
+        $scaffold = new ProjectScaffold(dirname(__DIR__, 2));
+        $files = $scaffold->job($this->workspace, 'GeneratedDurableJob');
+        require $files['job'];
+        require $files['handler'];
+        $config = new \Tempest\CommandBus\CommandBusConfig();
+        $discovery = new \Tempest\CommandBus\CommandBusDiscovery($config);
+        $items = new DiscoveryItems();
+        $discovery->setItems($items);
+        $discovery->discover(
+            new DiscoveryLocation('App', dirname($files['handler'])),
+            new ClassReflector(\App\Jobs\GeneratedDurableJobHandler::class),
+        );
+        $discovery->apply();
+        $store = \Thunder\Bolt\Jobs\SqliteJobStore::forTesting();
+        $codec = new \Thunder\Bolt\Jobs\JobCodec($config);
+        $jobs = new \Thunder\Bolt\Jobs($store, $codec)->in(\Thunder\Bolt\Jobs\JobContext::workspace('T-fixture'));
+        $result = $jobs->dispatch(new \App\Jobs\GeneratedDurableJob('hello'), key: 'generated');
+        $worker = new \Thunder\Bolt\Jobs\Worker(
+            $store,
+            $codec,
+            new GenericContainer(),
+            new Client(new RecordingHttpClient(), 'fixture-token'),
+            new BoltConfig('fixture-token'),
+        );
+        self::assertSame(\Thunder\Bolt\Jobs\JobStatus::Succeeded, $worker->runOnce()?->status);
+        self::assertSame(1, $store->find($result->id)?->attempts);
+        $original = file_get_contents($files['job']);
+        try {
+            $scaffold->job($this->workspace, 'GeneratedDurableJob');
+            self::fail('Existing job code must not be replaced.');
+        } catch (RuntimeException) {
+            self::assertSame($original, file_get_contents($files['job']));
+        }
+    }
+
     public function test_function_listener_scaffold_registers_and_can_complete_a_workflow(): void
     {
         $path = new ProjectScaffold(dirname(__DIR__, 2))->listener(

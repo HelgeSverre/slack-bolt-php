@@ -14,15 +14,15 @@ Assistant lifecycle routing, durable focus context, status, title, prompts and n
 
 The handwritten custom-function runtime now supports callback routing, typed inputs/DTO mapping, execution context and complete/fail helpers for events and function-scoped interactions. Workflow tokens are scoped to the authorized delivery client. The playground demonstrates an explicit Tempest async handoff with encrypted credentials, tenant/execution deduplication and reference-only commands. Core receivers still acknowledge after inline dispatch returns; slow work needs that explicit handoff. Live custom-function creation is gated by the development workspace's free Slack plan.
 
-## High-priority runtime gaps
+## Durable execution milestone completed
 
 | Surface | Current state | Evidence |
 | --- | --- | --- |
-| Durable/deferred execution | **Unimplemented framework capability.** HTTP and Socket Mode invoke handlers inline. HTTP only warns as processing approaches Slack’s acknowledgement deadline; it does not persist work before acknowledging, retry it, or deduplicate deliveries after a crash. | [`Http/Receiver.php`](../../src/Http/Receiver.php#L86), [`SocketMode/Runner.php`](../../src/SocketMode/Runner.php#L204), and the stated next milestone in [`README.md`](../../README.md#L185). |
+| Durable named jobs | Explicit named jobs commit before dispatch returns; independent workers use atomic claims, bounded opt-in retries, uncertainty-aware recovery and cooperative cancellation. Listeners still return synchronous responses. | [Implementation audit](durable-execution-audit.md), `src/Jobs/`, `tests/Jobs/`. |
 
 ## Receiver and lifecycle parity
 
-The example's [`Demo\Queue`](../../examples/hello-bolt/app/Demo/Queue.php) does persist jobs before acknowledgement and deduplicate deliveries. It is an application-local spool, not a framework adapter; claimed jobs are intentionally not replayed after restart. A reusable retry/lease/recovery policy remains missing.
+The older [`Demo\Queue`](../../examples/hello-bolt/app/Demo/Queue.php) remains an application-local spool for existing demos. The new framework-owned SQLite job module and named-note showcase are separate; no pending demo work was silently migrated. Full native agent-session lifecycle/status integration, serverless receivers and release conformance remain later work.
 
 Thunder has a deliberately PHP-native HTTP entry point and Socket Mode worker, but not Bolt JS receiver-class parity:
 

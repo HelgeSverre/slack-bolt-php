@@ -73,12 +73,16 @@ final readonly class Runtime
             $delivery->conversation,
             $delivery->thread,
             $thread,
+            jobs: $delivery->jobs,
         );
         if ($handler === null) {
             $thread->saveContext();
             return null;
         }
         $scope = $scoped ? InvocationScope::create($this->container, $client, $authorization) : null;
+        if ($scope !== null && $prepared->jobs !== null) {
+            $scope->singleton(\Thunder\Bolt\Jobs::class, $prepared->jobs);
+        }
         return new InvocationPipeline()->run($handler->middleware, $prepared, fn(): mixed => $this->invoker->invoke(
             $handler->target,
             $prepared,

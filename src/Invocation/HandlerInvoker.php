@@ -45,7 +45,8 @@ final class HandlerInvoker
             . '|'
             . $delivery->payload::class
             . ($delivery->assistant === null ? '' : '|assistant')
-            . ($delivery->execution === null ? '' : '|execution');
+            . ($delivery->execution === null ? '' : '|execution')
+            . ($delivery->jobs === null ? '' : '|jobs');
         $plan = $this->argumentPlans[$cacheKey] ??= $this->argumentPlan($target, $delivery);
         $arguments = [];
 
@@ -62,6 +63,7 @@ final class HandlerInvoker
                 'payload' => $delivery->payload,
                 'reply' => $delivery->reply,
                 'delivery' => $delivery,
+                'jobs' => $delivery->jobs ?? throw new \LogicException('No delivery jobs capability.'),
                 'client' => $delivery->client ?? throw new \LogicException('No delivery client.'),
                 'authorization' => $delivery->authorization ?? throw new \LogicException('No delivery authorization.'),
                 'authorizationSource' => $delivery->authorizationSource ?? throw new \LogicException(
@@ -105,6 +107,8 @@ final class HandlerInvoker
                 $plan[$parameter->getName()] = 'reply';
             } elseif ($this->accepts($parameter, $delivery)) {
                 $plan[$parameter->getName()] = 'delivery';
+            } elseif ($delivery->jobs !== null && $this->accepts($parameter, $delivery->jobs)) {
+                $plan[$parameter->getName()] = 'jobs';
             } elseif ($delivery->client !== null && $this->accepts($parameter, $delivery->client)) {
                 $plan[$parameter->getName()] = 'client';
             } elseif ($delivery->authorization !== null && $this->accepts($parameter, $delivery->authorization)) {

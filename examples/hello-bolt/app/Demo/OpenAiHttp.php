@@ -23,8 +23,14 @@ final readonly class OpenAiHttp implements StreamingHttpClient
 
     public function __construct(
         private ?Cancellation $stop = null,
+        ?HttpClient $http = null,
     ) {
-        $this->http = HttpClientBuilder::buildDefault();
+        $this->http = $http ?? HttpClientBuilder::buildDefault();
+    }
+
+    public function withCancellation(Cancellation $stop): self
+    {
+        return new self($stop, $this->http);
     }
 
     public function sendRequest(#[\SensitiveParameter] RequestInterface $request): ResponseInterface

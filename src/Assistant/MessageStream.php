@@ -38,7 +38,9 @@ final class MessageStream
         if ($markdown === '' || mb_strlen($markdown) > 12000) {
             throw new \InvalidArgumentException('A stream fragment must contain 1 to 12000 characters.');
         }
-        $this->send(['markdown_text' => $markdown]);
+        // Slack fixes a stream's wire mode on its first request. Always use chunks
+        // so text and task progress can be mixed throughout the same stream.
+        $this->send(['chunks' => [['type' => 'markdown_text', 'text' => $markdown]]]);
         return $this;
     }
 
@@ -59,6 +61,11 @@ final class MessageStream
 
     public function stop(Block ...$blocks): Response
     {
+        return $this->finish(AgentSessionStatus::Active, ...$blocks);
+    }
+
+    public function finish(AgentSessionStatus $status = AgentSessionStatus::Active, Block ...$blocks): Response
+    {
         $this->assertOpen();
         if ($this->timestamp === null) {
             throw new \LogicException('Append text or chunks before stopping a stream.');
@@ -69,6 +76,7 @@ final class MessageStream
                 ->stopStream([
                     'channel' => $this->identity->channelId(),
                     'ts' => $this->timestamp,
+                    'session_status' => $status->value,
                     ...(
                         $blocks !== []
                             ? ['blocks' => array_map(

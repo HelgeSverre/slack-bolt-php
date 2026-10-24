@@ -8,7 +8,7 @@ The handwritten [`App`](../../src/App.php) has real global/listener middleware, 
 
 ## Assistant milestone completed
 
-Assistant lifecycle routing, durable focus context, status, title, prompts and native streaming helpers now live in the handwritten [Assistant](../../src/Assistant.php) module. Both lifecycle events have typed payloads. The default store uses installation/DM/root-scoped conversation adapters; an explicit Slack metadata adapter offers Bolt-style compatibility without an unkeyed cache. [Assistant tests](../../tests/Assistant/) cover routing, middleware, authorization, context isolation and helper behavior. Laravel AI compatibility is application-level; there is no full Laravel package or agent-session protocol implementation.
+Assistant lifecycle routing, durable focus context, status, title, prompts and native streaming helpers now live in the handwritten [Assistant](../../src/Assistant.php) module. Both lifecycle events have typed payloads. The default store uses installation/DM/root-scoped conversation adapters; an explicit Slack metadata adapter offers Bolt-style compatibility without an unkeyed cache. [Assistant tests](../../tests/Assistant/) cover routing, middleware, authorization, context isolation and helper behavior. Modern agent-session lifecycle, title and stream completion helpers are implemented alongside the legacy methods. The AI demo connects Stop to durable cancellation and model I/O; [integration notes](agent-sessions.md). Laravel AI compatibility remains application-level; there is no full Laravel package.
 
 ## Custom functions milestone completed
 
@@ -22,7 +22,7 @@ The handwritten custom-function runtime now supports callback routing, typed inp
 
 ## Receiver and lifecycle parity
 
-The older [`Demo\Queue`](../../examples/hello-bolt/app/Demo/Queue.php) remains an application-local spool for existing demos. The new framework-owned SQLite job module and named-note showcase are separate; no pending demo work was silently migrated. Full native agent-session lifecycle/status integration, serverless receivers and release conformance remain later work.
+The older [`Demo\Queue`](../../examples/hello-bolt/app/Demo/Queue.php) remains an application-local spool for pet, terminal and work-item demos. AI turns, assistant setup and the interactive session tour now use the framework-owned SQLite queue. Old queued AI work is not silently replayed. Serverless receivers and exhaustive release conformance remain later work.
 
 Thunder has a deliberately PHP-native HTTP entry point and Socket Mode worker, but not Bolt JS receiver-class parity:
 

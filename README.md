@@ -47,7 +47,7 @@ Until the package is published, generated apps use a local Composer path reposit
 
 The [hello-bolt example](examples/hello-bolt/) connects mentions, buttons, shortcuts, external options, modal validation, and stored conversation state.
 
-It also includes a [playground](examples/hello-bolt/README.md): a shared JSON-backed pet, an owner-restricted terminal, and an OpenAI Responses assistant with web search and scoped pet-care tools. Run `php bolt demo:work` alongside the Socket Mode worker to try `/bolt pet`, `/bolt terminal`, and `/bolt ai how big is the Sun?`.
+It also includes a [playground](examples/hello-bolt/README.md): a shared JSON-backed pet, an owner-restricted terminal, and an OpenAI Responses agent with web search and scoped pet-care tools. Run `php bolt jobs:work` for AI and agent sessions, `php bolt demo:work` for pet, terminal and work items, alongside the Socket Mode worker. `/kickensink` opens an interactive tour.
 
 ### Run with Socket Mode
 
@@ -107,7 +107,7 @@ final readonly class Ping
 
 Register `/ping` in Slack with the same request URL. Actions, shortcuts, external options, and views follow the same pattern with their own attributes and response classes.
 
-**Handlers execute inline.** Slack must receive the acknowledgement within three seconds. Keep slow work outside the request; durable background workers are planned.
+**Listeners execute inline.** Slack must receive the acknowledgement within three seconds. Dispatch a named job for slow work; `jobs:work` executes it after durable acceptance.
 
 ## Use the Slack client
 
@@ -255,12 +255,11 @@ final readonly class WorkspaceAssistant
 
     public function message(Message $message, Thread $thread): void
     {
-        $thread->setTitle(mb_substr($message->text, 0, 80));
-        $thread->setStatus('is working');
+        $thread->session()->processing();
         try {
             $thread->say('Message received. Add your application logic here.');
         } finally {
-            $thread->clearStatus();
+            $thread->session()->active();
         }
     }
 }
@@ -268,9 +267,9 @@ final readonly class WorkspaceAssistant
 
 Assistant handlers consume IM thread replies with no subtype or `file_share`, matching Bolt JS. Other events continue to ordinary listeners. `threadContextChanged(...)` is optional: its default saves the new focus context. Focus context is separate from conversation history and is scoped by installation, DM and root timestamp; file and SQLite stores survive restarts. `contextStore(...)` accepts another adapter, including `SlackMetadataThreadContextStore` for Bolt-style message metadata storage. Without an explicit adapter, assistants use the application's conversation backend; disabling that backend selects Slack metadata storage, which requires a bot user ID and thread-history access.
 
-`Thread::sayStream()` returns a lazy stream with `append()`, `chunks()` and `stop()`. Text and task chunks use Slack's native streaming protocol. `Status::make('is working')->loadingMessages(...)` supplies optional status customization. All helpers pin the destination to the current assistant thread.
+`Thread::session()` controls the modern session lifecycle: `processing(?string $title)`, `active()`, `suspended()`, `closed()` and `rename(string $title)`. Set a title when creating a session; respect subsequent `agent_session_title_changed` user edits. `Thread::sayStream()` returns a lazy stream with `append()`, `chunks()` and `stop()`. Use `finish(AgentSessionStatus::Suspended)` when waiting for input, or `Closed` for completed work. `stop()` finishes as active. All helpers pin the destination to the current thread. Existing `setStatus()`, `clearStatus()` and `setTitle()` retain their older `assistant.threads.*` semantics for compatibility.
 
-Enable your Slack app's **Agent experience**, install with `assistant:write`, `chat:write` and `im:history`, and subscribe to `assistant_thread_started`, `assistant_thread_context_changed` and `message.im`. Slack currently recommends newer agent-session methods; this module implements the assistant-thread contract used by the pinned Bolt JS reference. It does not yet implement the full agent-session protocol.
+Enable your Slack app's **Agent experience**, install with `assistant:write`, `chat:write` and `im:history`, and subscribe to `assistant_thread_started`, `assistant_thread_context_changed`, `message.im`, `agent_session_stopped` and `agent_session_title_changed`. The stop subscription enables Slack's native Stop control while processing. A stop event does not itself cancel your work or clear status: the application must cancel its jobs and transition the session. The playground demonstrates both, including interrupting a pending Responses HTTP read. [Slack's session contract](https://docs.slack.dev/ai/agent-sessions/) describes the lifecycle.
 
 Slow model calls belong in a worker: the [native assistant playground](examples/hello-bolt/README.md#native-slack-assistant) saves context and queues work before acknowledging. Core handlers execute inline.
 
@@ -363,7 +362,7 @@ To regenerate from the pinned upstream archives, run `npm run sync:references`, 
 
 ## What's next
 
-The next milestone is **durable background execution** across the framework: acknowledge promptly, persist jobs, and run slow handlers through workers with retries, leases and delivery deduplication. The playground queue and protected Tempest function handoff demonstrate parts of this; neither is the framework-wide recovery system yet.
+Durable SQLite jobs and modern agent sessions are implemented, and the AI playground uses them. The next milestone is **release readiness**: a controlled live-workspace conformance suite, upgrade guidance and a first tagged release. Larger deployments will also need job retention and additional durable-store adapters.
 
 Extended guides and API documentation will live on a separate docs site. Existing design notes and coverage inventories remain under `docs/` for maintainers. Controlled live-workspace tests and Linux/macOS CI are release gates; generated coverage alone does not establish full Bolt JS conformance.
 

@@ -63,6 +63,12 @@ final class Thread
         return new MessageStream($this->client, $this->identity, $options);
     }
 
+    /** Modern agent-session controls. Legacy assistant-thread controls remain below. */
+    public function session(): Session
+    {
+        return new Session($this->client, $this->identity);
+    }
+
     /** @param list<string> $loadingMessages */
     public function setStatus(string|Status $status, array $loadingMessages = []): Response
     {

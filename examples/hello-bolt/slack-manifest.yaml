@@ -29,6 +29,12 @@ features:
       callback_id: open_request_modal
       description: Start a request with an optional assignee
   slash_commands:
+    - command: /kickensink
+      description: Tour Thunder with interactive cards and a stoppable agent session
+      should_escape: false
+    - command: /kitchensink
+      description: Alias for the Thunder kitchen-sink tour
+      should_escape: false
     - command: /bolt
       description: Run the pet, terminal, AI, or work-item demo
       usage_hint: pet | terminal | ai your question | work title
@@ -60,6 +66,8 @@ settings:
       - app_mention
       - assistant_thread_started
       - assistant_thread_context_changed
+      - agent_session_stopped
+      - agent_session_title_changed
       - message.im
       - entity_details_requested
       - entity_comments_requested

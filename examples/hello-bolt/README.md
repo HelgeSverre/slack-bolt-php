@@ -1,6 +1,6 @@
 # Thunder Bolt playground
 
-Use this example with the framework checkout and a Slack app configured for Socket Mode. Register `/bolt` in your app manifest; mentions work too.
+Use this example with the framework checkout and a Slack app configured for Socket Mode. Register `/bolt`, `/kickensink` (or `/kitchensink`) in your app manifest; mentions work too.
 
 ```sh
 composer install
@@ -8,16 +8,19 @@ cp .env.example .env
 php bolt socket:serve
 ```
 
-In a second terminal, from this directory:
+In separate terminals, from this directory:
 
 ```sh
 php bolt demo:work
+# AI, assistant lifecycle and the session tour:
+php bolt jobs:work
 ```
 
 Set `SLACK_APP_TOKEN` and `SLACK_BOT_TOKEN` in `.env`. Set `SLACK_TERMINAL_ALLOWED_USERS` to the comma-separated Slack member IDs allowed to use the terminal, and `OPENAI_API_KEY` to enable AI. `OPENAI_MODEL` defaults to `gpt-5.5` and can be changed to a model available to your API project.
 
 ## Try it in Slack
 
+- `/kickensink` — open the interactive tour: a real durable session with streamed task progress, Stop, AI, Boltling, work items and a framework-details modal. `/kitchensink` is an alias. The tour itself uses no model; Ask AI runs a real Responses request.
 - `/bolt pet` — meet Boltling. Everyone can feed, play, clean, and rest using the buttons. Contributors earn credit, and Boltling levels up and evolves. Stats decay over elapsed time; neglect is recoverable. Refresh reloads current state.
 - `/bolt terminal` — start a local shell and reply in its thread to type. Ctrl+C and Close buttons control the session. Only its allowlisted owner can operate it.
 - `/bolt ai hello` — introduce the assistant. Ask questions, request web searches, or ask it to check/feed the pet. Continue in the answer's thread. Search status is based on actual Responses tool output, and sources are clickable.
@@ -30,7 +33,9 @@ Mentions accept the same prefixes: `@Thunder Bolt pet`, `@Thunder Bolt terminal`
 
 Pet state is JSON at `.thunder-bolt/demo/pet.json`, partitioned by workspace, updated under a separate file lock and atomic replacement. Care has cooldowns and delivery deduplication; audit history and contributor counts record who did what. AI thread history and thread routing use the framework's file conversation adapter under `.thunder-bolt/demo/threads/`.
 
-Handlers enqueue small JSON jobs before acknowledging Slack. The demo worker claims jobs in order; an interrupted claimed job stays in `running/` for inspection and is never automatically replayed. Completed-job identifiers are retained for up to 24 hours (at most 4,096) to suppress redelivery. This local spool demonstrates the seam for background work; it does not replace a production queue. Terminal/AI output updates are best-effort and coalesced; Slack requests have bounded timeouts.
+AI turns, assistant setup and the session tour use named jobs in `.thunder-bolt/jobs/queue.sqlite`. Intake commits before acknowledgement; workers resolve current credentials and history. AI uses one attempt by default because model calls and tool effects are not safe to repeat automatically. After a crash, an expired attempt becomes uncertain for inspection. Use `jobs:list`, `jobs:show`, `jobs:cancel` and `jobs:recover` to inspect or stop work. AI conversation locks prevent concurrent workers overwriting the same thread's history.
+
+Pet, terminal and work-item handlers still use the local JSON spool and `demo:work`. An interrupted claimed entry remains in `running/` for inspection and is never automatically replayed. Completed identifiers are retained for up to 24 hours (at most 4,096). Old AI entries in this spool are rejected rather than silently replayed. Slack output is coalesced and requests have bounded timeouts.
 
 The terminal is a real shell on the worker host, with a dedicated initial working directory and a stripped child environment. It is **not a sandbox**. Its output is visible to the channel, so use a development host and an explicit allowlist. Sessions expire after inactivity and close with the worker; shell processes do not survive its restart. Pet and AI state do survive restarts. AI tools are limited to web search and pet care; the model has no terminal tool.
 
@@ -54,11 +59,13 @@ Run `/bolt work Ship the PHP integration`, then open its preview and Comments. T
 
 ## Native Slack assistant
 
-`config/assistant.config.php` registers typed assistant lifecycle and IM-thread handlers. Enable **Agents → Agent experience** in Slack, install with `assistant:write`, `chat:write` and `im:history`, and subscribe to `assistant_thread_started`, `assistant_thread_context_changed` and `message.im`. Keep Socket Mode and the demo worker running. Slack's current Agent experience may expose a different entry point from the older assistant container; the runtime targets Bolt JS's assistant-thread events and IM thread replies.
+`config/assistant.config.php` registers typed assistant lifecycle and IM-thread handlers. Enable **Agents → Agent experience** in Slack, install with `assistant:write`, `chat:write` and `im:history`, and subscribe to `assistant_thread_started`, `assistant_thread_context_changed`, `message.im`, `agent_session_stopped` and `agent_session_title_changed`. Keep Socket Mode and `jobs:work` running. The assistant event contract remains compatible with Bolt JS; status and titles use modern agent-session methods.
 
 When Slack sends `assistant_thread_started`, the demo queues a greeting, title and three suggested prompts. In the current Agent experience, send a DM to start: an application handler anchors the conversation to that message, saves empty focus context and queues the answer. The first answer sets its title and prompts; subsequent IM-thread replies use the core assistant runtime. Both paths reuse the existing Responses streaming implementation, web search and pet tools. Status is cleared on success and failure. Focus context is saved locally before acknowledgement at `.thunder-bolt/demo/assistant-context/`; it is not conversation history and is not a grant to read the channel the user is viewing. The AI example does not fetch that channel's messages.
 
-Assistant handlers own IM thread replies. Run the other playground demos in channels when testing this mode. To use ordinary IM-thread listeners instead, remove the assistant config. Slow model execution stays in the worker; lifecycle events and message deliveries are deduplicated by the local queue.
+Assistant handlers own IM thread replies. Run the other playground demos in channels when testing this mode. To use ordinary IM-thread listeners instead, remove the assistant config. Slow model execution stays in the durable worker; lifecycle events and message deliveries have stable deduplication keys.
+
+Slack's native Stop and the tour's Stop button flag jobs for the delivering installation and thread. Running AI work polls that flag, renews its lease, cancels the Amp HTTP transport during connection or stream reads, and checkpoints before tools. The response body closes and the session leaves processing. Stop cannot undo an already completed tool or interrupt synchronous PHP code; bounded Slack calls can finish before the next checkpoint. User title edits are retained rather than overwritten on follow-ups.
 
 ## Durable named-job showcase
 
@@ -66,7 +73,7 @@ Run `php bolt jobs:work` in another terminal, then mention the app with `durable
 
 The default database is `.thunder-bolt/jobs/queue.sqlite`, separate from conversation and playground storage. Set `SLACK_JOB_STORE_PATH` for another private local file. This worker requires `pdo_sqlite`; help and discovery remain usable without opening the database.
 
-The optional `agent_session_stopped` listener demonstrates thread-scoped cancellation of **these named jobs** when that event is subscribed. It does not migrate or cancel the older AI/terminal/pet spool. Those demos still use `demo:work`, and the protected custom-function example below uses `command:monitor`. A running named job must checkpoint/heartbeat to observe cancellation; native session status/stream cleanup remains application code.
+The `agent_session_stopped` listener cancels named work for the stopped thread and settles native session status. It now includes AI turns and the session tour. Pet and terminal spool entries still use `demo:work`; the protected custom-function example below uses `command:monitor`.
 
 ## Custom functions and Tempest async
 

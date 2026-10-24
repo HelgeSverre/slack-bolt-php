@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Demo;
 
+use App\Demo\Jobs\Answer;
+use App\Demo\Jobs\StartAssistantSession;
 use Thunder\Bolt\Assistant\Stores\StoredThreadContextStore;
-use Thunder\Bolt\Assistant\SuggestedPrompt;
 use Thunder\Bolt\Assistant\Thread;
 use Thunder\Bolt\Assistant\ThreadContext;
 use Thunder\Bolt\Assistant\ThreadIdentity;
@@ -13,10 +14,10 @@ use Thunder\Bolt\Attributes\Event;
 use Thunder\Bolt\Conversation\ConversationKey;
 use Thunder\Bolt\Conversation\Stores\FileConversationStore;
 use Thunder\Bolt\Invocation\Delivery;
+use Thunder\Bolt\Jobs;
 use Thunder\Bolt\Payloads\Events\AssistantThreadContextChanged;
 use Thunder\Bolt\Payloads\Events\AssistantThreadStarted;
 use Thunder\Bolt\Payloads\Events\Message;
-use Thunder\Bolt\WebApi\Client;
 
 /** The showcase handler for Slack's native Assistant surface, not a general agent runtime. */
 final readonly class AssistantDemo
@@ -25,10 +26,10 @@ final readonly class AssistantDemo
         private DemoConfig $config,
     ) {}
 
-    public function started(AssistantThreadStarted $event, Thread $thread, Delivery $delivery): void
+    public function started(AssistantThreadStarted $event, Thread $thread, Delivery $delivery, Jobs $jobs): void
     {
         $thread->saveContext();
-        $this->enqueue('started', '', $thread->identity->userId, $thread, $delivery, $event->ts ?? '');
+        $this->enqueueStart($thread, $delivery, $event->ts ?? '', $jobs);
     }
 
     public function contextChanged(AssistantThreadContextChanged $event, Thread $thread): void
@@ -36,18 +37,17 @@ final readonly class AssistantDemo
         $thread->saveContext();
     }
 
-    public function message(Message $message, Thread $thread, Delivery $delivery): void
+    public function message(Message $message, Thread $thread, Delivery $delivery, Jobs $jobs): void
     {
         if ($thread->context() === null) {
             return;
         }
         $this->enqueue(
-            'message',
             html_entity_decode($message->text, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            $thread->identity->userId,
             $thread,
             $delivery,
             $message->ts,
+            $jobs,
         );
     }
 
@@ -56,7 +56,7 @@ final readonly class AssistantDemo
      * has not sent an assistant_thread_started event yet.
      */
     #[Event('message')]
-    public function directMessage(Message $message, Delivery $delivery): void
+    public function directMessage(Message $message, Delivery $delivery, Jobs $jobs): void
     {
         if (
             ($message->raw['channel_type'] ?? null) !== 'im'
@@ -88,50 +88,16 @@ final readonly class AssistantDemo
         $thread->saveContext();
 
         $this->enqueue(
-            'message',
             html_entity_decode($message->text, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            $thread->identity->userId,
             $thread,
             $delivery,
             $message->ts,
-            ['root' => true],
+            $jobs,
         );
     }
 
-    public function start(DemoJob $job, Client $client): void
+    private function enqueue(string $text, Thread $thread, Delivery $delivery, string $identity, Jobs $jobs): void
     {
-        $thread = $this->threadFor($job, $client);
-        $thread->setStatus('Preparing this thread.', ['Saving context']);
-        try {
-            $thread->setTitle('Thunder Bolt');
-            $thread->setSuggestedPrompts($this->suggestedPrompts(), 'Try asking');
-            $thread->say('Ready. Ask a question, search the web, or ask about Boltling.');
-        } finally {
-            $thread->clearStatus();
-        }
-    }
-
-    public function beginAnswer(DemoJob $job, Client $client): Thread
-    {
-        $thread = $this->threadFor($job, $client);
-        $thread->setStatus('Thinking.', ['Reading your message']);
-        if (($job->payload['root'] ?? false) === true) {
-            $thread->setTitle($this->titleFor($job->text));
-            $thread->setSuggestedPrompts($this->suggestedPrompts(), 'Try asking');
-        }
-
-        return $thread;
-    }
-
-    private function enqueue(
-        string $operation,
-        string $text,
-        string $user,
-        Thread $thread,
-        Delivery $delivery,
-        string $identity,
-        array $payload = [],
-    ): void {
         $team = $delivery->authorizationSource?->teamId ?? '';
         $channel = $thread->identity->channelId();
         $root = $thread->identity->threadTs();
@@ -139,52 +105,40 @@ final readonly class AssistantDemo
         if (is_string($delivery->authorizationSource?->raw['event_id'] ?? null)) {
             $eventId = $delivery->authorizationSource->raw['event_id'];
         }
-        if ($team === '' || $channel === '' || $root === '' || $user === '' || $eventId === '') {
+        if ($team === '' || $channel === '' || $root === '' || $eventId === '') {
             throw new \InvalidArgumentException(
                 'Assistant demo requires trusted workspace, user, channel, thread, and delivery IDs.',
             );
         }
-        $job = new DemoJob('assistant', $text, $team, $user, $channel, $root, $operation, payload: $payload);
-        $this->config->queue()->enqueue($job->toArray(), hash('sha256', json_encode([
-            $team,
-            $channel,
-            $root,
-            $operation,
-            $eventId,
-        ], JSON_THROW_ON_ERROR)));
+        $jobs->dispatch(
+            new Answer($text, $root),
+            hash('sha256', json_encode([
+                $team,
+                $channel,
+                $root,
+                $eventId,
+            ], JSON_THROW_ON_ERROR)),
+        );
     }
 
-    public function threadFor(DemoJob $job, Client $client): Thread
+    private function enqueueStart(Thread $thread, Delivery $delivery, string $identity, Jobs $jobs): void
     {
-        return new Thread(
-            $client,
-            new ThreadIdentity(
-                new ConversationKey($job->channel, teamId: $job->team, threadTs: $job->thread),
-                $job->user,
-            ),
-            $this->contextStore(),
+        $team = $delivery->authorizationSource?->teamId ?? '';
+        $channel = $thread->identity->channelId();
+        $root = $thread->identity->threadTs();
+        if ($team === '' || $channel === '' || $root === '' || $identity === '') {
+            throw new \InvalidArgumentException(
+                'Assistant onboarding requires trusted workspace, channel, thread, and delivery IDs.',
+            );
+        }
+        $jobs->dispatch(
+            new StartAssistantSession(),
+            hash('sha256', json_encode([$team, $channel, $root, $identity], JSON_THROW_ON_ERROR)),
         );
     }
 
     private function contextStore(): StoredThreadContextStore
     {
         return new StoredThreadContextStore(new FileConversationStore($this->config->directory . '/assistant-context'));
-    }
-
-    /** @return list<SuggestedPrompt> */
-    private function suggestedPrompts(): array
-    {
-        return [
-            new SuggestedPrompt('What can you do?', 'What can you help me with in Slack?'),
-            new SuggestedPrompt('Check Boltling', 'How is Boltling doing?'),
-            new SuggestedPrompt('Search the web', 'Search the web for a useful answer.'),
-        ];
-    }
-
-    private function titleFor(string $question): string
-    {
-        $question = trim(preg_replace('/\s+/', ' ', $question) ?? '');
-
-        return $question === '' ? 'Thunder Bolt' : mb_strimwidth($question, 0, 80, '…');
     }
 }

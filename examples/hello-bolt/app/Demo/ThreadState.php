@@ -36,4 +36,22 @@ final readonly class ThreadState
     {
         $this->store->set(new ConversationKey($channel, teamId: $team, threadTs: $thread), $value);
     }
+
+    /** @param \Closure(array): array $updater */
+    public function update(string $team, string $channel, string $thread, \Closure $updater): array
+    {
+        $record = $this->store->update(
+            new ConversationKey($channel, teamId: $team, threadTs: $thread),
+            static function (mixed $current) use ($updater): array {
+                $value = $updater(is_array($current) ? $current : []);
+                if (!is_array($value)) {
+                    throw new \UnexpectedValueException('AI thread updates must return an object.');
+                }
+                return $value;
+            },
+        );
+        return is_array($record->value)
+            ? $record->value
+            : throw new \UnexpectedValueException('AI thread state must be an object.');
+    }
 }

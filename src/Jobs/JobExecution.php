@@ -23,6 +23,11 @@ final readonly class JobExecution
         $this->store->heartbeat($this->job->id, $this->token(), $this->leaseSeconds);
     }
 
+    public function leaseSeconds(): int
+    {
+        return $this->leaseSeconds;
+    }
+
     public function isCancellationRequested(): bool
     {
         try {

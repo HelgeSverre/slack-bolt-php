@@ -52,19 +52,30 @@ final class DemoRuntimeTest extends TestCase
         self::assertNull($config->queue()->claim());
     }
 
-    public function test_missing_ai_key_finishes_locally_and_registers_its_thread_without_api_calls(): void
+    public function test_legacy_ai_spool_jobs_fail_safe_without_running_the_model(): void
     {
-        [$config, $http, $runtime] = $this->worker();
+        $config = new DemoConfig($this->directory, ['UOWNER']);
+        $http = new RecordingHttpClient();
+        $reported = false;
+        $console = $this->createMock(Console::class);
+        $console
+            ->expects(self::once())
+            ->method('error')
+            ->willReturnCallback(function () use (&$reported, $console): Console {
+                $reported = true;
+                return $console;
+            });
+        $runtime = new DemoRuntime($config, new Client($http, 'test-bot'), $console);
         $config->queue()->enqueue(new DemoJob('ai', 'hello', 'T1', 'UOWNER', 'C1', '1.001')->toArray(), 'hello-one');
-        $runtime->run(static fn(): bool => count($http->requests) >= 2);
+        $runtime->run(static function () use (&$reported): bool {
+            return $reported;
+        });
 
+        self::assertTrue($reported);
+        self::assertSame('chat.postMessage', basename($http->requests[0]->getUri()->getPath()));
         self::assertSame('1.001', $http->sentPayload(0)['thread_ts']);
-        self::assertSame('chat.startStream', basename($http->requests[0]->getUri()->getPath()));
-        self::assertStringContainsString('OPENAI_API_KEY', $http->sentPayload(0)['chunks'][0]['text']);
-        self::assertSame('UOWNER', $http->sentPayload(0)['recipient_user_id']);
-        self::assertSame('T1', $http->sentPayload(0)['recipient_team_id']);
-        self::assertSame('chat.stopStream', basename($http->requests[1]->getUri()->getPath()));
-        self::assertSame('ai', new ThreadState($this->directory)->get('T1', 'C1', '1.001')['mode']);
+        self::assertStringContainsString('could not finish', $http->sentPayload(0)['text']);
+        self::assertNull(new ThreadState($this->directory)->get('T1', 'C1', '1.001'));
         self::assertNull($config->queue()->claim());
     }
 

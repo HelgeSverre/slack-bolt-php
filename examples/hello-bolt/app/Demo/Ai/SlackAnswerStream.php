@@ -70,6 +70,7 @@ final class SlackAnswerStream
                         ->stopStream([
                             'channel' => $this->channel,
                             'ts' => $this->timestamp,
+                            'session_status' => 'active',
                             ...(($chunks = $this->chunks()) !== [] ? ['chunks' => $chunks] : []),
                             ...($this->textBytes > 0 ? $this->sources($answer) : []),
                         ]);
@@ -86,6 +87,7 @@ final class SlackAnswerStream
                     ->stopStream([
                         'channel' => $this->channel,
                         'ts' => $this->timestamp,
+                        'session_status' => 'active',
                         'chunks' => [
                             ...$this->unfinishedTasks(),
                             [
@@ -107,6 +109,26 @@ final class SlackAnswerStream
                 'unfurl_links' => false,
                 'unfurl_media' => false,
             ]);
+    }
+
+    /** Stop a live stream after the durable worker observes Slack's native Stop control. */
+    public function cancel(): void
+    {
+        if ($this->timestamp === null) {
+            return;
+        }
+        try {
+            $this->client
+                ->chat()
+                ->stopStream([
+                    'channel' => $this->channel,
+                    'ts' => $this->timestamp,
+                    'session_status' => 'active',
+                    'chunks' => $this->unfinishedTasks(),
+                ]);
+        } catch (\Throwable) {
+            // Slack may already have stopped the listed stream timestamps before delivering the event.
+        }
     }
 
     private function flush(): void

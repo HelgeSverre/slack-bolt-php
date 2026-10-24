@@ -7,7 +7,7 @@ Current ordering refreshed 24 October 2026; earlier milestone sections below ret
 - PHP 8.5+, Tempest 3, and the provisional `Thunder\Bolt` namespace. Composer locks the tested dependency set, including Tempest 3.20.0.
 - Readonly payloads and message values, named factories, immutable builders, method attributes, and chainable listener registration. Application dependencies use constructor injection; delivery data is passed to handler methods.
 - A package-owned Slack Web API client and Block Kit implementation. Generated names preserve Slack's method hierarchy; endpoint models and specialized builders follow the pinned source schemas.
-- HTTP and Socket Mode handlers execute inline by default. Commands and interactions return one response value from their own family; reply helpers make outbound Web API or response-URL calls. Durable background workers remain a later adapter.
+- HTTP and Socket Mode listeners execute inline by default. Commands and interactions return one response value from their own family; reply helpers make outbound Web API or response-URL calls. Named jobs provide explicit durable background execution.
 - A project-local CLI for application and listener scaffolding, discovery, diagnostics, development serving, and completions.
 
 ## Initial milestone: implemented and locally verified
@@ -69,9 +69,10 @@ See the [client guide](../web-api-client.md), [builder guide](../sdk-and-block-k
 
 Durable named jobs are implemented: SQLite intake/deduplication, atomic claims/leases, bounded opt-in retries, uncertain recovery, cooperative cancellation, current authorization/state scopes and worker/operations scaffolds. See the [implementation audit](durable-execution-audit.md).
 
-1. **Modern agent sessions.** Build on the completed assistant-thread/function runtimes, typed stop/title-change events and named-job cancellation. Add session lifecycle helpers, status/stream cleanup and end-to-end cancellation of agent work while retaining assistant compatibility. The older AI/terminal/pet demo spool has not been migrated to the new queue.
-2. **Compatibility and release validation.** Maintain a behavior matrix, targeted live-workspace checks and package installation/release verification. Linux/macOS CI already passes; paid-plan custom-function validation still needs an eligible workspace. Triage Mago advisories explicitly. Fresh named-job project installation is verified, but publishing/release automation and CLI startup optimization remain open.
-3. **Demand-led adapters and operational growth.** Add deployment/shared-store adapters when needed; define job retention/schema-migration tooling before growing beyond the initial local SQLite execution backend.
+Modern agent sessions are implemented with typed lifecycle, session titles, stream completion states and stop handling. The AI demo now runs named durable jobs; persisted cancellation reaches model I/O and tool checkpoints. `/kickensink` provides an interactive tour. Pet, terminal and work-item spool entries remain application-local. See the [session integration notes](agent-sessions.md).
+
+1. **Compatibility and release validation.** Maintain a behavior matrix, targeted live-workspace checks and package installation/release verification. Linux/macOS CI already passes; paid-plan custom-function validation still needs an eligible workspace. Triage Mago advisories explicitly. Fresh named-job project installation is verified, but publishing/release automation and CLI startup optimization remain open.
+2. **Demand-led adapters and operational growth.** Add deployment/shared-store adapters when needed; define job retention/schema-migration tooling before growing beyond the initial local SQLite execution backend.
 
 Each milestone updates the [parity map](api-parity.md) with implemented behavior and its evidence. Full parity requires behavior coverage for every retained feature family; generated symbol counts alone cannot close a milestone. Remote Linux/macOS CI is verified in the current inventory. A release/publish operation remains outstanding.
 

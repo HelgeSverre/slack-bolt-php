@@ -6,13 +6,21 @@ namespace Thunder\Bolt\Tests\Examples;
 
 use App\Demo\DemoConfig;
 use App\Demo\DemoJob;
+use App\Demo\Jobs\Answer;
+use App\Demo\Jobs\AnswerHandler;
 use App\Demo\ThreadState;
 use App\Listeners\BoltlingHome;
 use App\Listeners\Playground;
 use PHPUnit\Framework\TestCase;
+use Tempest\CommandBus\CommandBusConfig;
+use Tempest\CommandBus\CommandHandler;
 use Tempest\Container\GenericContainer;
+use Tempest\Reflection\MethodReflector;
 use Thunder\Bolt\App;
 use Thunder\Bolt\BoltConfig;
+use Thunder\Bolt\Jobs;
+use Thunder\Bolt\Jobs\JobCodec;
+use Thunder\Bolt\Jobs\SqliteJobStore;
 use Thunder\Bolt\Tests\Support\RecordingHttpClient;
 use Thunder\Bolt\WebApi\Client;
 
@@ -22,6 +30,7 @@ final class PlaygroundTest extends TestCase
     private DemoConfig $config;
     private RecordingHttpClient $http;
     private App $app;
+    private SqliteJobStore $store;
 
     protected function setUp(): void
     {
@@ -29,8 +38,20 @@ final class PlaygroundTest extends TestCase
         $this->config = new DemoConfig($this->directory, ['UOWNER']);
         $container = new GenericContainer();
         $container->singleton(DemoConfig::class, $this->config);
+        $commands = new CommandBusConfig();
+        $commands->addHandler(
+            new CommandHandler(),
+            Answer::class,
+            MethodReflector::fromParts(AnswerHandler::class, 'handle'),
+        );
+        $this->store = SqliteJobStore::forTesting();
         $this->http = new RecordingHttpClient();
-        $this->app = new App($container, new Client($this->http, 'fake-bot'), new BoltConfig(token: 'fake-bot'));
+        $this->app = new App(
+            $container,
+            new Client($this->http, 'fake-bot'),
+            new BoltConfig(token: 'fake-bot'),
+            jobs: new Jobs($this->store, new JobCodec($commands)),
+        );
         $this->app->registerClass(Playground::class);
         $this->app->registerClass(BoltlingHome::class);
     }
@@ -50,17 +71,22 @@ final class PlaygroundTest extends TestCase
         rmdir($this->directory);
     }
 
-    public function test_command_acknowledges_after_durable_enqueue_without_outgoing_http(): void
+    public function test_ai_command_commits_once_before_acknowledgement_without_outgoing_http(): void
     {
         $ack = $this->app->dispatch($this->command('ai How big is the sun?'));
+        $duplicate = $this->app->dispatch($this->command('ai How big is the sun?'));
         self::assertStringContainsString('Queued', $ack->toArray()['text']);
+        self::assertStringContainsString('Queued', $duplicate->toArray()['text']);
         self::assertSame([], $this->http->requests);
-        $item = $this->config->queue()->claim();
-        $job = DemoJob::fromArray($item['job']);
-        self::assertSame('ai', $job->mode);
-        self::assertSame('T1', $job->team);
-        self::assertSame('UOWNER', $job->user);
-        self::assertSame('How big is the sun?', $job->text);
+        self::assertCount(1, $this->store->recent());
+        $record = $this->store->recent()[0];
+        self::assertSame(Answer::class, $record->type);
+        self::assertSame(['text' => 'How big is the sun?', 'thread' => null, 'title' => null], $record->payload);
+        self::assertSame('T1', $record->context->teamId);
+        self::assertSame('C1', $record->context->channelId);
+        self::assertNull($record->context->threadTs);
+        self::assertSame('UOWNER', $record->context->userId);
+        self::assertNull($this->config->queue()->claim());
     }
 
     public function test_terminal_is_denied_to_other_users_before_enqueuing(): void
@@ -133,6 +159,36 @@ final class PlaygroundTest extends TestCase
         self::assertSame('UOWNER', $queue->claim()['job']['user']);
         self::assertNull($queue->claim());
         self::assertNull($state->get('T2', 'C1', '1.001'));
+    }
+
+    public function test_ai_thread_redelivery_uses_the_durable_queue_and_keeps_thread_context(): void
+    {
+        new ThreadState($this->directory)->put('T1', 'C1', '1.002', ['mode' => 'ai', 'history' => []]);
+        $body = [
+            'type' => 'event_callback',
+            'team_id' => 'T1',
+            'event_id' => 'Ev-ai-thread',
+            'event' => [
+                'type' => 'message',
+                'channel' => 'C1',
+                'user' => 'UOWNER',
+                'text' => 'Continue from that.',
+                'thread_ts' => '1.002',
+                'ts' => '2.002',
+            ],
+        ];
+        $this->app->dispatch($body);
+        $this->app->dispatch($body);
+
+        self::assertCount(1, $this->store->recent());
+        $record = $this->store->recent()[0];
+        self::assertSame(Answer::class, $record->type);
+        self::assertSame(['text' => 'Continue from that.', 'thread' => '1.002', 'title' => null], $record->payload);
+        self::assertSame('T1', $record->context->teamId);
+        self::assertSame('C1', $record->context->channelId);
+        self::assertSame('1.002', $record->context->threadTs);
+        self::assertSame('UOWNER', $record->context->userId);
+        self::assertNull($this->config->queue()->claim());
     }
 
     public function test_other_users_cannot_fill_the_spool_using_terminal_control_buttons(): void

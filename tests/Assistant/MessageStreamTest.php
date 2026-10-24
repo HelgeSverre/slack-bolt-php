@@ -6,6 +6,7 @@ namespace Thunder\Bolt\Tests\Assistant;
 
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Thunder\Bolt\Assistant\AgentSessionStatus;
 use Thunder\Bolt\Assistant\MessageStream;
 use Thunder\Bolt\Assistant\Status;
 use Thunder\Bolt\Assistant\ThreadIdentity;
@@ -34,7 +35,7 @@ final class MessageStreamTest extends TestCase
                 'thread_ts' => '100.001',
                 'recipient_user_id' => 'U1',
                 'recipient_team_id' => 'T1',
-                'markdown_text' => 'The sun',
+                'chunks' => [['type' => 'markdown_text', 'text' => 'The sun']],
             ],
             $http->sentPayload(0),
         );
@@ -42,6 +43,7 @@ final class MessageStreamTest extends TestCase
         self::assertSame('chat.stopStream', basename($http->requests[2]->getUri()->getPath()));
         self::assertSame('1700000000.000002', $http->sentPayload(1)['ts']);
         self::assertSame($stream->timestamp(), $http->sentPayload(2)['ts']);
+        self::assertSame('active', $http->sentPayload(2)['session_status']);
         $this->expectException(\LogicException::class);
         $stream->append('Too late');
     }
@@ -68,6 +70,14 @@ final class MessageStreamTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         new MessageStream(new Client(new RecordingHttpClient(), 'test'), $this->identity(), ['channel' => 'OTHER']);
+    }
+
+    public function test_finish_can_leave_a_session_waiting_for_input(): void
+    {
+        $http = new RecordingHttpClient();
+        $this->stream($http)->append('Which workspace?')->finish(AgentSessionStatus::Suspended);
+
+        self::assertSame('suspended', $http->sentPayload(1)['session_status']);
     }
 
     public function test_status_builder_keeps_options_immutable_and_bounds_loading_messages(): void

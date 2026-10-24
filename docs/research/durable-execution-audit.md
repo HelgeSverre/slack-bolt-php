@@ -28,7 +28,7 @@ Persist installation/workspace/org, user, channel, known root, correlation and e
 
 Normal job dispatch rejects ambient custom-function context. Applications may queue a named job containing an opaque protected-function reference with an explicitly selected `JobContext`; the existing vault example remains responsible for token encryption, expiry and terminal workflow completion. This queue does not stretch a temporary Slack credential's lifetime.
 
-Jobs are authenticated Slack work, not a replacement for every host application scheduler. Tempest remains the sole kernel. No broad Application superclass, Redis/Postgres adapter, listener-wide deferral, native agent-session status protocol or automatic AI-spool migration is claimed.
+Jobs are authenticated Slack work, not a replacement for every host application scheduler. Tempest remains the sole kernel. No broad Application superclass, Redis/Postgres adapter or listener-wide deferral is claimed. The subsequent [agent-session milestone](agent-sessions.md) migrates new AI turns to durable jobs and connects Stop to cancellable model I/O; old spool entries are not automatically replayed.
 
 ## Validation
 

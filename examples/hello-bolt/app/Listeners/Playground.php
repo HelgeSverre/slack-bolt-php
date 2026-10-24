@@ -6,12 +6,14 @@ namespace App\Listeners;
 
 use App\Demo\DemoConfig;
 use App\Demo\DemoInput;
+use App\Demo\Jobs\Answer;
 use App\Demo\ThreadState;
 use Thunder\Bolt\Attributes\Action as ActionHandler;
 use Thunder\Bolt\Attributes\Event;
 use Thunder\Bolt\Attributes\Shortcut as ShortcutHandler;
 use Thunder\Bolt\Attributes\SlashCommand as CommandHandler;
 use Thunder\Bolt\Invocation\Delivery;
+use Thunder\Bolt\Jobs;
 use Thunder\Bolt\Payloads\Action;
 use Thunder\Bolt\Payloads\Events\AppMention;
 use Thunder\Bolt\Payloads\Events\Message;
@@ -30,7 +32,7 @@ final readonly class Playground
     ) {}
 
     #[CommandHandler('/bolt')]
-    public function command(SlashCommand $command, Delivery $delivery): CommandResponse
+    public function command(SlashCommand $command, Delivery $delivery, Jobs $jobs): CommandResponse
     {
         $input = DemoInput::parse($command->text);
         if ($input === null || $input['mode'] === 'help') {
@@ -47,12 +49,13 @@ final readonly class Playground
             null,
             $delivery,
             (string) ($command->raw['trigger_id'] ?? ''),
+            $jobs,
         );
         return CommandResponse::ephemeral('Queued! The demo worker will post here in a moment.');
     }
 
     #[ShortcutHandler('test_message', type: 'message_action')]
-    public function messageShortcut(Shortcut $shortcut, Delivery $delivery): ShortcutResponse
+    public function messageShortcut(Shortcut $shortcut, Delivery $delivery, Jobs $jobs): ShortcutResponse
     {
         $text = $shortcut->raw['message']['text'] ?? '';
         $this->enqueue(
@@ -63,12 +66,13 @@ final readonly class Playground
             $shortcut->threadTs ?? $shortcut->messageTs,
             $delivery,
             $shortcut->triggerId ?? '',
+            $jobs,
         );
         return ShortcutResponse::empty();
     }
 
     #[Event('app_mention')]
-    public function mention(AppMention $event, Delivery $delivery, Reply $reply): void
+    public function mention(AppMention $event, Delivery $delivery, Reply $reply, Jobs $jobs): void
     {
         $input = DemoInput::parse($event->text);
         if ($input === null) {
@@ -90,11 +94,12 @@ final readonly class Playground
             $event->threadTs ?? $event->ts,
             $delivery,
             $event->ts,
+            $jobs,
         );
     }
 
     #[Event('message')]
-    public function thread(Message $event, Delivery $delivery): void
+    public function thread(Message $event, Delivery $delivery, Jobs $jobs): void
     {
         if (
             $event->threadTs === null
@@ -124,12 +129,13 @@ final readonly class Playground
             $event->threadTs,
             $delivery,
             $event->ts,
+            $jobs,
             'input',
         );
     }
 
     #[ActionHandler(new Regex('/^demo_pet_(feed|play|clean|rest|refresh)$/'))]
-    public function pet(Action $action, Delivery $delivery): ActionResponse
+    public function pet(Action $action, Delivery $delivery, Jobs $jobs): ActionResponse
     {
         $this->enqueue(
             'pet',
@@ -139,6 +145,7 @@ final readonly class Playground
             $action->threadTs,
             $delivery,
             (string) ($action->action['action_ts'] ?? ''),
+            $jobs,
             'care',
             $action->messageTs,
         );
@@ -146,7 +153,7 @@ final readonly class Playground
     }
 
     #[ActionHandler(new Regex('/^demo_terminal_(interrupt|close)$/'))]
-    public function terminalControl(Action $action, Delivery $delivery): ActionResponse
+    public function terminalControl(Action $action, Delivery $delivery, Jobs $jobs): ActionResponse
     {
         $team = $delivery->authorizationSource?->teamId ?? '';
         $thread = $action->threadTs ?? $action->messageTs ?? '';
@@ -162,6 +169,7 @@ final readonly class Playground
             $action->threadTs ?? $action->messageTs,
             $delivery,
             (string) ($action->action['action_ts'] ?? ''),
+            $jobs,
             substr($action->actionId ?? '', strlen('demo_terminal_')),
         );
         return ActionResponse::empty();
@@ -175,6 +183,7 @@ final readonly class Playground
         ?string $thread,
         Delivery $delivery,
         string $identity,
+        Jobs $jobs,
         string $operation = 'open',
         ?string $message = null,
     ): void {
@@ -184,6 +193,13 @@ final readonly class Playground
         }
         $source = $delivery->authorizationSource?->raw ?? [];
         $eventId = $source['event_id'] ?? $identity;
+        if ($mode === 'ai') {
+            $jobs->dispatch(
+                new Answer($text, $thread),
+                hash('sha256', json_encode([$team, $mode, $eventId, $text, $thread], JSON_THROW_ON_ERROR)),
+            );
+            return;
+        }
         $job = [
             'mode' => $mode,
             'text' => $text,

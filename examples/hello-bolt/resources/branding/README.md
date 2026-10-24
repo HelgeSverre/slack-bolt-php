@@ -1,6 +1,6 @@
 # Thunder Bolt demo branding
 
-This directory holds the minimal identity for the `hello-bolt` Slack demonstration. It is not yet a decision about the framework-wide Thunder Bolt identity.
+This directory holds the minimal identity for the `hello-bolt` Slack demonstration only. The user confirmed that it does not apply to the Thunder Bolt PHP framework.
 
 The identity has one original connected, sharp, notched diagonal contact and one accent. The geometry lives in `generate.php`; do not redraw it from a raster export. The square avatar field is intentional: Slack crops app imagery square.
 

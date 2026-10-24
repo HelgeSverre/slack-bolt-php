@@ -15,7 +15,7 @@ colors:
 
 This is a deliberately small identity for the hello-bolt Slack demonstration: one accent, one connected sharp diagonal form, and plain supporting language. It gives the app a recognizable square-crop avatar without turning a developer demo into a mascot brand.
 
-Its scope is the demo identity only. Whether it becomes the framework's permanent identity remains undecided.
+The user confirmed its scope is the Slack demo only. Do not apply this identity to the Thunder Bolt PHP framework.
 
 **Key Characteristics:**
 

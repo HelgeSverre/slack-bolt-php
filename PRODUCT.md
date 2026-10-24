@@ -22,7 +22,7 @@ Experimental and unpublished. PHP 8.5+ and Tempest 3. The namespace and package 
 
 ## Brand Commitments
 
-The user requested a minimal identity: one distinctive accent, one geometric shape, sparse formatting and plain language. Avoid ornamental AI imagery. The current asset work targets the Slack demonstration; whether this becomes the permanent framework identity remains open.
+The user requested a minimal identity for the Slack demo only: one distinctive accent, one geometric shape, sparse formatting and plain language. Avoid ornamental AI imagery. This identity does not apply to the Thunder Bolt PHP framework.
 
 ## Evidence on Hand
 

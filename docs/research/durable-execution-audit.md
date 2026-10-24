@@ -32,13 +32,13 @@ Jobs are authenticated Slack work, not a replacement for every host application 
 
 ## Validation
 
-- Signed HTTP: commit visible to a second connection before listener return; post-intake failure followed by redelivery deduplicates; a held SQLite writer causes a non-success response within bounded time, including with a returning app error hook.
+- Signed HTTP: commit visible to a second connection before listener return; post-intake failure followed by redelivery deduplicates; a held SQLite writer causes a concrete `SQLITE_BUSY` failure and non-success response, including with a returning app error hook. The configured lock wait is 250 ms; wall-clock scheduler latency is not a protocol guarantee.
 - Socket Mode: two distinct envelopes with the same Events API event ID acknowledge only after persistent intake and create one job.
 - Two competing PHP processes: exactly one claim; process exit without settlement leaves an expired attempt which recovers to uncertain.
 - Storage/runtime: tenant isolation, duplicate conflicts, scheduling, lease renewal/expiry, stale settlement, bounded backoff, manual recovery budgets, pending/running/thread cancellation, cancellation-vs-retry race, explicit uncertainty, fresh constructor services/current state, and metadata redaction.
 - Scaffolding: generated job/handler passes real Tempest command discovery and worker execution; overwrite protection and completion suggestions are tested.
 - Fresh Composer-installed project: generated job, custom producer command, worker completion and duplicate intake succeeded with both cold and cached discovery. No Slack API request was sent by that smoke test.
 
-Final validation: **515 tests / 3,364 assertions pass** on PHP 8.5.12. Mago formatting passes; lint reports zero errors (24 existing warnings, 45 help findings, one note), and analysis reports zero errors (162 warnings, 46 help findings). Composer strict validation passes. All seven tooling tests and verification of 273 generated model pairs pass. Independent standards and spec reviews approved the remediation of container, private-store and failed-intake issues.
+Final validation: **515 tests / 3,365 assertions pass** on PHP 8.5.12. Mago formatting passes; lint reports zero errors (24 existing warnings, 45 help findings, one note), and analysis reports zero errors (162 warnings, 46 help findings). Composer strict validation passes. All seven tooling tests and verification of 273 generated model pairs pass. Independent standards and spec reviews approved the remediation of container, private-store and failed-intake issues.
 
 Fixture tests and local process tests do not establish performance under arbitrary disk contention or a live production crash campaign. SQLite is a local file backend: use one shared local database, not a network filesystem, and do not assume separate hosts coordinate through independent copies.

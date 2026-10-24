@@ -612,7 +612,10 @@ final class DurableExecutionTest extends TestCase
         $app->event('app_mention', static function (Jobs $jobs): void {
             $jobs->dispatch(new PublishNote('one'));
         });
-        $app->error(static fn(): null => null);
+        $cause = null;
+        $app->error(static function (\Thunder\Bolt\Exceptions\HandlerFailures $failure) use (&$cause): void {
+            $cause = $failure->getPrevious()?->getPrevious();
+        });
         $body = json_encode([
             'type' => 'event_callback',
             'event_id' => 'EvLock',
@@ -627,10 +630,10 @@ final class DurableExecutionTest extends TestCase
         $blocking = new PDO('sqlite:' . $this->directory . '/queue.sqlite');
         $blocking->exec('BEGIN IMMEDIATE');
         try {
-            $start = hrtime(true);
             $response = new Receiver($app, $config)->handle($body, $headers);
             self::assertSame(500, $response->status);
-            self::assertLessThan(2.5, (hrtime(true) - $start) / 1e9);
+            self::assertInstanceOf(\PDOException::class, $cause);
+            self::assertSame(5, $cause->errorInfo[1]); // SQLITE_BUSY, not a different handler failure.
         } finally {
             $blocking->exec('ROLLBACK');
         }

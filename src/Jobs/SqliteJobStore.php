@@ -22,7 +22,7 @@ final readonly class SqliteJobStore
         }
         $this->clock = $clock ?? new SystemClock();
         $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $connection->exec('PRAGMA busy_timeout = 1000');
+        $connection->exec('PRAGMA busy_timeout = 250');
         $connection->exec('PRAGMA synchronous = FULL');
         $connection->exec(<<<'SQL'
             CREATE TABLE IF NOT EXISTS thunder_bolt_jobs (

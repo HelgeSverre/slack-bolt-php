@@ -7,6 +7,7 @@ namespace App\Demo;
 use Amp\DeferredCancellation;
 use App\Demo\Ai\ResponsesAgent;
 use App\Demo\Ai\SlackAnswerStream;
+use App\Demo\Pet\PetHomeView;
 use App\Demo\Pet\PetStore;
 use App\Demo\Pet\PetView;
 use Tempest\Console\Console;
@@ -126,6 +127,7 @@ final class DemoRuntime
         try {
             match ($job->mode) {
                 'pet' => $this->pet($job, $id),
+                'pet_home' => $this->petHome($job, $id),
                 'terminal' => $this->terminal->handle($job),
                 'ai' => $this->ai($job, $id),
                 default => throw new \InvalidArgumentException('Unknown demo job.'),
@@ -135,6 +137,12 @@ final class DemoRuntime
             $this->queue->fail($id, $exception::class);
             $this->console->error('Demo job failed: ' . $exception::class);
             try {
+                if ($job->mode === 'pet_home') {
+                    $this->client
+                        ->views()
+                        ->publish(['user_id' => $job->user, 'view' => PetHomeView::unavailable()->toArray()]);
+                    return;
+                }
                 $this->reply(
                     $job,
                     'The demo could not finish that action. Check the local worker. '
@@ -158,6 +166,19 @@ final class DemoRuntime
         } else {
             $this->reply($job, $message);
         }
+    }
+
+    private function petHome(DemoJob $job, string $id): void
+    {
+        $state = in_array($job->text, ['feed', 'play', 'clean', 'rest'], true)
+            ? $this->pet->care($job->team, $job->user, $job->text, $id)
+            : $this->pet->snapshot($job->team);
+        $this->client
+            ->views()
+            ->publish([
+                'user_id' => $job->user,
+                'view' => PetHomeView::make($state, $job->text)->toArray(),
+            ]);
     }
 
     private function ai(DemoJob $job, string $id): void

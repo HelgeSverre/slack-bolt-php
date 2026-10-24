@@ -93,6 +93,35 @@ final class DemoRuntimeTest extends TestCase
         self::assertSame('closed', new ThreadState($this->directory)->get('T1', 'C1', $last['ts'])['mode']);
     }
 
+    public function test_home_care_uses_the_shared_pet_and_only_publishes_to_the_acting_user(): void
+    {
+        [$config, $http, $runtime] = $this->worker();
+        $store = new PetStore($this->directory . '/pet.json');
+        $store->care('T1', 'UOTHER', 'clean', 'channel-care');
+        $config->queue()->enqueue(
+            new DemoJob('pet_home', 'feed', 'T1', 'UOWNER', '', operation: 'care')->toArray(),
+            'home-feed',
+        );
+        $config->queue()->enqueue(
+            new DemoJob('pet_home', 'play', 'T1', 'UOWNER', '', operation: 'care')->toArray(),
+            'home-cooldown',
+        );
+        $runtime->run(static fn(): bool => count($http->requests) >= 2);
+
+        foreach ($http->requests as $request) {
+            self::assertSame('views.publish', basename($request->getUri()->getPath()));
+        }
+        self::assertSame('UOWNER', $http->sentPayload()['user_id']);
+        self::assertSame('home', $http->sentPayload()['view']['type']);
+        $first = json_encode($http->sentPayload(), JSON_THROW_ON_ERROR);
+        self::assertStringContainsString('UOTHER', $first);
+        self::assertStringContainsString('Fed Boltling. +12 XP.', $first);
+        self::assertStringContainsString('cooldown', json_encode($http->sentPayload(1), JSON_THROW_ON_ERROR));
+        self::assertSame(1, $store->snapshot('T1')['contributors']['UOWNER']['actions']);
+        self::assertSame(24, $store->snapshot('T1')['xp']);
+        self::assertSame(0, $store->snapshot('T2')['xp']);
+    }
+
     private function worker(): array
     {
         $config = new DemoConfig($this->directory, ['UOWNER']);

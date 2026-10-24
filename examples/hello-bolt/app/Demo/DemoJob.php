@@ -17,10 +17,10 @@ final readonly class DemoJob
         public ?string $message = null,
     ) {
         if (
-            !in_array($mode, ['pet', 'terminal', 'ai'], true)
+            !in_array($mode, ['pet', 'pet_home', 'terminal', 'ai'], true)
             || $team === ''
             || $user === ''
-            || $channel === ''
+            || $channel === '' && $mode !== 'pet_home'
             || strlen($text) > 8000
             || !in_array($operation, ['open', 'input', 'care', 'interrupt', 'close'], true)
         ) {
@@ -52,6 +52,7 @@ final readonly class DemoJob
         );
     }
 
+    /** @return array<string, mixed> */
     public function toArray(): array
     {
         return get_object_vars($this);

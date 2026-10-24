@@ -7,6 +7,7 @@ namespace Thunder\Bolt\Tests\Examples;
 use App\Demo\DemoConfig;
 use App\Demo\DemoJob;
 use App\Demo\ThreadState;
+use App\Listeners\BoltlingHome;
 use App\Listeners\Playground;
 use PHPUnit\Framework\TestCase;
 use Tempest\Container\GenericContainer;
@@ -31,6 +32,7 @@ final class PlaygroundTest extends TestCase
         $this->http = new RecordingHttpClient();
         $this->app = new App($container, new Client($this->http, 'fake-bot'), new BoltConfig(token: 'fake-bot'));
         $this->app->registerClass(Playground::class);
+        $this->app->registerClass(BoltlingHome::class);
     }
 
     protected function tearDown(): void
@@ -149,6 +151,59 @@ final class PlaygroundTest extends TestCase
         $queue = $this->config->queue();
         self::assertSame('UOWNER', $queue->claim()['job']['user']);
         self::assertNull($queue->claim());
+    }
+
+    public function test_home_opened_without_a_channel_is_queued_once_and_other_tabs_are_ignored(): void
+    {
+        foreach (['messages', 'home', 'home'] as $tab) {
+            $this->app->dispatch([
+                'type' => 'event_callback',
+                'team_id' => 'T1',
+                'event_id' => 'Ev-home',
+                'event' => ['type' => 'app_home_opened', 'user' => 'UOWNER', 'tab' => $tab, 'event_ts' => '1.001'],
+            ]);
+        }
+        $queue = $this->config->queue();
+        $job = DemoJob::fromArray($queue->claim()['job']);
+        self::assertSame('pet_home', $job->mode);
+        self::assertSame('', $job->channel);
+        self::assertSame('UOWNER', $job->user);
+        self::assertSame('T1', $job->team);
+        self::assertNull($queue->claim());
+        self::assertSame([], $this->http->requests);
+    }
+
+    public function test_home_buttons_acknowledge_without_http_and_preserve_actor_and_delivery_identity(): void
+    {
+        $body = [
+            'type' => 'block_actions',
+            'team' => ['id' => 'T1'],
+            'user' => ['id' => 'UCAREGIVER'],
+            'view' => ['type' => 'home', 'callback_id' => 'boltling_home'],
+            'actions' => [['action_id' => 'demo_pet_home_play', 'action_ts' => '2.001']],
+        ];
+        self::assertSame([], $this->app->dispatch($body)->toArray());
+        $this->app->dispatch($body);
+        $queue = $this->config->queue();
+        $job = DemoJob::fromArray($queue->claim()['job']);
+        self::assertSame('pet_home', $job->mode);
+        self::assertSame('play', $job->text);
+        self::assertSame('care', $job->operation);
+        self::assertSame('UCAREGIVER', $job->user);
+        self::assertNull($queue->claim());
+        self::assertSame([], $this->http->requests);
+    }
+
+    public function test_home_controls_ignore_buttons_on_other_surfaces(): void
+    {
+        $this->app->dispatch([
+            'type' => 'block_actions',
+            'team' => ['id' => 'T1'],
+            'user' => ['id' => 'UOWNER'],
+            'channel' => ['id' => 'C1'],
+            'actions' => [['action_id' => 'demo_pet_home_feed', 'action_ts' => '2.001']],
+        ]);
+        self::assertNull($this->config->queue()->claim());
     }
 
     private function command(string $text, string $user = 'UOWNER'): array

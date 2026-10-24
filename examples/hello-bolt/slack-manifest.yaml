@@ -3,6 +3,8 @@ _metadata:
 display_information:
   name: Thunder Bolt App
 features:
+  app_home:
+    home_tab_enabled: true
   bot_user:
     display_name: Thunder Bolt
   shortcuts:
@@ -34,4 +36,5 @@ settings:
   event_subscriptions:
     request_url: https://example.test/slack/events
     bot_events:
+      - app_home_opened
       - app_mention

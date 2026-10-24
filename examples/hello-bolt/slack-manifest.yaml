@@ -25,8 +25,10 @@ oauth_config:
   scopes:
     bot:
       - app_mentions:read
+      - assistant:write
       - chat:write
       - commands
+      - im:history
       - links:read
       - links:write
 settings:
@@ -40,6 +42,9 @@ settings:
     bot_events:
       - app_home_opened
       - app_mention
+      - assistant_thread_started
+      - assistant_thread_context_changed
+      - message.im
       - entity_details_requested
       - entity_comments_requested
       - link_shared

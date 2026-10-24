@@ -118,7 +118,7 @@ final class AppInitializer implements Initializer
             $container->singleton(ConversationStore::class, $contextStore);
         }
 
-        return new App(
+        $app = new App(
             $container,
             $client,
             $config,
@@ -126,6 +126,10 @@ final class AppInitializer implements Initializer
             $contextStore,
             $container->has(LoggerInterface::class) ? $container->get(LoggerInterface::class) : null,
         );
+        if ($container->has(\Thunder\Bolt\Assistant::class)) {
+            $app->assistant($container->get(\Thunder\Bolt\Assistant::class));
+        }
+        return $app;
     }
 
     private function sqlite(string $path): PDO

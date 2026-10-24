@@ -18,7 +18,7 @@ use Thunder\Bolt\Routing\HandlerTarget;
 
 final class HandlerInvoker
 {
-    /** @var array<string, array<string, 'payload'|'reply'|'delivery'|'client'|'authorization'|'authorizationSource'|'conversation'|'thread'>> */
+    /** @var array<string, array<string, 'payload'|'reply'|'delivery'|'client'|'authorization'|'authorizationSource'|'conversation'|'thread'|'assistant'>> */
     private array $argumentPlans = [];
 
     public function __construct(
@@ -40,7 +40,8 @@ final class HandlerInvoker
     /** @return array<string, object> */
     private function deliveryArguments(HandlerTarget $target, Delivery $delivery): array
     {
-        $cacheKey = $target->key() . '|' . $delivery->payload::class;
+        $cacheKey =
+            $target->key() . '|' . $delivery->payload::class . ($delivery->assistant === null ? '' : '|assistant');
         $plan = $this->argumentPlans[$cacheKey] ??= $this->argumentPlan($target, $delivery);
         $arguments = [];
 
@@ -58,13 +59,14 @@ final class HandlerInvoker
                     'No delivery conversation context.',
                 ),
                 'thread' => $delivery->thread ?? throw new \LogicException('No delivery thread context.'),
+                'assistant' => $delivery->assistant ?? throw new \LogicException('No delivery assistant thread.'),
             };
         }
 
         return $arguments;
     }
 
-    /** @return array<string, 'payload'|'reply'|'delivery'|'client'|'authorization'|'authorizationSource'|'conversation'|'thread'> */
+    /** @return array<string, 'payload'|'reply'|'delivery'|'client'|'authorization'|'authorizationSource'|'conversation'|'thread'|'assistant'> */
     private function argumentPlan(HandlerTarget $target, Delivery $delivery): array
     {
         $plan = [];
@@ -89,6 +91,8 @@ final class HandlerInvoker
                 $plan[$parameter->getName()] = 'conversation';
             } elseif ($delivery->thread !== null && $this->accepts($parameter, $delivery->thread)) {
                 $plan[$parameter->getName()] = 'thread';
+            } elseif ($delivery->assistant !== null && $this->accepts($parameter, $delivery->assistant)) {
+                $plan[$parameter->getName()] = 'assistant';
             }
         }
 

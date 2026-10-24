@@ -93,6 +93,13 @@ final readonly class AuthorizationSource
         $authorizations = $envelope['authorizations'] ?? null;
         $authorization = is_array($authorizations) ? self::array($authorizations[0] ?? null) : [];
         $event = self::array($envelope['event'] ?? null);
+        $assistantThread = in_array(
+            $event['type'] ?? null,
+            ['assistant_thread_started', 'assistant_thread_context_changed'],
+            true,
+        )
+            ? self::array($event['assistant_thread'] ?? null)
+            : [];
         $eventUser = $event['user'] ?? null;
         $eventUserId = is_string($eventUser)
             ? self::string($eventUser)
@@ -124,8 +131,11 @@ final readonly class AuthorizationSource
             enterpriseId: $authorization !== []
                 ? self::string($authorization['enterprise_id'] ?? null)
                 : self::string($envelope['enterprise_id'] ?? null),
-            userId: $eventUserId ?? $creator ?? self::string($subteam['created_by'] ?? null),
-            conversationId: $conversationId,
+            userId: self::string($assistantThread['user_id'] ?? null)
+            ?? $eventUserId
+            ?? $creator
+            ?? self::string($subteam['created_by'] ?? null),
+            conversationId: self::string($assistantThread['channel_id'] ?? null) ?? $conversationId,
             isEnterpriseInstall: $enterpriseInstall,
             raw: $envelope,
         );

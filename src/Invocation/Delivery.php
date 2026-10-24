@@ -31,5 +31,6 @@ final readonly class Delivery
         public ?AuthorizationSource $authorizationSource = null,
         public ?ConversationContext $conversation = null,
         public ?ThreadContext $thread = null,
+        public ?\Thunder\Bolt\Assistant\Thread $assistant = null,
     ) {}
 }

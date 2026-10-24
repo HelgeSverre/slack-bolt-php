@@ -68,7 +68,7 @@ final class DemoRuntime
                 });
             }
         }
-        $this->console->info('Demo worker ready: pet, terminal, AI, and work items. Press Ctrl+C to stop.');
+        $this->console->info('Demo worker ready: pet, terminal, AI, work items, and assistants. Press Ctrl+C to stop.');
         try {
             while (!$stop && ($shouldStop === null || !$shouldStop())) {
                 foreach ($this->tasks() as $key => $task) {
@@ -82,7 +82,7 @@ final class DemoRuntime
                 if ($item !== null) {
                     $job = DemoJob::fromArray($item['job']);
                     $id = $item['id'];
-                    if (($job->mode ?? '') === 'ai') {
+                    if ($job->mode === 'ai' || $job->mode === 'assistant' && $job->operation === 'message') {
                         $key = ThreadState::id($job->team, $job->channel, $job->thread ?? $id);
                         if (
                             array_any($this->tasks(), static fn(AiTask $task): bool => $task->conversationKey === $key)
@@ -130,6 +130,7 @@ final class DemoRuntime
                 'pet' => $this->pet($job, $id),
                 'pet_home' => $this->petHome($job, $id),
                 'work' => new WorkObjectsDemo($this->config, $this->client)->handle($job, $id),
+                'assistant' => $this->assistant($job, $id),
                 'terminal' => $this->terminal->handle($job),
                 'ai' => $this->ai($job, $id),
                 default => throw new \InvalidArgumentException('Unknown demo job.'),
@@ -143,6 +144,16 @@ final class DemoRuntime
                 $this->console->error('Slack API error: ' . substr($code ?? '', 0, 100));
             }
             try {
+                if ($job->mode === 'assistant') {
+                    try {
+                        new AssistantDemo($this->config)
+                            ->threadFor($job, $this->client)
+                            ->clearStatus();
+                    } catch (\Throwable) {
+                        $this->console->info('Could not clear the optional assistant status.');
+                    }
+                    return;
+                }
                 if ($job->mode === 'work' && $job->channel === '') {
                     return;
                 }
@@ -232,6 +243,25 @@ final class DemoRuntime
                 'mode' => 'ai',
                 'history' => $answer->history,
             ]);
+        }
+    }
+
+    private function assistant(DemoJob $job, string $id): void
+    {
+        $assistant = new AssistantDemo($this->config);
+        if ($job->operation === 'started') {
+            $assistant->start($job, $this->client);
+
+            return;
+        }
+        if ($job->operation !== 'message') {
+            throw new \InvalidArgumentException('Unknown assistant demo operation.');
+        }
+        $thread = $assistant->beginAnswer($job, $this->client);
+        try {
+            $this->ai($job, $id);
+        } finally {
+            $thread->clearStatus();
         }
     }
 

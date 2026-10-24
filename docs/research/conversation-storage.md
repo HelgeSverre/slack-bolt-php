@@ -187,9 +187,10 @@ production projects should choose a durable adapter explicitly.
 messages through `conversations.replies`, then writes context into the assistant bot's initial
 message metadata with `chat.update` ([source](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/AssistantThreadContextStore.ts#L5-L89)).
 
-Do not couple that API to this milestone. It belongs with complete Assistant lifecycle and
-metadata behavior. The common `ConversationAddress` extractor may later be reused, but Assistant
-storage must retain its distinct `get/save` contract and Slack message-metadata semantics.
+The later [Assistant milestone](assistant-runtime-research.md) implements this separately as
+`Thunder\Bolt\Assistant\ThreadContextStore`. Its default adapter uses the conversation backend
+with a distinct assistant storage key; a Slack metadata adapter provides Bolt-style compatibility.
+Generic conversation/history values and Assistant focus context remain separate.
 
 ## Compatibility tests
 

@@ -18,7 +18,7 @@ final readonly class DemoJob
         public array $payload = [],
     ) {
         if (
-            !in_array($mode, ['pet', 'pet_home', 'terminal', 'ai', 'work'], true)
+            !in_array($mode, ['pet', 'pet_home', 'terminal', 'ai', 'work', 'assistant'], true)
             || $team === ''
             || $user === ''
             || $channel === '' && $mode !== 'pet_home' && !($mode === 'work' && $operation !== 'open')
@@ -37,11 +37,16 @@ final readonly class DemoJob
                     'edit_comment',
                     'delete_comment',
                     'unfurl',
+                    'started',
+                    'message',
                 ],
                 true,
             )
         ) {
             throw new \InvalidArgumentException('Invalid demo job.');
+        }
+        if ($mode === 'assistant' && ($thread === null || $thread === '')) {
+            throw new \InvalidArgumentException('Assistant demo jobs require a root thread timestamp.');
         }
     }
 

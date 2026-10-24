@@ -133,6 +133,61 @@ The injected client also supports arrays, cursor pagination, streamed multipart 
 
 Calls send once by default. Background or CLI code can opt into bounded retries with `$client->retrying()`. OAuth exchanges, response URLs, and file-content transfers remain single-attempt. Supply a PSR-18 transport to configure timeouts or test outgoing requests.
 
+## Slack assistants
+
+Register one assistant with typed lifecycle and message handlers. In a Tempest app, return this value from `config/assistant.config.php`; otherwise pass it to `$app->assistant(...)`.
+
+```php
+use App\Listeners\WorkspaceAssistant;
+use Thunder\Bolt\Assistant;
+
+return Assistant::make()
+    ->threadStarted([WorkspaceAssistant::class, 'started'])
+    ->userMessage([WorkspaceAssistant::class, 'message']);
+```
+
+The injected thread object supplies the destination and the authorized client:
+
+```php
+use Thunder\Bolt\Assistant\{SuggestedPrompt, Thread};
+use Thunder\Bolt\Payloads\Events\{AssistantThreadStarted, Message};
+
+final readonly class WorkspaceAssistant
+{
+    public function started(AssistantThreadStarted $event, Thread $thread): void
+    {
+        $thread->saveContext();
+        $thread->say('Ready. What are we working on?');
+        $thread->setSuggestedPrompts([
+            new SuggestedPrompt('Explain something', 'Explain how this works.'),
+        ]);
+    }
+
+    public function message(Message $message, Thread $thread): void
+    {
+        $thread->setTitle(mb_substr($message->text, 0, 80));
+        $thread->setStatus('is working');
+        try {
+            $thread->say('Message received. Add your application logic here.');
+        } finally {
+            $thread->clearStatus();
+        }
+    }
+}
+```
+
+Assistant handlers consume IM thread replies with no subtype or `file_share`, matching Bolt JS. Other events continue to ordinary listeners. `threadContextChanged(...)` is optional: its default saves the new focus context. Focus context is separate from conversation history and is scoped by installation, DM and root timestamp; file and SQLite stores survive restarts. `contextStore(...)` accepts another adapter, including `SlackMetadataThreadContextStore` for Bolt-style message metadata storage. Without an explicit adapter, assistants use the application's conversation backend; disabling that backend selects Slack metadata storage, which requires a bot user ID and thread-history access.
+
+`Thread::sayStream()` returns a lazy stream with `append()`, `chunks()` and `stop()`. Text and task chunks use Slack's native streaming protocol. `Status::make('is working')->loadingMessages(...)` supplies optional status customization. All helpers pin the destination to the current assistant thread.
+
+Enable your Slack app's **Agent experience**, install with `assistant:write`, `chat:write` and `im:history`, and subscribe to `assistant_thread_started`, `assistant_thread_context_changed` and `message.im`. Slack currently recommends newer agent-session methods; this module implements the assistant-thread contract used by the pinned Bolt JS reference. It does not yet implement the full agent-session protocol.
+
+Slow model calls belong in a worker: the [native assistant playground](examples/hello-bolt/README.md#native-slack-assistant) saves context and queues work before acknowledging. Core handlers execute inline.
+
+### Using Laravel AI
+
+Model execution remains application code. In a configured Laravel application, a worker can call `$agent->prompt($text)->text` and pass the result to `$thread->say(...)`, or translate its text deltas into `sayStream()->append(...)`. Keep Laravel's conversation UUID in your application conversation state and map Slack users to Laravel participants explicitly. This milestone provides the Slack integration seam and a [source-backed compatibility assessment](docs/research/assistant-laravel-ai.md); it does not include a full Laravel AI package or Eloquent integration. Laravel dependencies are not required by Thunder Bolt.
+
 ## Work Objects
 
 Publish external work as native Slack previews, open details, and synchronize comments with your application.
@@ -166,6 +221,7 @@ Slack app configuration and feature availability are required. The [work-item de
 - Conversation/thread state with memory, file, and SQLite adapters and atomic updates.
 - Typed Web API models, message/view builders, uploads, pagination, and opt-in retries.
 - Work Object entities, details, unfurls and bidirectional comments with application-owned storage and authorization.
+- Slack assistant lifecycle handlers, isolated durable focus context, status, titles, suggested prompts and streaming helpers.
 - Project/listener scaffolding, discovery, diagnostics, and shell completions.
 
 Capability parity is the goal; PHP handlers use native types, dependency injection, and explicit response values. Generated declaration scaffolds under `src/Scaffold/` are planning artifacts, excluded from discovery, and do not represent implemented runtime features.

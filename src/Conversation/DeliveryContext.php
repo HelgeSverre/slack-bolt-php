@@ -73,6 +73,9 @@ final readonly class DeliveryContext
         if ($type === null) {
             return null;
         }
+        if (in_array($type, ['assistant_thread_started', 'assistant_thread_context_changed'], true)) {
+            return self::string(self::array($event['assistant_thread'] ?? null)['thread_ts'] ?? null);
+        }
 
         if (in_array($type, ['app_mention', 'message'], true)) {
             $subtype = self::string($event['subtype'] ?? null);

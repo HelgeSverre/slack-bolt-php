@@ -50,6 +50,9 @@ use Thunder\Bolt\Middleware\Middleware;
 use Thunder\Bolt\Payloads\Action;
 use Thunder\Bolt\Payloads\Event as GenericEvent;
 use Thunder\Bolt\Payloads\Events\AppMention;
+use Thunder\Bolt\Payloads\Events\AssistantThreadContextChanged;
+use Thunder\Bolt\Payloads\Events\AssistantThreadEvent;
+use Thunder\Bolt\Payloads\Events\AssistantThreadStarted;
 use Thunder\Bolt\Payloads\Events\EntityCommentsRequested;
 use Thunder\Bolt\Payloads\Events\EntityDetailsRequested;
 use Thunder\Bolt\Payloads\Events\EntityRequest;
@@ -79,6 +82,8 @@ final class App
     private array $globalMiddleware = [];
 
     private ?Closure $errorHandler = null;
+
+    private ?Assistant $registeredAssistant = null;
 
     private readonly HandlerInvoker $invoker;
 
@@ -110,6 +115,33 @@ final class App
         $this->globalMiddleware[] = $middleware;
 
         return $this;
+    }
+
+    public function assistant(Assistant $assistant): self
+    {
+        if ($this->registeredAssistant !== null) {
+            throw new \LogicException('An application can register one assistant.');
+        }
+        $assistant->validate();
+        foreach ([
+            'assistant_thread_started' => $assistant->started,
+            'assistant_thread_context_changed' => $assistant->contextChanged,
+            'message' => $assistant->message,
+        ] as $event => $handler) {
+            if ($handler !== null) {
+                $this->validatePayloadCompatibility(ListenerDescriptor::event($event, $handler->target));
+            }
+        }
+        $this->registeredAssistant = $assistant;
+        $store = $this->conversationStore === false
+            ? new \Thunder\Bolt\Assistant\Stores\SlackMetadataThreadContextStore()
+            : new \Thunder\Bolt\Assistant\Stores\StoredThreadContextStore($this->conversationStore);
+        $runtime = new \Thunder\Bolt\Assistant\Runtime($assistant, $this->container, $this->invoker, $store);
+        return $this->use(fn(Delivery $delivery, Closure $next): mixed => $runtime->handle(
+            $delivery,
+            $next,
+            $this->authorizer !== null,
+        ));
     }
 
     public function error(callable $handler): self
@@ -309,10 +341,25 @@ final class App
      */
     public function listeners(): array
     {
-        return array_map(
+        $listeners = array_map(
             static fn(ListenerDescriptor $listener): array => $listener->summary(),
             $this->registeredListeners,
         );
+        if ($this->registeredAssistant !== null) {
+            foreach ([
+                'assistant_thread_started' => $this->registeredAssistant->started,
+                'assistant_thread_context_changed' => $this->registeredAssistant->contextChanged,
+                'message.im (thread replies)' => $this->registeredAssistant->message,
+            ] as $selector => $handler) {
+                $listeners[] = [
+                    'kind' => 'assistant',
+                    'selector' => $selector,
+                    'target' => $handler?->target->key() ?? 'default context persistence',
+                    'source' => 'Assistant ' . ($handler?->target->key() ?? 'default context persistence'),
+                ];
+            }
+        }
+        return $listeners;
     }
 
     /**
@@ -497,6 +544,8 @@ final class App
         return match ($event['type'] ?? null) {
             'app_mention' => AppMention::fromArray($event),
             'message' => MessageEvent::fromArray($event),
+            'assistant_thread_started' => AssistantThreadStarted::fromArray($event),
+            'assistant_thread_context_changed' => AssistantThreadContextChanged::fromArray($event),
             'entity_details_requested' => EntityDetailsRequested::fromArray($event),
             'entity_comments_requested' => EntityCommentsRequested::fromArray($event),
             default => GenericEvent::fromArray($event),
@@ -614,6 +663,8 @@ final class App
             default => match ($descriptor->selector) {
                 'app_mention' => AppMention::class,
                 'message' => MessageEvent::class,
+                'assistant_thread_started' => AssistantThreadStarted::class,
+                'assistant_thread_context_changed' => AssistantThreadContextChanged::class,
                 'entity_details_requested' => EntityDetailsRequested::class,
                 'entity_comments_requested' => EntityCommentsRequested::class,
                 default => GenericEvent::class,
@@ -630,6 +681,9 @@ final class App
                         MessageEvent::class,
                         SlashCommand::class,
                         GenericEvent::class,
+                        AssistantThreadEvent::class,
+                        AssistantThreadStarted::class,
+                        AssistantThreadContextChanged::class,
                         EntityRequest::class,
                         EntityDetailsRequested::class,
                         EntityCommentsRequested::class,

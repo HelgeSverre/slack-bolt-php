@@ -22,6 +22,7 @@ use Thunder\Bolt\Attributes\Event as EventAttribute;
 use Thunder\Bolt\Attributes\Message as MessageAttribute;
 use Thunder\Bolt\Attributes\Options as OptionsAttribute;
 use Thunder\Bolt\Attributes\Shortcut as ShortcutAttribute;
+use Thunder\Bolt\Attributes\SlackFunction as FunctionAttribute;
 use Thunder\Bolt\Attributes\SlashCommand as SlashCommandAttribute;
 use Thunder\Bolt\Attributes\View as ViewAttribute;
 use Thunder\Bolt\Authorization\Authorization;
@@ -40,6 +41,8 @@ use Thunder\Bolt\Exceptions\InvalidListener;
 use Thunder\Bolt\Exceptions\InvalidPayload;
 use Thunder\Bolt\Exceptions\MissingAcknowledgement;
 use Thunder\Bolt\Exceptions\MissingCommandResponse;
+use Thunder\Bolt\Functions\Execution;
+use Thunder\Bolt\Functions\ExecutionContext;
 use Thunder\Bolt\Invocation\AcknowledgementValidator;
 use Thunder\Bolt\Invocation\Delivery;
 use Thunder\Bolt\Invocation\HandlerInvoker;
@@ -56,6 +59,7 @@ use Thunder\Bolt\Payloads\Events\AssistantThreadStarted;
 use Thunder\Bolt\Payloads\Events\EntityCommentsRequested;
 use Thunder\Bolt\Payloads\Events\EntityDetailsRequested;
 use Thunder\Bolt\Payloads\Events\EntityRequest;
+use Thunder\Bolt\Payloads\Events\FunctionExecuted;
 use Thunder\Bolt\Payloads\Events\Message as MessageEvent;
 use Thunder\Bolt\Payloads\Options;
 use Thunder\Bolt\Payloads\Shortcut;
@@ -163,9 +167,36 @@ final class App
         return $this;
     }
 
-    public function hasAuthorization(): bool
+    public function hasAuthorization(?array $body = null): bool
     {
-        return $this->authorizer !== null || $this->config->token !== '';
+        return (
+            $this->authorizer !== null
+            || $this->config->token !== ''
+            || $body !== null
+            && ExecutionContext::fromArray($body)?->workflowToken() !== null
+        );
+    }
+
+    public function hasFunctionListeners(): bool
+    {
+        return array_any(
+            $this->registeredListeners,
+            static fn(ListenerDescriptor $listener): bool => (
+                $listener->kind === ListenerKind::Function
+                || $listener->kind === ListenerKind::Event
+                && $listener->selector === 'function_executed'
+            ),
+        );
+    }
+
+    public function function(string $callbackId, mixed ...$middlewareAndHandler): self
+    {
+        [$handler, $middleware] = $this->registrationArguments(array_values($middlewareAndHandler));
+        return $this->registerDescriptor(ListenerDescriptor::function(
+            $callbackId,
+            HandlerTarget::from($handler),
+            $middleware,
+        ));
     }
 
     /** @param string|Regex $selector @param (callable|Middleware|string|array) ...$middlewareAndHandler */
@@ -288,6 +319,13 @@ final class App
                     source: "{$source} #[Event]",
                 ));
             }
+            foreach ($method->getAttributes(FunctionAttribute::class) as $attribute) {
+                $this->registerDescriptor(ListenerDescriptor::function(
+                    $attribute->newInstance()->callbackId,
+                    $target,
+                    source: "{$source} #[SlackFunction]",
+                ));
+            }
 
             foreach ($method->getAttributes(MessageAttribute::class) as $attribute) {
                 $this->registerDescriptor(ListenerDescriptor::message(
@@ -371,6 +409,9 @@ final class App
     public function dispatch(array $body, array $metadata = []): ?Acknowledgement
     {
         $payload = $this->payloadFrom($body);
+        $functionContext = $payload instanceof FunctionExecuted
+            ? $payload->execution
+            : ExecutionContext::fromArray($body);
         $source = AuthorizationSource::fromArray($body);
         try {
             $lifecycle =
@@ -386,7 +427,9 @@ final class App
                     botToken: $this->config->token,
                     botUserId: $this->config->botUserId,
                 );
-            $client = $this->client->withToken($lifecycle ? '' : $authorization->token());
+            $client = $this->client->withToken(
+                $lifecycle ? '' : $functionContext?->workflowToken() ?? $authorization->token(),
+            );
         } catch (Throwable $exception) {
             $this->reportFailures([$exception], $payload, $metadata);
 
@@ -404,7 +447,11 @@ final class App
         $store = $this->conversationStore === false ? null : $this->conversationStore;
         $conversation = new ConversationContext($store, $context->conversation, $this->logger);
         $thread = new ThreadContext($store, $context->thread, $this->logger);
-        $scope = $this->authorizer === null ? null : InvocationScope::create($this->container, $client, $authorization);
+        $scope =
+            $this->authorizer === null && $functionContext?->workflowToken() === null
+                ? null
+                : InvocationScope::create($this->container, $client, $authorization);
+        $execution = $functionContext === null ? null : new Execution($client, $functionContext);
         $responses = [];
         $failures = [];
 
@@ -421,6 +468,7 @@ final class App
                     authorizationSource: $source,
                     conversation: $conversation,
                     thread: $thread,
+                    execution: $execution,
                 ),
                 function () use (
                     $payload,
@@ -432,6 +480,7 @@ final class App
                     $scope,
                     $conversation,
                     $thread,
+                    $execution,
                     &$responses,
                     &$failures,
                 ): mixed {
@@ -454,6 +503,7 @@ final class App
                                 $source,
                                 $conversation,
                                 $thread,
+                                execution: $execution,
                             );
                             $result = $this->pipeline->run(
                                 $listener->middleware,
@@ -544,6 +594,7 @@ final class App
         return match ($event['type'] ?? null) {
             'app_mention' => AppMention::fromArray($event),
             'message' => MessageEvent::fromArray($event),
+            'function_executed' => FunctionExecuted::fromArray($event),
             'assistant_thread_started' => AssistantThreadStarted::fromArray($event),
             'assistant_thread_context_changed' => AssistantThreadContextChanged::fromArray($event),
             'entity_details_requested' => EntityDetailsRequested::fromArray($event),
@@ -660,9 +711,11 @@ final class App
             $descriptor->kind === ListenerKind::Shortcut => Shortcut::class,
             $descriptor->kind === ListenerKind::Options => Options::class,
             $descriptor->kind === ListenerKind::View => View::class,
+            $descriptor->kind === ListenerKind::Function => FunctionExecuted::class,
             default => match ($descriptor->selector) {
                 'app_mention' => AppMention::class,
                 'message' => MessageEvent::class,
+                'function_executed' => FunctionExecuted::class,
                 'assistant_thread_started' => AssistantThreadStarted::class,
                 'assistant_thread_context_changed' => AssistantThreadContextChanged::class,
                 'entity_details_requested' => EntityDetailsRequested::class,
@@ -681,6 +734,7 @@ final class App
                         MessageEvent::class,
                         SlashCommand::class,
                         GenericEvent::class,
+                        FunctionExecuted::class,
                         AssistantThreadEvent::class,
                         AssistantThreadStarted::class,
                         AssistantThreadContextChanged::class,

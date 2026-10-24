@@ -58,13 +58,6 @@ final readonly class Receiver
         if (!$isCommand && !$isEvent && Interaction::kind($body) === null) {
             return new Response(501, 'This Slack payload family is not implemented.');
         }
-        if (!$this->app->hasAuthorization()) {
-            return new Response(
-                503,
-                'Configure a Slack bot token or installation authorizer before dispatching Slack deliveries.',
-            );
-        }
-
         $normalized = array_change_key_case($headers, CASE_LOWER);
         $retry = $normalized['x-slack-retry-num'] ?? null;
         $reason = $normalized['x-slack-retry-reason'] ?? null;
@@ -73,6 +66,12 @@ final readonly class Receiver
             'retryReason' => is_string($reason) ? $reason : null,
         ];
         try {
+            if (!$this->app->hasAuthorization($body)) {
+                return new Response(
+                    503,
+                    'Configure a Slack bot token or installation authorizer before dispatching Slack deliveries.',
+                );
+            }
             $ack = $this->app->dispatch($body, $metadata);
         } catch (InvalidPayload $exception) {
             return new Response(400, 'Malformed Slack delivery payload.');

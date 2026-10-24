@@ -38,6 +38,19 @@ final readonly class ListenerDescriptor
     }
 
     /** @param list<callable|Middleware> $middleware */
+    public static function function(
+        string $callbackId,
+        HandlerTarget $handler,
+        array $middleware = [],
+        string $source = 'fluent registration',
+    ): self {
+        if (trim($callbackId) === '') {
+            throw new \InvalidArgumentException('A function listener needs a callback ID.');
+        }
+        return new self(ListenerKind::Function, $callbackId, $handler, $middleware, $source);
+    }
+
+    /** @param list<callable|Middleware> $middleware */
     public static function command(
         string|Regex $name,
         HandlerTarget $handler,

@@ -136,7 +136,7 @@ final readonly class Client
         }
         $request = new Request('POST', rtrim($this->baseUrl, '/') . '/' . $method, $headers, $body);
         $allowRetries = match ($method) {
-            'openid.connect.token' => false,
+            'openid.connect.token', 'functions.completeSuccess', 'functions.completeError' => false,
             default => !str_starts_with($method, 'oauth.'),
         };
         $response = $this->send($request, $allowRetries && ($multipart === null || $multipart->replayable), $multipart);

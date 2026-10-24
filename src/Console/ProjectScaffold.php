@@ -85,6 +85,14 @@ final readonly class ProjectScaffold
             return $target;
         }
 
+        if ($kind === 'function') {
+            $this->write($target, strtr($this->stub('function-listener.php.stub'), [
+                '{{ class }}' => $class,
+                '{{ selector }}' => var_export($selector, true),
+            ]));
+            return $target;
+        }
+
         [$attribute, $payloadUse, $payloadClass] = match ($kind) {
             'event' => ['Event', 'Events\\AppMention', 'AppMention'],
             'message' => ['MessageAttribute', 'Events\\Message as SlackMessage', 'SlackMessage'],

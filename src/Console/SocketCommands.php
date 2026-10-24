@@ -35,7 +35,7 @@ final readonly class SocketCommands
 
             return ExitCode::INVALID;
         }
-        if (!$app->hasAuthorization()) {
+        if (!$app->hasAuthorization() && !$app->hasFunctionListeners()) {
             $this->error('socket:serve requires SLACK_BOT_TOKEN or configured OAuth installation authorization.');
 
             return ExitCode::INVALID;

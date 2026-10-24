@@ -74,6 +74,8 @@ final readonly class BoltCommands
             description: 'Optional Slack interaction payload type; legacy action/options selectors target callback IDs',
         )]
         ?string $type = null,
+        #[ConsoleArgument(name: 'function', description: 'Slack custom function callback ID')]
+        ?string $function = null,
     ): ExitCode {
         $choices = array_filter(
             [
@@ -84,12 +86,13 @@ final readonly class BoltCommands
                 'shortcut' => $shortcut,
                 'options' => $options,
                 'view' => $view,
+                'function' => $function,
             ],
             static fn(?string $value): bool => $value !== null,
         );
         if (count($choices) !== 1) {
             $this->console->error(
-                'Choose exactly one listener selector, such as --event, --action, --shortcut, --options, or --view.',
+                'Choose exactly one listener selector, such as --event, --action, --shortcut, --options, --view, or --function.',
             );
 
             return ExitCode::INVALID;
@@ -122,7 +125,7 @@ final readonly class BoltCommands
 
             return ExitCode::INVALID;
         }
-        if (in_array($kind, ['shortcut', 'view'], true) && $selector === '') {
+        if (in_array($kind, ['shortcut', 'view', 'function'], true) && trim($selector) === '') {
             $this->console->error("--{$kind} requires a callback ID.");
 
             return ExitCode::INVALID;

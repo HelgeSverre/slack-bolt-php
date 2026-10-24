@@ -2,6 +2,22 @@ _metadata:
   major_version: 1
 display_information:
   name: Thunder Bolt App
+functions:
+  demo_format_message:
+    title: Format a message
+    description: Demonstrates a protected Tempest async custom-function handoff.
+    input_parameters:
+      message:
+        type: string
+        title: Message
+        description: The message to format.
+        is_required: true
+    output_parameters:
+      message:
+        type: string
+        title: Formatted message
+        description: The formatted message.
+        is_required: true
 features:
   app_home:
     home_tab_enabled: true
@@ -47,4 +63,5 @@ settings:
       - message.im
       - entity_details_requested
       - entity_comments_requested
+      - function_executed
       - link_shared

@@ -10,11 +10,14 @@ The handwritten [`App`](../../src/App.php) has real global/listener middleware, 
 
 Assistant lifecycle routing, durable focus context, status, title, prompts and native streaming helpers now live in the handwritten [Assistant](../../src/Assistant.php) module. Both lifecycle events have typed payloads. The default store uses installation/DM/root-scoped conversation adapters; an explicit Slack metadata adapter offers Bolt-style compatibility without an unkeyed cache. [Assistant tests](../../tests/Assistant/) cover routing, middleware, authorization, context isolation and helper behavior. Laravel AI compatibility is application-level; there is no full Laravel package or agent-session protocol implementation.
 
+## Custom functions milestone completed
+
+The handwritten custom-function runtime now supports callback routing, typed inputs/DTO mapping, execution context and complete/fail helpers for events and function-scoped interactions. Workflow tokens are scoped to the authorized delivery client. The playground demonstrates an explicit Tempest async handoff with encrypted credentials, tenant/execution deduplication and reference-only commands. Core receivers still acknowledge after inline dispatch returns; slow work needs that explicit handoff. Live custom-function creation is gated by the development workspace's free Slack plan.
+
 ## High-priority runtime gaps
 
 | Surface | Current state | Evidence |
 | --- | --- | --- |
-| Slack custom functions | **Unimplemented.** No `App::function()`, typed `function_executed` listener, execution-ID extraction, auto-ack policy, or injected `complete` / `fail` callbacks. The raw Web API completion endpoints alone do not supply the runtime protocol. | [`CustomFunction.php`](../../src/Scaffold/Bolt/CustomFunction.php#L17) throws. The pinned surface includes the class and function-completion helpers in [`bolt-js-api-surface.md`](bolt-js-api-surface.md#L128). Endpoint bindings exist in [`Generated/WebApi/Functions.php`](../../src/Generated/WebApi/Functions.php#L19). |
 | Durable/deferred execution | **Unimplemented framework capability.** HTTP and Socket Mode invoke handlers inline. HTTP only warns as processing approaches Slack’s acknowledgement deadline; it does not persist work before acknowledging, retry it, or deduplicate deliveries after a crash. | [`Http/Receiver.php`](../../src/Http/Receiver.php#L86), [`SocketMode/Runner.php`](../../src/SocketMode/Runner.php#L204), and the stated next milestone in [`README.md`](../../README.md#L185). |
 
 ## Receiver and lifecycle parity
@@ -30,9 +33,9 @@ Thunder has a deliberately PHP-native HTTP entry point and Socket Mode worker, b
 
 ## Narrow or lightly covered runtime areas
 
-- Events outside `app_mention`, `message`, `entity_details_requested`, `entity_comments_requested`, `assistant_thread_started` and `assistant_thread_context_changed` are preserved as [`Payloads\Event`](../../src/Payloads/Event.php), rather than receiving dedicated typed payload classes. Generic `event()` listeners remain usable for these events.
+- Events outside `app_mention`, `message`, `entity_details_requested`, `entity_comments_requested`, `assistant_thread_started`, `assistant_thread_context_changed` and `function_executed` are preserved as [`Payloads\Event`](../../src/Payloads/Event.php), rather than receiving dedicated typed payload classes. Generic `event()` listeners remain usable for these events.
 - The [`WorkflowStep`](../../src/Views/WorkflowStep.php) builder serializes the legacy `workflow_step` view. It is outbound representation only, with no workflow-step listener runtime; the builder coverage note says this directly ([`block-kit-coverage.md`](block-kit-coverage.md#L34)).
-- The present suite has strong groups for HTTP, runtime dispatch, Socket Mode, OAuth, storage, views, Block Kit, and Web API, and Assistant fixtures. Custom-function execution still lacks runtime code and behavior tests. See the current test grouping in [`tests/`](../../tests/).
+- The present suite has strong groups for HTTP, runtime dispatch, Socket Mode, OAuth, storage, views, Block Kit, and Web API, and Assistant fixtures. Custom-function fixtures now cover routing, authorization, typed inputs, interactions, terminal outcomes and a real Tempest command-bus handoff. See the current test grouping in [`tests/`](../../tests/).
 
 ## How to read the scaffold count
 

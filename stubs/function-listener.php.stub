@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use Thunder\Bolt\Attributes\SlackFunction;
+use Thunder\Bolt\Functions\Execution;
+use Thunder\Bolt\Functions\Inputs;
+
+final readonly class {{ class }}
+{
+    #[SlackFunction({{ selector }})]
+    public function __invoke(Inputs $inputs, Execution $execution): void
+    {
+        // Read the declared inputs and pass outputs matching your Slack manifest.
+        $execution->complete();
+    }
+}

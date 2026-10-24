@@ -59,3 +59,23 @@ Run `/bolt work Ship the PHP integration`, then open its preview and Comments. T
 When Slack sends `assistant_thread_started`, the demo queues a greeting, title and three suggested prompts. In the current Agent experience, send a DM to start: an application handler anchors the conversation to that message, saves empty focus context and queues the answer. The first answer sets its title and prompts; subsequent IM-thread replies use the core assistant runtime. Both paths reuse the existing Responses streaming implementation, web search and pet tools. Status is cleared on success and failure. Focus context is saved locally before acknowledgement at `.thunder-bolt/demo/assistant-context/`; it is not conversation history and is not a grant to read the channel the user is viewing. The AI example does not fetch that channel's messages.
 
 Assistant handlers own IM thread replies. Run the other playground demos in channels when testing this mode. To use ordinary IM-thread listeners instead, remove the assistant config. Slow model execution stays in the worker; lifecycle events and message deliveries are deduplicated by the local queue.
+
+## Custom functions and Tempest async
+
+The manifest declares `demo_format_message`: one required string input, `message`, and one string output with the same name. Configure remote function execution, org-readiness and the `function_executed` subscription in Slack. Add **Format a message** to a Workflow Builder workflow, provide its input, and use its output in a later step. Slack rejected creating custom functions in our free development workspace; these settings require an eligible workspace before a live workflow run is possible.
+
+Run the Socket Mode worker and Tempest's command worker from this directory:
+
+```sh
+php bolt socket:serve
+# A separate terminal; this is distinct from demo:work.
+php bolt command:monitor
+```
+
+`FormatMessageFunction` saves the execution before dispatching a `#[Async]` data command. The command contains only a reference. Its worker returns `Formatted: <message>` through `functions.completeSuccess`; invalid business input uses `functions.completeError`. Slack's delivery acknowledgement and workflow completion are separate.
+
+The demo requires `ext-sodium`. `.thunder-bolt/demo/function-executions/` holds a private local encryption key and atomic execution records. Workflow credentials are encrypted, expire after 14 minutes, and are removed on known terminal outcomes. References are scoped by the trusted delivery tenant and execution ID; duplicate commands do not repeat work. A claimed or uncertain execution is never automatically replayed after a crash. Inspect such records manually; this is a local demonstration, not a retry/recovery system.
+
+Tempest 3.20's async bus is experimental. Its default file repository stores reference-only command payloads inside the installed command-bus package; configure an appropriate repository for deployment. Keep the vault outside `public/` and out of source control. Tests exercise the real command bus with a memory repository and recorded Slack HTTP responses, including redelivery, expiry and completion failure.
+
+The generated Thunder app icon is saved in `resources/branding/thunder-bolt-dev.png` and is installed on the development Slack app.

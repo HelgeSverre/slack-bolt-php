@@ -18,7 +18,7 @@ use Thunder\Bolt\Routing\HandlerTarget;
 
 final class HandlerInvoker
 {
-    /** @var array<string, array<string, 'payload'|'reply'|'delivery'|'client'|'authorization'|'authorizationSource'|'conversation'|'thread'|'assistant'>> */
+    /** @var array<string, array<string, string>> */
     private array $argumentPlans = [];
 
     public function __construct(
@@ -41,11 +41,23 @@ final class HandlerInvoker
     private function deliveryArguments(HandlerTarget $target, Delivery $delivery): array
     {
         $cacheKey =
-            $target->key() . '|' . $delivery->payload::class . ($delivery->assistant === null ? '' : '|assistant');
+            $target->key()
+            . '|'
+            . $delivery->payload::class
+            . ($delivery->assistant === null ? '' : '|assistant')
+            . ($delivery->execution === null ? '' : '|execution');
         $plan = $this->argumentPlans[$cacheKey] ??= $this->argumentPlan($target, $delivery);
         $arguments = [];
 
         foreach ($plan as $name => $value) {
+            if (str_starts_with($value, 'inputs:')) {
+                $class = substr($value, 7);
+                if (!class_exists($class) || $delivery->execution === null) {
+                    throw new \LogicException('Mapped function inputs require an active function execution.');
+                }
+                $arguments[$name] = $delivery->execution->inputs()->as($class);
+                continue;
+            }
             $arguments[$name] = match ($value) {
                 'payload' => $delivery->payload,
                 'reply' => $delivery->reply,
@@ -60,19 +72,34 @@ final class HandlerInvoker
                 ),
                 'thread' => $delivery->thread ?? throw new \LogicException('No delivery thread context.'),
                 'assistant' => $delivery->assistant ?? throw new \LogicException('No delivery assistant thread.'),
+                'execution' => $delivery->execution ?? throw new \LogicException('No function execution context.'),
+                'functionInputs' => $delivery->execution?->inputs() ?? throw new \LogicException('No function inputs.'),
+                'functionContext' => $delivery->execution?->context ?? throw new \LogicException(
+                    'No function execution context.',
+                ),
+                default => throw new \LogicException('Unknown delivery argument.'),
             };
         }
 
         return $arguments;
     }
 
-    /** @return array<string, 'payload'|'reply'|'delivery'|'client'|'authorization'|'authorizationSource'|'conversation'|'thread'|'assistant'> */
+    /** @return array<string, string> */
     private function argumentPlan(HandlerTarget $target, Delivery $delivery): array
     {
         $plan = [];
 
         foreach ($this->reflect($target)->getParameters() as $parameter) {
-            if ($this->accepts($parameter, $delivery->payload)) {
+            if ($parameter->getAttributes(\Thunder\Bolt\Attributes\FromInputs::class) !== []) {
+                $type = $parameter->getType();
+                if (!$type instanceof ReflectionNamedType || $type->isBuiltin() || !class_exists($type->getName())) {
+                    throw new \InvalidArgumentException('FromInputs parameters need a concrete input DTO class.');
+                }
+                if ($delivery->execution === null) {
+                    throw new \LogicException('FromInputs requires an active function execution.');
+                }
+                $plan[$parameter->getName()] = 'inputs:' . $type->getName();
+            } elseif ($this->accepts($parameter, $delivery->payload)) {
                 $plan[$parameter->getName()] = 'payload';
             } elseif ($this->accepts($parameter, $delivery->reply)) {
                 $plan[$parameter->getName()] = 'reply';
@@ -93,6 +120,12 @@ final class HandlerInvoker
                 $plan[$parameter->getName()] = 'thread';
             } elseif ($delivery->assistant !== null && $this->accepts($parameter, $delivery->assistant)) {
                 $plan[$parameter->getName()] = 'assistant';
+            } elseif ($delivery->execution !== null && $this->accepts($parameter, $delivery->execution)) {
+                $plan[$parameter->getName()] = 'execution';
+            } elseif ($delivery->execution !== null && $this->accepts($parameter, $delivery->execution->inputs())) {
+                $plan[$parameter->getName()] = 'functionInputs';
+            } elseif ($delivery->execution !== null && $this->accepts($parameter, $delivery->execution->context)) {
+                $plan[$parameter->getName()] = 'functionContext';
             }
         }
 

@@ -15,6 +15,7 @@ use Thunder\Bolt\Attributes\Event;
 use Thunder\Bolt\Attributes\Message;
 use Thunder\Bolt\Attributes\Options;
 use Thunder\Bolt\Attributes\Shortcut;
+use Thunder\Bolt\Attributes\SlackFunction;
 use Thunder\Bolt\Attributes\SlashCommand;
 use Thunder\Bolt\Attributes\View;
 use Thunder\Bolt\Routing\HandlerTarget;
@@ -38,6 +39,7 @@ final class BoltDiscovery implements Discovery
     {
         foreach ($class->getPublicMethods() as $method) {
             $events = $method->getAttributes(Event::class);
+            $functions = $method->getAttributes(SlackFunction::class);
             $messages = $method->getAttributes(Message::class);
             $commands = $method->getAttributes(SlashCommand::class);
             $actions = $method->getAttributes(Action::class);
@@ -46,6 +48,7 @@ final class BoltDiscovery implements Discovery
             $views = $method->getAttributes(View::class);
             if (
                 $events === []
+                && $functions === []
                 && $messages === []
                 && $commands === []
                 && $actions === []
@@ -62,6 +65,13 @@ final class BoltDiscovery implements Discovery
                     $attribute->type,
                     $target,
                     source: "{$source} #[Event]",
+                ));
+            }
+            foreach ($functions as $attribute) {
+                $this->discoveryItems->add($location, ListenerDescriptor::function(
+                    $attribute->callbackId,
+                    $target,
+                    source: "{$source} #[SlackFunction]",
                 ));
             }
             foreach ($messages as $attribute) {

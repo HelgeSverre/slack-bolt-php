@@ -7,6 +7,7 @@ namespace Thunder\Bolt\Routing;
 enum ListenerKind: string
 {
     case Event = 'event';
+    case Function = 'function';
     case Message = 'message';
     case SlashCommand = 'slash_command';
     case Action = 'action';

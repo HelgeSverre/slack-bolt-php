@@ -131,7 +131,37 @@ $client->upload(
 
 The injected client also supports arrays, cursor pagination, streamed multipart fields, and single/multiple external uploads. Unknown response fields remain in `data` and `get()`. Some polymorphic and deeply nested SDK fields deliberately retain raw representations.
 
-Calls send once by default. Background or CLI code can opt into bounded retries with `$client->retrying()`. OAuth exchanges, response URLs, and file-content transfers remain single-attempt. Supply a PSR-18 transport to configure timeouts or test outgoing requests.
+Calls send once by default. Background or CLI code can opt into bounded retries with `$client->retrying()`. OAuth exchanges, function completion, response URLs, and file-content transfers remain single-attempt. Supply a PSR-18 transport to configure timeouts or test outgoing requests.
+
+## Custom workflow functions
+
+Match a Workflow Builder function by its manifest callback ID, then explicitly complete or fail the execution:
+
+```php
+use Thunder\Bolt\Attributes\{FromInputs, SlackFunction};
+use Thunder\Bolt\Functions\Execution;
+
+final readonly class FormatInputs
+{
+    public function __construct(public string $message, public bool $uppercase = false) {}
+}
+
+final readonly class FormatMessage
+{
+    #[SlackFunction('format_message')]
+    public function __invoke(#[FromInputs] FormatInputs $inputs, Execution $execution): void
+    {
+        $text = $inputs->uppercase ? mb_strtoupper($inputs->message) : $inputs->message;
+        $execution->complete(['message' => $text]);
+    }
+}
+```
+
+`$app->function('format_message', FormatMessage::class)` provides fluent registration. Inputs may also be injected as `Functions\Inputs` for strict accessors such as `string()` and `integer()`, or mapped explicitly with `as(MyInputs::class)`. DTO mapping supports constructor defaults, nullable fields, nested DTOs, backed enums and `#[InputName('wire_name')]` aliases. It does not coerce strings into numbers or booleans. Missing and invalid inputs raise `InvalidInputs`; application error handling remains explicit.
+
+`Execution` supplies `complete()`, `fail()`, `inputs()`, `client()` and a typed execution context. Function-scoped actions and views receive the same capability alongside their normal acknowledgement responses. The workflow token overrides the delivery client after installation authorization; it never enters the global client pool. Make completion your last Slack call: the temporary credential expires when the function ends. A duplicate terminal call is rejected locally, and a failed completion request leaves the outcome `Uncertain` rather than automatically attempting the opposite result. This guard is per delivery, not distributed idempotency.
+
+The transport acknowledgement confirms delivery; it does not complete the workflow. Inline event handlers need no response value, and the receiver acknowledges after they return. For slow work, the [Tempest async example](examples/hello-bolt/README.md#custom-functions-and-tempest-async) persists an encrypted, short-lived execution credential and queues only an opaque reference. It deduplicates executions before business work. Tempest's async bus is experimental; this example adds explicit claim/outcome handling without presenting it as a framework-wide queue.
 
 ## Slack assistants
 
@@ -222,6 +252,7 @@ Slack app configuration and feature availability are required. The [work-item de
 - Typed Web API models, message/view builders, uploads, pagination, and opt-in retries.
 - Work Object entities, details, unfurls and bidirectional comments with application-owned storage and authorization.
 - Slack assistant lifecycle handlers, isolated durable focus context, status, titles, suggested prompts and streaming helpers.
+- Custom functions with typed inputs, execution context, workflow-token scoping and explicit complete/fail helpers.
 - Project/listener scaffolding, discovery, diagnostics, and shell completions.
 
 Capability parity is the goal; PHP handlers use native types, dependency injection, and explicit response values. Generated declaration scaffolds under `src/Scaffold/` are planning artifacts, excluded from discovery, and do not represent implemented runtime features.
@@ -234,6 +265,7 @@ Run commands from a generated application:
 php bolt make:listener Greeting --event=app_mention
 php bolt make:listener Approve --action=approve_deployment
 php bolt make:listener Submission --view=approve_deployment
+php bolt make:listener FormatMessage --function=format_message
 php bolt listener:list
 php bolt doctor
 php bolt socket:serve
@@ -265,7 +297,7 @@ To regenerate from the pinned upstream archives, run `npm run sync:references`, 
 
 ## What's next
 
-The next milestone is **durable background execution**: acknowledge promptly, persist jobs, and run slow handlers through workers with retries and delivery deduplication. Assistant and custom-function support follow.
+The next milestone is **durable background execution** across the framework: acknowledge promptly, persist jobs, and run slow handlers through workers with retries, leases and delivery deduplication. The playground queue and protected Tempest function handoff demonstrate parts of this; neither is the framework-wide recovery system yet.
 
 Extended guides and API documentation will live on a separate docs site. Existing design notes and coverage inventories remain under `docs/` for maintainers. Controlled live-workspace tests and Linux/macOS CI are release gates; generated coverage alone does not establish full Bolt JS conformance.
 

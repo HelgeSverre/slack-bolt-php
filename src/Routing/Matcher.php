@@ -7,6 +7,7 @@ namespace Thunder\Bolt\Routing;
 use Thunder\Bolt\Payloads\Action;
 use Thunder\Bolt\Payloads\Event;
 use Thunder\Bolt\Payloads\Events\AppMention;
+use Thunder\Bolt\Payloads\Events\FunctionExecuted;
 use Thunder\Bolt\Payloads\Events\Message;
 use Thunder\Bolt\Payloads\Options;
 use Thunder\Bolt\Payloads\Shortcut;
@@ -34,6 +35,10 @@ final class Matcher
         }
         $matches = match ($descriptor->kind) {
             ListenerKind::Event => self::event($descriptor->selector, $payload),
+            ListenerKind::Function => $payload instanceof FunctionExecuted
+                && $descriptor->selector === $payload->callbackId
+                    ? []
+                    : null,
             ListenerKind::Message => self::message($descriptor->selector, $payload),
             ListenerKind::SlashCommand => self::command($descriptor->selector, $payload),
             default => null,

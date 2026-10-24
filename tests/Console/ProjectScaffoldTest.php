@@ -10,6 +10,35 @@ use Thunder\Bolt\Console\ProjectScaffold;
 
 final class ProjectScaffoldTest extends TestCase
 {
+    public function test_function_listener_scaffold_registers_and_can_complete_a_workflow(): void
+    {
+        $path = new ProjectScaffold(dirname(__DIR__, 2))->listener(
+            $this->workspace,
+            'FormatFunction',
+            'function',
+            'format_text',
+        );
+        require $path;
+        $http = new \Thunder\Bolt\Tests\Support\RecordingHttpClient();
+        $app = new \Thunder\Bolt\App(
+            new \Tempest\Container\GenericContainer(),
+            new \Thunder\Bolt\WebApi\Client($http, 'test'),
+            new \Thunder\Bolt\BoltConfig('test'),
+        );
+        $app->registerClass(\App\Listeners\FormatFunction::class);
+        $app->dispatch([
+            'type' => 'event_callback',
+            'event' => [
+                'type' => 'function_executed',
+                'function' => ['callback_id' => 'format_text'],
+                'function_execution_id' => 'Fx1',
+                'inputs' => [],
+            ],
+        ]);
+        self::assertSame('Fx1', $http->sentPayload()['function_execution_id']);
+        self::assertStringContainsString('"outputs":{}', (string) $http->requests[0]->getBody());
+    }
+
     private string $workspace;
 
     protected function setUp(): void

@@ -78,4 +78,4 @@ The demo requires `ext-sodium`. `.thunder-bolt/demo/function-executions/` holds 
 
 Tempest 3.20's async bus is experimental. Its default file repository stores reference-only command payloads inside the installed command-bus package; configure an appropriate repository for deployment. Keep the vault outside `public/` and out of source control. Tests exercise the real command bus with a memory repository and recorded Slack HTTP responses, including redelivery, expiry and completion failure.
 
-The generated Thunder app icon is saved in `resources/branding/thunder-bolt-dev.png` and is installed on the development Slack app.
+The minimal Thunder app icon is saved in `resources/branding/thunder-bolt-dev.png` and is installed on the development Slack app. [Brand assets](resources/branding/README.md) include the SVG masters, size exports, palette and reproduction command.

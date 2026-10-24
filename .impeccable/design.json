@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T00:00:00+02:00",
+  "title": "Design System: Thunder Bolt",
+  "extensions": {
+    "colorMeta": {
+      "vermilion": {
+        "role": "primary",
+        "displayName": "Vermilion",
+        "purpose": "The sole graphic accent; not for small text."
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "purpose": "Light field and reversed contact."
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "purpose": "Text and dark field."
+      }
+    }
+  },
+  "narrative": {
+    "northStar": "The Notched Contact",
+    "overview": "This is a deliberately small identity for the hello-bolt Slack demonstration: one accent, one connected sharp diagonal form, and plain supporting language. It gives the app a recognizable square-crop avatar without turning a developer demo into a mascot brand. Its scope is the demo identity only. Whether it becomes the framework's permanent identity remains undecided.",
+    "keyCharacteristics": [
+      "One original notched diagonal contact, drawn as a single SVG path.",
+      "One vermilion accent held against paper and ink.",
+      "Sparse, functional labelling; no ornamental AI imagery."
+    ],
+    "rules": [
+      {
+        "name": "The One-Accent Rule",
+        "body": "Vermilion is the only accent; do not add supporting colors to decorate the mark.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Do use the generated square avatar exports for Slack app imagery.",
+      "Do reproduce assets from the PHP source and preserve the three named color tokens.",
+      "Do use ink on paper for small readable text."
+    ],
+    "donts": [
+      "Don't treat the brand-sheet label as a wordmark or infer a brand typeface from it.",
+      "Don't use vermilion for small text or add another accent color.",
+      "Don't turn the contact into generic AI imagery, a mascot, or an illustrated character."
+    ]
+  }
+}

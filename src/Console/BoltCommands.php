@@ -49,7 +49,7 @@ final readonly class BoltCommands
     public function makeListener(
         #[ConsoleArgument(description: 'Listener PHP class name')]
         string $name,
-        #[ConsoleArgument(name: 'event', description: 'Slack event type, currently app_mention')]
+        #[ConsoleArgument(name: 'event', description: 'Slack event type; known events use typed payloads')]
         ?string $event = null,
         #[ConsoleArgument(name: 'message', description: 'Message text to match')]
         ?string $message = null,
@@ -99,11 +99,6 @@ final readonly class BoltCommands
         }
         $kind = array_key_first($choices);
         $selector = $choices[$kind];
-        if ($kind === 'event' && $selector !== 'app_mention') {
-            $this->console->error('The first milestone supports --event=app_mention.');
-
-            return ExitCode::INVALID;
-        }
         if ($kind === 'slash-command' && !str_starts_with($selector, '/')) {
             $this->console->error('A slash command must begin with /.');
 
@@ -147,6 +142,32 @@ final readonly class BoltCommands
             return ExitCode::INVALID;
         }
         $this->console->success("Created {$path}");
+
+        return ExitCode::SUCCESS;
+    }
+
+    #[ConsoleCommand(name: 'make:assistant', description: 'Create a configured Slack assistant listener')]
+    public function makeAssistant(
+        #[ConsoleArgument(description: 'Assistant listener PHP class name')]
+        string $name = 'AssistantListener',
+    ): ExitCode {
+        try {
+            $paths = new ProjectScaffold(dirname(__DIR__, 2))->assistant(
+                getcwd() ?: throw new RuntimeException('Unable to resolve the current directory.'),
+                $name,
+            );
+        } catch (RuntimeException $exception) {
+            $this->console->error($exception->getMessage());
+
+            return ExitCode::INVALID;
+        }
+        $this->console->success("Created {$paths['listener']} and {$paths['config']}");
+        $this->console->instructions([
+            'Add only the assistant capabilities you need to slack-manifest.yaml:',
+            'bot scopes: assistant:write, chat:write, im:history',
+            'bot events: assistant_thread_started, assistant_thread_context_changed, message.im',
+            'Enable Agents → Agent experience in Slack, then reinstall the app.',
+        ]);
 
         return ExitCode::SUCCESS;
     }

@@ -96,7 +96,7 @@ $container = Tempest\Core\Tempest::boot(
 $consoleConfig = $container->get(ConsoleConfig::class);
 $consoleConfig->name = 'Thunder Bolt';
 $allowedCommands = [
-    'new', 'make:listener', 'serve', 'socket:serve', 'listener:list', 'doctor', 'routes', 'about',
+    'new', 'make:listener', 'make:assistant', 'serve', 'socket:serve', 'listener:list', 'doctor', 'routes', 'about',
     'discovery:generate', 'discovery:clear', 'discovery:status',
     'command:monitor', 'command:handle',
     'completion:generate', 'completion:install', 'completion:show', 'completion:uninstall',

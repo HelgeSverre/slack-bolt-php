@@ -1,0 +1,11 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Listeners\{{ class }};
+use Thunder\Bolt\Assistant;
+
+return Assistant::make()
+    ->threadStarted([{{ class }}::class, 'started'])
+    ->threadContextChanged([{{ class }}::class, 'contextChanged'])
+    ->userMessage([{{ class }}::class, 'message']);

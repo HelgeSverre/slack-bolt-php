@@ -40,8 +40,8 @@ The target is capability and protocol parity. PHP source compatibility with Java
 1. Handler methods receive readonly payload objects and narrow reply capabilities. Container-resolved application dependencies belong in constructors.
 2. Registration methods are chainable. Attribute and fluent registrations feed the same descriptor representation.
 3. Commands and interactions return a response value: `CommandResponse`, `ActionResponse`, `ShortcutResponse`, `OptionsResponse`, or `ViewResponse`. Wrong-family, missing, and multiple responses fail clearly.
-4. HTTP execution is inline and response emission is buffered. Processing must fit Slack's three-second deadline; optional workers are later adapters.
-5. Matching listeners run sequentially in the first PHP HTTP implementation. Global middleware runs once. Errors from matching listeners are collected rather than losing later listeners after an earlier failure.
+4. HTTP execution is inline and response emission is buffered. Processing must fit Slack's three-second deadline. The playground explicitly persists slow work; framework-wide durable execution is being designed separately from in-process concurrency.
+5. Matching listeners run sequentially. Global middleware runs once. Errors from matching listeners are collected rather than losing later listeners after an earlier failure. An Amp-backed Socket Mode transport does not make handlers or the default PSR-18 HTTP client non-blocking.
 6. Reply helpers derive a thread root from `thread_ts ?? ts`. Outbound message factories make block fallback text explicit.
 7. Known event/payload mismatches and duplicate registrations fail at boot. Unsupported capabilities remain visible in the inventory without being silently acknowledged.
 8. Pagination uses PHP generators; immutable builders use PHP 8.5 clone updates and `#[NoDiscard]`.
@@ -57,4 +57,4 @@ The full Tempest foundation is intentional: discovery, container, console, HTTP 
 
 ## Port order
 
-HTTP interactivity, retained legacy families, OAuth installation/authorization, conversation/thread storage, and Socket Mode are implemented. SDK models, Block Kit builders, retries, and upload protocols are implemented against pinned sources. Durable background execution and assistant/custom-function behavior remain. Every step adds behavior fixtures derived from the pinned upstream source and updates the parity inventory. See the [HTTP interactivity audit](research/http-interactivity-audit.md), [OAuth audit](research/oauth-authorization-audit.md), and [storage audit](research/conversation-storage-audit.md).
+HTTP interactivity, retained legacy families, OAuth installation/authorization, conversation/thread storage, and Socket Mode are implemented. SDK models, Block Kit builders, retries, and upload protocols are implemented against pinned sources. Work Objects, assistant-thread lifecycle/context/streaming, and custom-function input/completion runtimes are also implemented. Framework-wide durable execution, modern agent-session cancellation and release conformance remain open. See the [current inventory](research/codebase-inventory-2026-10-24.md), [parity map](research/api-parity.md), and [application/async research brief](research/application-and-async-brief.md).

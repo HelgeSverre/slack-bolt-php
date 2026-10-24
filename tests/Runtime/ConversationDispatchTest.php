@@ -162,7 +162,13 @@ final class ConversationDispatchTest extends TestCase
             $app->dispatch([
                 'type' => 'event_callback',
                 'team_id' => 'T1',
-                'event' => ['type' => $type, 'channel' => 'C1', 'user' => 'U1'],
+                'event' => [
+                    'type' => $type,
+                    'channel' => 'C1',
+                    'channel_type' => 'C',
+                    'team' => 'T1',
+                    'user' => 'U1',
+                ],
             ]);
         }
         self::assertSame(['member_joined_channel', 'member_left_channel'], $calls);

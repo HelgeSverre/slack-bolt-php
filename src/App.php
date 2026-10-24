@@ -52,15 +52,28 @@ use Thunder\Bolt\Invocation\InvocationScope;
 use Thunder\Bolt\Middleware\Middleware;
 use Thunder\Bolt\Payloads\Action;
 use Thunder\Bolt\Payloads\Event as GenericEvent;
+use Thunder\Bolt\Payloads\Events\AgentSessionEvent;
+use Thunder\Bolt\Payloads\Events\AgentSessionStopped;
+use Thunder\Bolt\Payloads\Events\AgentSessionTitleChanged;
 use Thunder\Bolt\Payloads\Events\AppMention;
+use Thunder\Bolt\Payloads\Events\AppUninstalled;
 use Thunder\Bolt\Payloads\Events\AssistantThreadContextChanged;
 use Thunder\Bolt\Payloads\Events\AssistantThreadEvent;
 use Thunder\Bolt\Payloads\Events\AssistantThreadStarted;
+use Thunder\Bolt\Payloads\Events\ChannelMembership;
 use Thunder\Bolt\Payloads\Events\EntityCommentsRequested;
 use Thunder\Bolt\Payloads\Events\EntityDetailsRequested;
 use Thunder\Bolt\Payloads\Events\EntityRequest;
+use Thunder\Bolt\Payloads\Events\FileShared;
 use Thunder\Bolt\Payloads\Events\FunctionExecuted;
+use Thunder\Bolt\Payloads\Events\LinkShared;
+use Thunder\Bolt\Payloads\Events\MemberJoinedChannel;
+use Thunder\Bolt\Payloads\Events\MemberLeftChannel;
 use Thunder\Bolt\Payloads\Events\Message as MessageEvent;
+use Thunder\Bolt\Payloads\Events\ReactionAdded;
+use Thunder\Bolt\Payloads\Events\ReactionEvent;
+use Thunder\Bolt\Payloads\Events\ReactionRemoved;
+use Thunder\Bolt\Payloads\Events\TokensRevoked;
 use Thunder\Bolt\Payloads\Options;
 use Thunder\Bolt\Payloads\Shortcut;
 use Thunder\Bolt\Payloads\SlashCommand;
@@ -599,6 +612,16 @@ final class App
             'assistant_thread_context_changed' => AssistantThreadContextChanged::fromArray($event),
             'entity_details_requested' => EntityDetailsRequested::fromArray($event),
             'entity_comments_requested' => EntityCommentsRequested::fromArray($event),
+            'reaction_added' => ReactionAdded::fromArray($event),
+            'reaction_removed' => ReactionRemoved::fromArray($event),
+            'member_joined_channel' => MemberJoinedChannel::fromArray($event),
+            'member_left_channel' => MemberLeftChannel::fromArray($event),
+            'link_shared' => LinkShared::fromArray($event),
+            'file_shared' => FileShared::fromArray($event),
+            'app_uninstalled' => AppUninstalled::fromArray($event),
+            'tokens_revoked' => TokensRevoked::fromArray($event),
+            'agent_session_stopped' => AgentSessionStopped::fromArray($event),
+            'agent_session_title_changed' => AgentSessionTitleChanged::fromArray($event),
             default => GenericEvent::fromArray($event),
         };
     }
@@ -720,6 +743,16 @@ final class App
                 'assistant_thread_context_changed' => AssistantThreadContextChanged::class,
                 'entity_details_requested' => EntityDetailsRequested::class,
                 'entity_comments_requested' => EntityCommentsRequested::class,
+                'reaction_added' => ReactionAdded::class,
+                'reaction_removed' => ReactionRemoved::class,
+                'member_joined_channel' => MemberJoinedChannel::class,
+                'member_left_channel' => MemberLeftChannel::class,
+                'link_shared' => LinkShared::class,
+                'file_shared' => FileShared::class,
+                'app_uninstalled' => AppUninstalled::class,
+                'tokens_revoked' => TokensRevoked::class,
+                'agent_session_stopped' => AgentSessionStopped::class,
+                'agent_session_title_changed' => AgentSessionTitleChanged::class,
                 default => GenericEvent::class,
             },
         };
@@ -741,6 +774,19 @@ final class App
                         EntityRequest::class,
                         EntityDetailsRequested::class,
                         EntityCommentsRequested::class,
+                        ReactionEvent::class,
+                        ReactionAdded::class,
+                        ReactionRemoved::class,
+                        ChannelMembership::class,
+                        MemberJoinedChannel::class,
+                        MemberLeftChannel::class,
+                        LinkShared::class,
+                        FileShared::class,
+                        AppUninstalled::class,
+                        TokensRevoked::class,
+                        AgentSessionEvent::class,
+                        AgentSessionStopped::class,
+                        AgentSessionTitleChanged::class,
                         Action::class,
                         Shortcut::class,
                         Options::class,

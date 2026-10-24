@@ -1,6 +1,6 @@
 # API parity map
 
-Current inventory: [24 October 2026 codebase audit](codebase-inventory-2026-10-24.md). This summary distinguishes handwritten runtime behavior from generated migration declarations.
+Current inventory: [24 October 2026 codebase audit](codebase-inventory-2026-10-24.md), followed by the [CLI/payload gap closure](gap-closure-and-async-audit.md). This summary distinguishes handwritten runtime behavior from generated migration declarations.
 
 ## Bolt application surface — 🟢 inventory, 🟡 implementation status
 
@@ -18,6 +18,7 @@ The generated [Bolt surface](bolt-js-api-surface.md) lists every extracted expor
 | assistants | assistant lifecycle listeners, scoped context stores, status/title/prompts and native streaming | 🟢 pinned assistant-thread contract implemented; modern agent-session lifecycle/cancellation remains open |
 | custom functions | callback listeners, typed inputs/DTOs, execution context and complete/fail | 🟢 runtime and protected example async handoff implemented; core durable workers and live paid-plan workflow validation remain open |
 | Work Objects | entity builders, details/unfurls, comments and mutation-provider interface | 🟢 implemented with fixtures and a playground; provider authorization and external storage remain application responsibilities |
+| Typed event ergonomics and scaffolding | Native reaction/membership/link/file/lifecycle/agent-session payloads; generic fallback; assistant scaffold | 🟢 added beyond the original payload slice; stop/title-change routing is not a complete cancellation runtime |
 | conversation store / middleware | delivery-scoped conversation state plus thread extension; memory, file, SQLite adapters | 🟢 implemented; [guide](../conversation-and-thread-storage.md), [source mapping](conversation-storage.md), [audit](conversation-storage-audit.md) |
 
 The HTTP interaction matrix covers `block_actions`, `shortcut`, `message_action`, `block_suggestion`, `view_submission`, `view_closed`, and retained legacy `interactive_message`, `dialog_submission`, and `dialog_suggestion` forms. Selector normalization and classification follow pinned Bolt JS 5.1.0, including the first action, legacy suggestion precedence, and submission-only view shorthand. See the [source mapping](http-interactivity.md) and [PHP API guide](../http-interactivity.md). `dialog_cancellation` is unsupported by that upstream classifier and receives an explicit `501`.

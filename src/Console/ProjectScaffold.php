@@ -94,11 +94,14 @@ final readonly class ProjectScaffold
         }
 
         [$attribute, $payloadUse, $payloadClass] = match ($kind) {
-            'event' => ['Event', 'Events\\AppMention', 'AppMention'],
+            'event' => $this->eventPayload($selector),
             'message' => ['MessageAttribute', 'Events\\Message as SlackMessage', 'SlackMessage'],
             default => throw new RuntimeException("Unknown listener kind {$kind}."),
         };
-        $contents = strtr($this->stub('listener.php.stub'), [
+        $stub = $kind === 'event' && !in_array($selector, ['app_mention', 'message'], true)
+            ? 'event-listener.php.stub'
+            : 'listener.php.stub';
+        $contents = strtr($this->stub($stub), [
             '{{ attribute }}' => $attribute,
             '{{ attributeUse }}' => $kind === 'message' ? 'Message as MessageAttribute' : $attribute,
             '{{ payloadUse }}' => $payloadUse,
@@ -109,6 +112,61 @@ final readonly class ProjectScaffold
         $this->write($target, $contents);
 
         return $target;
+    }
+
+    /** @return array{listener: string, config: string} */
+    public function assistant(string $root, string $name = 'AssistantListener'): array
+    {
+        $class = $this->normalizeClassName($name);
+        $listenerDirectory = rtrim($root, DIRECTORY_SEPARATOR) . '/app/Listeners';
+        $configDirectory = rtrim($root, DIRECTORY_SEPARATOR) . '/config';
+        $listener = "{$listenerDirectory}/{$class}.php";
+        $config = "{$configDirectory}/assistant.config.php";
+        foreach ([$listener, $config] as $target) {
+            if (file_exists($target)) {
+                throw new RuntimeException("Refusing to overwrite existing assistant scaffold {$target}.");
+            }
+        }
+        $this->makeDirectory($listenerDirectory);
+        $this->makeDirectory($configDirectory);
+        $this->write($listener, strtr($this->stub('assistant-listener.php.stub'), [
+            '{{ class }}' => $class,
+        ]));
+        $this->write($config, strtr($this->stub('assistant.config.php.stub'), [
+            '{{ class }}' => $class,
+        ]));
+
+        return ['listener' => $listener, 'config' => $config];
+    }
+
+    /** @return array{0: string, 1: string, 2: string} */
+    private function eventPayload(string $selector): array
+    {
+        $typedEvents = [
+            'app_mention' => ['Events\\AppMention', 'AppMention'],
+            'message' => ['Events\\Message as SlackMessage', 'SlackMessage'],
+            'function_executed' => ['Events\\FunctionExecuted', 'FunctionExecuted'],
+            'assistant_thread_started' => ['Events\\AssistantThreadStarted', 'AssistantThreadStarted'],
+            'assistant_thread_context_changed' => [
+                'Events\\AssistantThreadContextChanged',
+                'AssistantThreadContextChanged',
+            ],
+            'entity_details_requested' => ['Events\\EntityDetailsRequested', 'EntityDetailsRequested'],
+            'entity_comments_requested' => ['Events\\EntityCommentsRequested', 'EntityCommentsRequested'],
+            'reaction_added' => ['Events\\ReactionAdded', 'ReactionAdded'],
+            'reaction_removed' => ['Events\\ReactionRemoved', 'ReactionRemoved'],
+            'member_joined_channel' => ['Events\\MemberJoinedChannel', 'MemberJoinedChannel'],
+            'member_left_channel' => ['Events\\MemberLeftChannel', 'MemberLeftChannel'],
+            'link_shared' => ['Events\\LinkShared', 'LinkShared'],
+            'file_shared' => ['Events\\FileShared', 'FileShared'],
+            'app_uninstalled' => ['Events\\AppUninstalled', 'AppUninstalled'],
+            'tokens_revoked' => ['Events\\TokensRevoked', 'TokensRevoked'],
+            'agent_session_stopped' => ['Events\\AgentSessionStopped', 'AgentSessionStopped'],
+            'agent_session_title_changed' => ['Events\\AgentSessionTitleChanged', 'AgentSessionTitleChanged'],
+        ];
+        [$payloadUse, $payloadClass] = $typedEvents[$selector] ?? ['Event as SlackEvent', 'SlackEvent'];
+
+        return ['Event', $payloadUse, $payloadClass];
     }
 
     private function interactionSelectorArgument(string $kind, string $selector, ?string $type): string

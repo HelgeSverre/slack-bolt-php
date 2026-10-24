@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use Thunder\Bolt\Assistant\Thread;
+use Thunder\Bolt\Messages\Message as OutgoingMessage;
+use Thunder\Bolt\Payloads\Events\AssistantThreadContextChanged;
+use Thunder\Bolt\Payloads\Events\AssistantThreadStarted;
+use Thunder\Bolt\Payloads\Events\Message;
+
+final class {{ class }}
+{
+    public function started(AssistantThreadStarted $event, Thread $thread): void
+    {
+        $thread->saveContext();
+        $thread->say(OutgoingMessage::text('I’m ready to help.'));
+    }
+
+    public function contextChanged(AssistantThreadContextChanged $event, Thread $thread): void
+    {
+        $thread->saveContext();
+    }
+
+    public function message(Message $message, Thread $thread): void
+    {
+        $thread->say(OutgoingMessage::text('Thanks for your message.'));
+    }
+}

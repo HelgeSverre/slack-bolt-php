@@ -263,14 +263,18 @@ Run commands from a generated application:
 
 ```sh
 php bolt make:listener Greeting --event=app_mention
+php bolt make:listener Reaction --event=reaction_added
 php bolt make:listener Approve --action=approve_deployment
 php bolt make:listener Submission --view=approve_deployment
 php bolt make:listener FormatMessage --function=format_message
+php bolt make:assistant WorkspaceAssistant
 php bolt listener:list
 php bolt doctor
 php bolt socket:serve
 php bolt completion:show --shell=zsh
 ```
+
+Known event selectors receive native payload types; other events receive the generic `Payloads\Event`. Non-chat event templates make no automatic Slack calls. `make:assistant` writes a listener and `config/assistant.config.php`, refuses existing files, and prints the Slack capabilities to enable without changing your manifest.
 
 The CLI scaffolds local code; Slack app configuration and installation still happen through Slack. `doctor` checks local requirements and configuration without contacting Slack or printing credentials.
 

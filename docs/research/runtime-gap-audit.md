@@ -33,7 +33,7 @@ Thunder has a deliberately PHP-native HTTP entry point and Socket Mode worker, b
 
 ## Narrow or lightly covered runtime areas
 
-- Events outside `app_mention`, `message`, `entity_details_requested`, `entity_comments_requested`, `assistant_thread_started`, `assistant_thread_context_changed` and `function_executed` are preserved as [`Payloads\Event`](../../src/Payloads/Event.php), rather than receiving dedicated typed payload classes. Generic `event()` listeners remain usable for these events.
+- Dedicated event payloads cover mentions/messages, Work Objects, assistant threads, custom functions, reactions, channel membership, shared links/files, uninstall/revocation and agent-session stop/title changes. Other events remain usable through [`Payloads\Event`](../../src/Payloads/Event.php). Typed agent-session events do not themselves implement a job-cancellation runtime.
 - The [`WorkflowStep`](../../src/Views/WorkflowStep.php) builder serializes the legacy `workflow_step` view. It is outbound representation only, with no workflow-step listener runtime; the builder coverage note says this directly ([`block-kit-coverage.md`](block-kit-coverage.md#L34)).
 - The present suite has strong groups for HTTP, runtime dispatch, Socket Mode, OAuth, storage, views, Block Kit, and Web API, and Assistant fixtures. Custom-function fixtures now cover routing, authorization, typed inputs, interactions, terminal outcomes and a real Tempest command-bus handoff. See the current test grouping in [`tests/`](../../tests/).
 
@@ -45,7 +45,7 @@ That count is useful as a map of remaining design work, but it must not be read 
 
 ## Documentation debt
 
-[`roadmap.md`](roadmap.md#L68) is useful for ordering the remaining work, but it predates the later playground/streaming work and retains an obsolete statement that no remote CI run has occurred ([`roadmap.md`](roadmap.md#L74)). It should be refreshed before being treated as a current release-status document. The top-level README also correctly remains conservative: it calls the package experimental and incomplete ([`README.md`](../../README.md#L7)).
+The [roadmap](roadmap.md), [parity map](api-parity.md) and [architecture overview](../architecture.md) now reflect assistant/custom-function completion and verified remote CI. Earlier dated milestone audits remain historical snapshots. The package is still experimental and unpublished. The [application/async explainer](durable-execution-explained.md) distinguishes shipped execution behavior from proposed durability and composition changes.
 
 ## Sources and caveat
 

@@ -133,7 +133,11 @@ final class AuthorizationDispatchTest extends TestCase
                 self::assertSame('T1', $delivery->authorization->teamId);
                 $calls[] = $type;
             });
-            $app->dispatch(['type' => 'event_callback', 'team_id' => 'T1', 'event' => ['type' => $type]]);
+            $event = ['type' => $type];
+            if ($type === 'tokens_revoked') {
+                $event['tokens'] = ['bot' => ['U1']];
+            }
+            $app->dispatch(['type' => 'event_callback', 'team_id' => 'T1', 'event' => $event]);
         }
         self::assertSame(['app_uninstalled', 'tokens_revoked'], $calls);
     }

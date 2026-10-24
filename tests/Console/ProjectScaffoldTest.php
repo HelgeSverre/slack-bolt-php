@@ -6,7 +6,17 @@ namespace Thunder\Bolt\Tests\Console;
 
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Tempest\Container\GenericContainer;
+use Tempest\Discovery\DiscoveryItems;
+use Tempest\Discovery\DiscoveryLocation;
+use Tempest\Reflection\ClassReflector;
+use Thunder\Bolt\App;
+use Thunder\Bolt\Assistant;
+use Thunder\Bolt\BoltConfig;
 use Thunder\Bolt\Console\ProjectScaffold;
+use Thunder\Bolt\Integration\BoltDiscovery;
+use Thunder\Bolt\Tests\Support\RecordingHttpClient;
+use Thunder\Bolt\WebApi\Client;
 
 final class ProjectScaffoldTest extends TestCase
 {
@@ -37,6 +47,120 @@ final class ProjectScaffoldTest extends TestCase
         ]);
         self::assertSame('Fx1', $http->sentPayload()['function_execution_id']);
         self::assertStringContainsString('"outputs":{}', (string) $http->requests[0]->getBody());
+    }
+
+    public function test_event_listener_scaffolds_discover_and_dispatch_known_and_generic_payloads(): void
+    {
+        $scaffold = new ProjectScaffold(dirname(__DIR__, 2));
+        $project = $this->workspace . '/project';
+        mkdir($project, 0775, true);
+        $mention = $scaffold->listener($project, 'GeneratedMention', 'event', 'app_mention');
+        $reaction = $scaffold->listener($project, 'GeneratedReaction', 'event', 'reaction_added');
+        $future = $scaffold->listener($project, 'GeneratedFutureEvent', 'event', 'future_slack_event');
+        $uninstalled = $scaffold->listener($project, 'GeneratedUninstalled', 'event', 'app_uninstalled');
+        $channelless = $scaffold->listener($project, 'GeneratedChannelless', 'event', 'future_channelless_event');
+        require $mention;
+        require $reaction;
+        require $future;
+        require $uninstalled;
+        require $channelless;
+
+        self::assertStringContainsString('Events\\AppMention', (string) file_get_contents($mention));
+        self::assertStringContainsString('Events\\ReactionAdded', (string) file_get_contents($reaction));
+        self::assertStringContainsString('Payloads\\Event as SlackEvent', (string) file_get_contents($future));
+        self::assertStringContainsString('Events\\AppUninstalled', (string) file_get_contents($uninstalled));
+        self::assertStringNotContainsString('Reply', (string) file_get_contents($uninstalled));
+        self::assertStringNotContainsString('inThread', (string) file_get_contents($channelless));
+
+        $http = new RecordingHttpClient();
+        $app = new App(new GenericContainer(), new Client($http, 'test'), new BoltConfig('test'));
+        $items = new DiscoveryItems();
+        $discovery = new BoltDiscovery(new GenericContainer());
+        $discovery->setItems($items);
+        $location = new DiscoveryLocation('App', dirname($mention));
+        foreach ([
+            \App\Listeners\GeneratedMention::class,
+            \App\Listeners\GeneratedReaction::class,
+            \App\Listeners\GeneratedFutureEvent::class,
+            \App\Listeners\GeneratedUninstalled::class,
+            \App\Listeners\GeneratedChannelless::class,
+        ] as $listener) {
+            $discovery->discover($location, new ClassReflector($listener));
+        }
+        foreach ($items->getForLocation($location) as $descriptor) {
+            $app->registerDescriptor($descriptor);
+        }
+
+        $app->dispatch(['event' => [
+            'type' => 'app_mention',
+            'user' => 'U1',
+            'channel' => 'C1',
+            'text' => 'hello',
+            'ts' => '1.001',
+        ]]);
+        $app->dispatch([
+            'event' => [
+                'type' => 'reaction_added',
+                'user' => 'U1',
+                'reaction' => 'thumbsup',
+                'event_ts' => '1.002',
+                'item' => ['type' => 'message', 'channel' => 'C1', 'ts' => '1.002'],
+            ],
+        ]);
+        $app->dispatch(['event' => [
+            'type' => 'future_slack_event',
+            'user' => 'U1',
+            'channel' => 'C1',
+            'text' => 'hello again',
+            'ts' => '1.003',
+        ]]);
+        $app->dispatch(['type' => 'event_callback', 'team_id' => 'T1', 'event' => ['type' => 'app_uninstalled']]);
+        $app->dispatch(['event' => ['type' => 'future_channelless_event']]);
+
+        self::assertCount(1, $http->requests);
+    }
+
+    public function test_assistant_scaffold_creates_a_safe_configured_listener_without_changing_the_manifest(): void
+    {
+        $scaffold = new ProjectScaffold(dirname(__DIR__, 2));
+        $project = $this->workspace . '/project';
+        mkdir($project, 0775, true);
+        $manifest = $project . '/slack-manifest.yaml';
+        file_put_contents($manifest, "oauth_config:\n  scopes:\n    bot:\n      - app_mentions:read\n");
+        $originalManifest = (string) file_get_contents($manifest);
+        $paths = $scaffold->assistant($project, 'GeneratedAssistant');
+
+        foreach ($paths as $path) {
+            $output = [];
+            exec(implode(' ', [escapeshellarg(PHP_BINARY), '-l', escapeshellarg($path)]), $output, $status);
+            self::assertSame(0, $status, implode(PHP_EOL, $output));
+        }
+        require $paths['listener'];
+        $assistant = require $paths['config'];
+
+        self::assertInstanceOf(Assistant::class, $assistant);
+        $http = new RecordingHttpClient();
+        $app = new App(new GenericContainer(), new Client($http, 'test'), new BoltConfig('test'));
+        $app->assistant($assistant)->dispatch([
+            'type' => 'event_callback',
+            'team_id' => 'T1',
+            'event' => [
+                'type' => 'assistant_thread_started',
+                'event_ts' => '1.001',
+                'assistant_thread' => [
+                    'channel_id' => 'D1',
+                    'thread_ts' => '1.001',
+                    'user_id' => 'U1',
+                    'context' => ['team_id' => 'T1'],
+                ],
+            ],
+        ]);
+
+        self::assertCount(1, $http->requests);
+        self::assertSame($originalManifest, (string) file_get_contents($manifest));
+        self::assertStringNotContainsString('assistant:write', $originalManifest);
+        $this->expectException(RuntimeException::class);
+        $scaffold->assistant($project, 'GeneratedAssistant');
     }
 
     private string $workspace;

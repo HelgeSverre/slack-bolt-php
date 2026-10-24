@@ -17,7 +17,7 @@ $modal = Modal::make('Deploy',
 )->callbackId('deploy')->submit('Deploy')->close('Cancel');
 ```
 
-Pass a `Modal` directly to `ViewResponse::update()` or `ViewResponse::push()`. `RawBlock::fromArray()` and `RawElement::fromArray()` preserve typed, validated extension points for Slack Block Kit additions that do not yet have a dedicated builder. `RichText::fromElements()` validates the rich-text container while retaining Slack's nested rich-text element shape.
+Pass a `Modal` directly to `ViewResponse::update()` or `ViewResponse::push()`. `RawBlock::fromArray()` and `RawElement::fromArray()` preserve raw Slack Block Kit additions through explicit extension points; discriminator checks do not establish full Slack schema validation. `RichText::fromElements()` validates the rich-text container while retaining Slack's nested rich-text element shape.
 
 Dedicated factories cover the pinned block, element, composition, and view families. Raw extension points allow future Slack additions without pretending to validate unknown schemas.
 

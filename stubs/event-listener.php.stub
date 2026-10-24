@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use Thunder\Bolt\Attributes\{{ attributeUse }};
+use Thunder\Bolt\Payloads\{{ payloadUse }};
+
+final class {{ class }}
+{
+    #[{{ attribute }}({{ selector }})]
+    public function __invoke({{ payloadClass }} $event): void {}
+}

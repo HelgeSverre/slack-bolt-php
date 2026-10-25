@@ -183,11 +183,20 @@ php bolt jobs:show JOB_ID
 php bolt jobs:cancel JOB_ID
 php bolt jobs:recover
 php bolt jobs:retry JOB_ID --allow-repeat
+php bolt jobs:migrate
+php bolt jobs:prune --before=30d --dry-run
+php bolt jobs:prune --before=30d --limit=1000
 ```
 
 Requires `pdo_sqlite` when used. The default file is `.thunder-bolt/jobs/queue.sqlite`; `SLACK_JOB_STORE_PATH` or a typed `Jobs\JobConfig` selects another private local path. On POSIX, an existing custom parent directory must be private (`0700`); the factory will not change shared-directory permissions. Help/discovery do not open the database. Run the worker under your process supervisor; `--max-jobs=100` bounds a worker's lifetime and `--lease=120` selects its claim duration.
 
-The default is **one attempt**. Opt into bounded retries and expired-lease recovery with `Jobs\RetryPolicy::idempotent(maxAttempts: 3)` only when repeating the **whole handler** is safe. Posting a new Slack message is not inherently idempotent. Unsafe abandoned attempts become `uncertain`; inspect them before explicitly allowing a repeat. Records and duplicate keys are retained; archive them deliberately rather than deleting deduplication history blindly.
+The default is **one attempt**. Opt into bounded retries and expired-lease recovery with `Jobs\RetryPolicy::idempotent(maxAttempts: 3)` only when repeating the **whole handler** is safe. Posting a new Slack message is not inherently idempotent. Unsafe abandoned attempts become `uncertain`; inspect them before explicitly allowing a repeat.
+
+`jobs:show` includes timestamps, attempt history and recovery decisions; `--history-limit=100` bounds the newest entries. History is committed with each state change and contains no job inputs or lease tokens. Heartbeats do not create history entries. Older databases receive one explicitly incomplete legacy snapshot, preserving their existing jobs, leases and keys.
+
+`jobs:prune` deletes inputs and history for succeeded, failed and cancelled jobs completed strictly before the retention cutoff. Pending, running and uncertain jobs are protected. Ages use days or hours (`30d`, `12h`); each call handles at most 1,000 jobs and reports `more_available`. Preview with `--dry-run`, then repeat batches as needed. Compact deduplication receipts remain indefinitely: an identical delivery still returns the original ID, different inputs still conflict, and `jobs:show` identifies a pruned job. Pruned inputs cannot be recovered or retried. Receipts still grow; pruning frees SQLite pages for reuse rather than shrinking the file automatically.
+
+Stores apply supported additive schema migrations when opened; `jobs:migrate` opens the store explicitly and reports its version. Before upgrading, stop older workers and make a consistent private SQLite backup. Migrations are transactional and reject newer schemas rather than attempting a downgrade. A prune preview never deletes jobs, but opening an older store can still migrate its schema. [Operations and upgrade details](docs/research/job-operations.md).
 
 Cancellation is cooperative: call `checkpoint()` between steps and `heartbeat()` before the lease expires. Pending jobs are cancelled immediately; running jobs stop when they check. A delivery-bound `$jobs->cancelThread()` targets the current installation/channel/root, useful for `agent_session_stopped`; application listeners still enforce business permissions and session UI/status changes. Blocking I/O needs bounded timeouts. Cancellation never rolls back a completed external action.
 
@@ -372,7 +381,7 @@ To regenerate from the pinned upstream archives, run `npm run sync:references`, 
 
 ## What's next
 
-Durable SQLite jobs and modern agent sessions are implemented, and the AI playground uses them. Conversation reads and Slack-metadata context now have an opt-in live conformance suite. Release readiness still needs broader protocol coverage, upgrade guidance and a first tagged release. Larger deployments will also need job retention and additional durable-store adapters.
+Durable SQLite jobs, operator history, retention and modern agent sessions are implemented, and the AI playground uses them. Conversation reads and Slack-metadata context have an opt-in live conformance suite. Release readiness still needs broader protocol coverage, upgrade guidance and a first tagged release. Larger deployments may need additional durable-store adapters and an explicit deduplication-key expiry policy.
 
 Extended guides and API documentation will live on a separate docs site. Existing design notes and coverage inventories remain under `docs/` for maintainers. Controlled live-workspace tests and Linux/macOS CI are release gates; generated coverage alone does not establish full Bolt JS conformance.
 

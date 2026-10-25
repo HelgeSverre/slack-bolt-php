@@ -21,6 +21,9 @@ final readonly class JobRecord implements \JsonSerializable
         private ?string $leaseToken,
         public bool $cancellationRequested,
         public ?string $failureType,
+        public ?int $createdAt = null,
+        public ?int $updatedAt = null,
+        public ?int $finishedAt = null,
     ) {}
 
     public function summary(): array
@@ -36,6 +39,9 @@ final readonly class JobRecord implements \JsonSerializable
             'lease_expires_at' => $this->leaseExpiresAt,
             'cancellation_requested' => $this->cancellationRequested,
             'failure_type' => $this->failureType,
+            'created_at' => $this->createdAt,
+            'updated_at' => $this->updatedAt,
+            'finished_at' => $this->finishedAt,
         ];
     }
 

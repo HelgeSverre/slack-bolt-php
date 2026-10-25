@@ -96,11 +96,16 @@ final class JobCommands
     }
 
     #[ConsoleCommand(name: 'jobs:show', description: 'Show one job lifecycle record without input data')]
-    public function show(string $id): ExitCode
-    {
+    public function show(
+        string $id,
+        #[ConsoleArgument(name: 'history-limit', description: 'Maximum recent history entries, between 1 and 1000')]
+        int $historyLimit = 100,
+    ): ExitCode {
         try {
-            $job = $this->store()->find($id) ?? throw new \OutOfBoundsException('Job not found.');
-            $this->output($job->summary());
+            if ($historyLimit < 1 || $historyLimit > 1000) {
+                throw new \InvalidArgumentException('Show between 1 and 1000 history entries.');
+            }
+            $this->output($this->store()->inspect($id, $historyLimit));
             return ExitCode::SUCCESS;
         } catch (\Throwable $exception) {
             return $this->error($exception);
@@ -141,6 +146,51 @@ final class JobCommands
         try {
             $this->store()->retry($id, $allowRepeat);
             $this->output(['id' => $id, 'status' => 'pending']);
+            return ExitCode::SUCCESS;
+        } catch (\Throwable $exception) {
+            return $this->error($exception);
+        }
+    }
+
+    #[ConsoleCommand(
+        name: 'jobs:prune',
+        description: 'Prune old terminal job inputs and history, retaining deduplication receipts',
+    )]
+    public function prune(
+        #[ConsoleArgument(description: 'Positive age in days or hours, such as 30d or 12h')]
+        string $before = '30d',
+        #[ConsoleArgument(name: 'dry-run', description: 'Preview one batch without deleting jobs')]
+        bool $dryRun = false,
+        #[ConsoleArgument(description: 'Maximum jobs per batch, between 1 and 1000')]
+        int $limit = 1000,
+    ): ExitCode {
+        try {
+            // Validate before opening storage: invalid flags must not initialize or migrate it.
+            if (preg_match('/\A([1-9][0-9]{0,5})(d|h)\z/', $before, $match) !== 1) {
+                throw new \InvalidArgumentException(
+                    'Use a positive retention age such as --before=30d or --before=12h.',
+                );
+            }
+            if ($limit < 1 || $limit > 1000) {
+                throw new \InvalidArgumentException('Prune in batches of 1 to 1000 jobs.');
+            }
+            $seconds = (int) $match[1] * ($match[2] === 'd' ? 86400 : 3600);
+            $cutoff = new \DateTimeImmutable('@' . (time() - $seconds));
+            $this->output($this->store()->prune($cutoff, $dryRun, $limit));
+            return ExitCode::SUCCESS;
+        } catch (\Throwable $exception) {
+            return $this->error($exception);
+        }
+    }
+
+    #[ConsoleCommand(
+        name: 'jobs:migrate',
+        description: 'Apply supported additive job-store migrations and report the schema version',
+    )]
+    public function migrate(): ExitCode
+    {
+        try {
+            $this->output(['schema_version' => $this->store()->schemaVersion()]);
             return ExitCode::SUCCESS;
         } catch (\Throwable $exception) {
             return $this->error($exception);

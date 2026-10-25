@@ -24,31 +24,8 @@ final readonly class SqliteJobStore
         $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $connection->exec('PRAGMA busy_timeout = 250');
         $connection->exec('PRAGMA synchronous = FULL');
-        $connection->exec(<<<'SQL'
-            CREATE TABLE IF NOT EXISTS thunder_bolt_jobs (
-                id TEXT PRIMARY KEY,
-                tenant TEXT NOT NULL,
-                type TEXT NOT NULL,
-                idempotency_key TEXT NOT NULL,
-                fingerprint TEXT NOT NULL,
-                payload_json TEXT NOT NULL,
-                context_json TEXT NOT NULL,
-                retry_json TEXT NOT NULL,
-                status TEXT NOT NULL,
-                attempts INTEGER NOT NULL DEFAULT 0,
-                attempt_limit INTEGER NOT NULL,
-                available_at INTEGER NOT NULL,
-                lease_token TEXT NULL,
-                lease_expires_at INTEGER NULL,
-                cancellation_requested INTEGER NOT NULL DEFAULT 0,
-                failure_type TEXT NULL,
-                created_at INTEGER NOT NULL,
-                updated_at INTEGER NOT NULL,
-                UNIQUE (tenant, type, idempotency_key)
-            );
-            CREATE INDEX IF NOT EXISTS thunder_bolt_jobs_due ON thunder_bolt_jobs(status, available_at);
-            CREATE INDEX IF NOT EXISTS thunder_bolt_jobs_leases ON thunder_bolt_jobs(status, lease_expires_at);
-            SQL);
+        $connection->exec('PRAGMA foreign_keys = ON');
+        JobSchema::migrate($connection);
     }
 
     public static function open(string $path, ?ClockInterface $clock = null): self
@@ -136,6 +113,20 @@ final readonly class SqliteJobStore
             $fingerprint,
             $availableAt,
         ): DispatchResult {
+            $receipt = $this->prepare(
+                'SELECT job_id, fingerprint FROM thunder_bolt_job_receipts WHERE tenant = ? AND type = ? AND key_digest = ?',
+            );
+            $receipt->execute([$context->tenant(), $type, hash('sha256', $key)]);
+            $pruned = $receipt->fetch(PDO::FETCH_ASSOC);
+            $receipt->closeCursor();
+            if (is_array($pruned)) {
+                if (!hash_equals((string) $pruned['fingerprint'], $fingerprint)) {
+                    throw new \LogicException(
+                        'The same pruned job key was reused with different inputs, context or retry policy.',
+                    );
+                }
+                return new DispatchResult((string) $pruned['job_id'], true);
+            }
             $id = bin2hex(random_bytes(16));
             $now = $this->now();
             $insert = $this->prepare(<<<'SQL'
@@ -159,6 +150,7 @@ final readonly class SqliteJobStore
                 $now,
             ]);
             if ($insert->rowCount() === 1) {
+                $this->history($id, 'accepted');
                 return new DispatchResult($id, false);
             }
             $existing = $this->prepare(
@@ -166,6 +158,7 @@ final readonly class SqliteJobStore
             );
             $existing->execute([$context->tenant(), $type, $key]);
             $row = $existing->fetch(PDO::FETCH_ASSOC);
+            $existing->closeCursor();
             if (!is_array($row) || !hash_equals((string) $row['fingerprint'], $fingerprint)) {
                 throw new \LogicException(
                     'The same job key was reused with different inputs, context or retry policy.',
@@ -180,6 +173,7 @@ final readonly class SqliteJobStore
         $query = $this->prepare('SELECT * FROM thunder_bolt_jobs WHERE id = ?');
         $query->execute([$id]);
         $row = $query->fetch(PDO::FETCH_ASSOC);
+        $query->closeCursor();
         return is_array($row) ? $this->record($row) : null;
     }
 
@@ -204,6 +198,7 @@ final readonly class SqliteJobStore
             );
             $query->execute([$this->now()]);
             $id = $query->fetchColumn();
+            $query->closeCursor();
             if (!is_string($id)) {
                 return null;
             }
@@ -211,6 +206,7 @@ final readonly class SqliteJobStore
                 "UPDATE thunder_bolt_jobs SET status = 'running', attempts = attempts + 1, lease_token = ?, lease_expires_at = ?, updated_at = ? WHERE id = ? AND status = 'pending'",
             );
             $update->execute([bin2hex(random_bytes(24)), $this->now() + $leaseSeconds, $this->now(), $id]);
+            $this->history($id, 'claimed');
             return $this->find($id);
         });
     }
@@ -261,32 +257,47 @@ final readonly class SqliteJobStore
         )) {
             throw new \InvalidArgumentException('Invalid job outcome.');
         }
-        $update = $this->prepare(
-            "UPDATE thunder_bolt_jobs SET status = CASE WHEN cancellation_requested = 1 AND ? <> 'uncertain' THEN 'cancelled' ELSE ? END, failure_type = ?, available_at = ?, lease_token = NULL, lease_expires_at = NULL, updated_at = ? WHERE id = ? AND status = 'running' AND lease_token = ? AND lease_expires_at > ?",
-        );
-        $update->execute([
-            $status->value,
-            $status->value,
-            $failureType,
-            $availableAt ?? $this->now(),
-            $this->now(),
-            $job->id,
-            $job->leaseToken(),
-            $this->now(),
-        ]);
-        if ($update->rowCount() !== 1) {
-            throw new LeaseLost('A stale worker cannot settle this job.');
-        }
+        $this->transaction(function () use ($job, $status, $failureType, $availableAt): void {
+            $update = $this->prepare(
+                "UPDATE thunder_bolt_jobs SET status = CASE WHEN cancellation_requested = 1 AND ? <> 'uncertain' THEN 'cancelled' ELSE ? END, failure_type = ?, available_at = ?, lease_token = NULL, lease_expires_at = NULL, finished_at = CASE WHEN ? = 'pending' AND cancellation_requested = 0 THEN NULL ELSE ? END, updated_at = ? WHERE id = ? AND status = 'running' AND lease_token = ? AND lease_expires_at > ?",
+            );
+            $update->execute([
+                $status->value,
+                $status->value,
+                $failureType,
+                $availableAt ?? $this->now(),
+                $status->value,
+                $this->now(),
+                $this->now(),
+                $job->id,
+                $job->leaseToken(),
+                $this->now(),
+            ]);
+            if ($update->rowCount() !== 1) {
+                throw new LeaseLost('A stale worker cannot settle this job.');
+            }
+            $this->history($job->id, 'attempt_finished', $failureType);
+        });
     }
 
     public function cancel(string $id, ?string $tenant = null): bool
     {
-        $update = $this->prepare(
-            "UPDATE thunder_bolt_jobs SET cancellation_requested = 1, status = CASE WHEN status = 'pending' THEN 'cancelled' ELSE status END, updated_at = ? WHERE id = ? AND status IN ('pending', 'running')"
-            . ($tenant === null ? '' : ' AND tenant = ?'),
-        );
-        $update->execute($tenant === null ? [$this->now(), $id] : [$this->now(), $id, $tenant]);
-        return $update->rowCount() === 1;
+        return $this->transaction(function () use ($id, $tenant): bool {
+            $query = $this->prepare(
+                "SELECT id, cancellation_requested FROM thunder_bolt_jobs WHERE id = ? AND status IN ('pending', 'running')"
+                . ($tenant === null ? '' : ' AND tenant = ?'),
+            );
+            $query->execute($tenant === null ? [$id] : [$id, $tenant]);
+            $row = $query->fetch(PDO::FETCH_ASSOC);
+            $query->closeCursor();
+            if (!is_array($row)) {
+                return false;
+            }
+            if ((int) $row['cancellation_requested'] === 0) {
+                $this->requestCancellation($id, 'requested');
+            }
+            return true;
+        });
     }
 
     public function cancelThread(JobContext $context): int
@@ -294,11 +305,17 @@ final readonly class SqliteJobStore
         if ($context->channelId === null || $context->threadTs === null) {
             throw new \InvalidArgumentException('Thread cancellation needs both channel and thread identities.');
         }
-        $update = $this->prepare(
-            "UPDATE thunder_bolt_jobs SET cancellation_requested = 1, status = CASE WHEN status = 'pending' THEN 'cancelled' ELSE status END, updated_at = ? WHERE tenant = ? AND status IN ('pending', 'running') AND json_extract(context_json, '$.channel_id') = ? AND json_extract(context_json, '$.thread_ts') = ?",
-        );
-        $update->execute([$this->now(), $context->tenant(), $context->channelId, $context->threadTs]);
-        return $update->rowCount();
+        return $this->transaction(function () use ($context): int {
+            $query = $this->prepare(
+                "SELECT id FROM thunder_bolt_jobs WHERE tenant = ? AND status IN ('pending', 'running') AND cancellation_requested = 0 AND json_extract(context_json, '$.channel_id') = ? AND json_extract(context_json, '$.thread_ts') = ?",
+            );
+            $query->execute([$context->tenant(), $context->channelId, $context->threadTs]);
+            $rows = $this->rows($query);
+            foreach ($rows as $row) {
+                $this->requestCancellation((string) $row['id'], 'thread_requested');
+            }
+            return count($rows);
+        });
     }
 
     /** Expired non-idempotent attempts are uncertain, never silently repeated. */
@@ -316,15 +333,23 @@ final readonly class SqliteJobStore
                     $job->retry->safeToRepeat && !$job->cancellationRequested && $job->attempts < $job->attemptLimit;
                 $status = $retry ? JobStatus::Pending : JobStatus::Uncertain;
                 $update = $this->prepare(
-                    'UPDATE thunder_bolt_jobs SET status = ?, available_at = ?, lease_token = NULL, lease_expires_at = NULL, failure_type = ?, updated_at = ? WHERE id = ?',
+                    'UPDATE thunder_bolt_jobs SET status = ?, available_at = ?, lease_token = NULL, lease_expires_at = NULL, failure_type = ?, finished_at = ?, updated_at = ? WHERE id = ?',
                 );
                 $update->execute([
                     $status->value,
                     $this->now() + ($retry ? $job->retry->delay($job->attempts) : 0),
                     'lease_expired',
+                    $retry ? null : $this->now(),
                     $this->now(),
                     $job->id,
                 ]);
+                $reason = match (true) {
+                    $retry => 'lease_expired_retry',
+                    $job->cancellationRequested => 'lease_expired_cancellation_uncertain',
+                    !$job->retry->safeToRepeat => 'lease_expired_non_idempotent',
+                    default => 'lease_expired_attempts_exhausted',
+                };
+                $this->history($job->id, 'recovered', $reason);
             }
             return count($rows);
         });
@@ -343,10 +368,132 @@ final readonly class SqliteJobStore
                 );
             }
             $update = $this->prepare(
-                "UPDATE thunder_bolt_jobs SET status = 'pending', cancellation_requested = 0, failure_type = NULL, attempt_limit = ?, available_at = ?, updated_at = ? WHERE id = ?",
+                "UPDATE thunder_bolt_jobs SET status = 'pending', cancellation_requested = 0, failure_type = NULL, finished_at = NULL, attempt_limit = ?, available_at = ?, updated_at = ? WHERE id = ?",
             );
             $update->execute([$job->attempts + $job->retry->maxAttempts, $this->now(), $this->now(), $id]);
+            $this->history($id, 'retry_requested', $allowRepeat ? 'operator_allow_repeat' : 'operator_retry');
         });
+    }
+
+    public function schemaVersion(): int
+    {
+        return JobSchema::version($this->connection);
+    }
+
+    public function inspect(string $id, int $historyLimit = 100): array
+    {
+        if ($historyLimit < 1 || $historyLimit > 1000) {
+            throw new \InvalidArgumentException('Show between 1 and 1000 history entries.');
+        }
+        return $this->transaction(function () use ($id, $historyLimit): array {
+            $job = $this->find($id);
+            if ($job === null) {
+                $query = $this->prepare(
+                    'SELECT job_id, tenant, type, last_status, pruned_at FROM thunder_bolt_job_receipts WHERE job_id = ?',
+                );
+                $query->execute([$id]);
+                $row = $query->fetch(PDO::FETCH_ASSOC);
+                $query->closeCursor();
+                if (!is_array($row)) {
+                    throw new \OutOfBoundsException('Job not found.');
+                }
+                return [
+                    'id' => (string) $row['job_id'],
+                    'tenant' => (string) $row['tenant'],
+                    'type' => (string) $row['type'],
+                    'status' => 'pruned',
+                    'last_status' => (string) $row['last_status'],
+                    'pruned_at' => (int) $row['pruned_at'],
+                    'deduplication' => 'retained',
+                    'schema_version' => $this->schemaVersion(),
+                    'history' => [],
+                    'history_pruned' => true,
+                ];
+            }
+            $query = $this->prepare(
+                'SELECT attempt, event, status, occurred_at, reason, available_at, lease_expires_at FROM thunder_bolt_job_history WHERE job_id = ? ORDER BY id DESC LIMIT ?',
+            );
+            $query->bindValue(1, $id);
+            $query->bindValue(2, $historyLimit + 1, PDO::PARAM_INT);
+            $query->execute();
+            $rows = $this->rows($query);
+            return [
+                ...$job->summary(),
+                'schema_version' => $this->schemaVersion(),
+                'history' => array_reverse(array_slice($rows, 0, $historyLimit)),
+                'history_truncated' => count($rows) > $historyLimit,
+            ];
+        }, write: false);
+    }
+
+    public function prune(\DateTimeInterface $before, bool $dryRun = false, int $limit = 1000): PruneResult
+    {
+        $cutoff = $before->getTimestamp();
+        if ($cutoff > $this->now() || $limit < 1 || $limit > 1000) {
+            throw new \InvalidArgumentException('Prune before a non-future cutoff, in batches of 1 to 1000 jobs.');
+        }
+        $operation = function () use ($cutoff, $dryRun, $limit): PruneResult {
+            $query = $this->prepare(<<<'SQL'
+                SELECT id, tenant, type, idempotency_key, fingerprint, status,
+                    (SELECT COUNT(*) FROM thunder_bolt_job_history h WHERE h.job_id = j.id) AS history_count
+                FROM thunder_bolt_jobs j
+                WHERE status IN ('succeeded', 'failed', 'cancelled') AND finished_at < ?
+                ORDER BY finished_at, id LIMIT ?
+                SQL);
+            $query->bindValue(1, $cutoff, PDO::PARAM_INT);
+            $query->bindValue(2, $limit + 1, PDO::PARAM_INT);
+            $query->execute();
+            $found = $this->rows($query);
+            $rows = array_slice($found, 0, $limit);
+            $history = 0;
+            foreach ($rows as $row) {
+                $history += (int) $row['history_count'];
+                if ($dryRun) {
+                    continue;
+                }
+                $receipt = $this->prepare(
+                    'INSERT INTO thunder_bolt_job_receipts (tenant, type, key_digest, fingerprint, job_id, last_status, pruned_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                );
+                $receipt->execute([
+                    $row['tenant'],
+                    $row['type'],
+                    hash('sha256', (string) $row['idempotency_key']),
+                    $row['fingerprint'],
+                    $row['id'],
+                    $row['status'],
+                    $this->now(),
+                ]);
+                $delete = $this->prepare('DELETE FROM thunder_bolt_jobs WHERE id = ?');
+                $delete->execute([$row['id']]);
+                if ($delete->rowCount() !== 1) {
+                    throw new \RuntimeException('The selected job was not pruned; the batch was rolled back.');
+                }
+            }
+            return new PruneResult($cutoff, $dryRun, count($rows), $history, $limit, count($found) > $limit);
+        };
+        return $dryRun ? $operation() : $this->transaction($operation);
+    }
+
+    private function requestCancellation(string $id, string $reason): void
+    {
+        $update = $this->prepare(
+            "UPDATE thunder_bolt_jobs SET cancellation_requested = 1, finished_at = CASE WHEN status = 'pending' THEN ? ELSE finished_at END, status = CASE WHEN status = 'pending' THEN 'cancelled' ELSE status END, updated_at = ? WHERE id = ?",
+        );
+        $update->execute([$this->now(), $this->now(), $id]);
+        $this->history($id, 'cancellation_requested', $reason);
+    }
+
+    private function history(string $id, string $event, ?string $reason = null): void
+    {
+        $insert = $this->prepare(<<<'SQL'
+            INSERT INTO thunder_bolt_job_history (job_id, attempt, event, status, occurred_at, reason, available_at, lease_expires_at)
+            SELECT id, attempts, ?, status, ?, ?, available_at, lease_expires_at FROM thunder_bolt_jobs WHERE id = ?
+            SQL);
+        try {
+            $insert->execute([$event, $this->now(), $reason, $id]);
+        } finally {
+            $insert->closeCursor();
+        }
     }
 
     private function validateLease(int $seconds): void
@@ -361,12 +508,12 @@ final readonly class SqliteJobStore
      * @param \Closure(): T $operation
      * @return T
      */
-    private function transaction(\Closure $operation): mixed
+    private function transaction(\Closure $operation, bool $write = true): mixed
     {
         if ($this->connection->inTransaction()) {
             throw new \LogicException('Execution storage needs a dedicated SQLite connection.');
         }
-        $this->connection->exec('BEGIN IMMEDIATE');
+        $this->connection->exec($write ? 'BEGIN IMMEDIATE' : 'BEGIN');
         try {
             $result = $operation();
             $this->connection->exec('COMMIT');
@@ -393,6 +540,9 @@ final readonly class SqliteJobStore
             $row['lease_token'] === null ? null : (string) $row['lease_token'],
             (int) $row['cancellation_requested'] === 1,
             $row['failure_type'] === null ? null : (string) $row['failure_type'],
+            (int) $row['created_at'],
+            (int) $row['updated_at'],
+            $row['finished_at'] === null ? null : (int) $row['finished_at'],
         );
     }
 

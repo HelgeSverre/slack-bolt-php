@@ -11,7 +11,7 @@ The generated [Bolt surface](bolt-js-api-surface.md) lists every extracted expor
 | `App` construction and event/message/command listeners | `Thunder\Bolt\App`, typed payloads, attributes and fluent registration | 🟡 working first slice; full parity pending |
 | middleware / listener matching / context | invocation pipeline and delivery-scoped reply helper | 🟡 working first slice; full parity pending |
 | HTTP receiver / signing / URL verification | `Http\Receiver` with inline buffered acknowledgement | 🟡 working first slice; other receiver protocols pending |
-| `client` Web API calls | `WebApi\Client` plus generated resource groups | 🟢 typed models, named resources, multipart, uploads, opt-in retries; [scope](sdk-block-kit-audit.md) |
+| `client` Web API calls | `WebApi\Client` plus generated resource groups | 🟢 typed models, resources, multipart, uploads, opt-in retries; five conversation reads audited as GET with live metadata round-trip coverage; [transport scope](web-api-transport-conformance.md), [SDK scope](sdk-block-kit-audit.md) |
 | shortcuts, actions, options, views | readonly payloads, attributes/fluent selectors, typed acknowledgements, response-URL replies | 🟢 implemented for HTTP; [scope and evidence](http-interactivity-audit.md) |
 | OAuth installation / token rotation | OAuth v2 installer, one-time state, file/memory stores, bot/user grant rotation and scoped authorizers | 🟢 HTTP milestone implemented; [scope](../oauth-and-authorization.md) and [source mapping](oauth-authorization.md) |
 | Socket Mode | `SocketMode\Runner`, Amp transport, `socket:serve` | 🟡 implemented with explicit durable job intake; full protocol conformance remains open |

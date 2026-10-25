@@ -71,6 +71,8 @@ Durable named jobs are implemented: SQLite intake/deduplication, atomic claims/l
 
 Modern agent sessions are implemented with typed lifecycle, session titles, stream completion states and stop handling. The AI demo now runs named durable jobs; persisted cancellation reaches model I/O and tool checkpoints. `/kickensink` provides an interactive tour. Pet, terminal and work-item spool entries remain application-local. See the [session integration notes](agent-sessions.md).
 
+The first opt-in live transport slice is complete: five conversation read methods use documented GET/query encoding, pagination preserves filters and rejects cycles, and the Slack-metadata context adapter has a live persistence round trip. See the [transport audit](web-api-transport-conformance.md). This closes the specific `conversations.replies` gap found during the session demo.
+
 1. **Compatibility and release validation.** Maintain a behavior matrix, targeted live-workspace checks and package installation/release verification. Linux/macOS CI already passes; paid-plan custom-function validation still needs an eligible workspace. Triage Mago advisories explicitly. Fresh named-job project installation is verified, but publishing/release automation and CLI startup optimization remain open.
 2. **Demand-led adapters and operational growth.** Add deployment/shared-store adapters when needed; define job retention/schema-migration tooling before growing beyond the initial local SQLite execution backend.
 

@@ -37,4 +37,10 @@ final class RecordingHttpClient implements ClientInterface
     {
         return json_decode((string) $this->requests[$index]->getBody(), true, flags: JSON_THROW_ON_ERROR);
     }
+
+    public function sentQuery(int $index = 0): array
+    {
+        parse_str($this->requests[$index]->getUri()->getQuery(), $query);
+        return $query;
+    }
 }

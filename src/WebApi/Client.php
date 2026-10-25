@@ -15,6 +15,15 @@ final readonly class Client
 {
     use HasResources;
 
+    // Audited against Slack's method contracts; do not infer verbs from method names.
+    private const array GET_METHODS = [
+        'conversations.history',
+        'conversations.info',
+        'conversations.list',
+        'conversations.members',
+        'conversations.replies',
+    ];
+
     public function workObjects(): \Thunder\Bolt\WorkObjects\Publisher
     {
         return new \Thunder\Bolt\WorkObjects\Publisher($this);
@@ -112,21 +121,41 @@ final readonly class Client
             ['oauth.access', 'oauth.v2.access', 'oauth.v2.exchange', 'openid.connect.token'],
             true,
         );
-        $headers = [
-            'Accept' => 'application/json',
-            'Content-Type' => $form ? 'application/x-www-form-urlencoded' : 'application/json; charset=utf-8',
-        ];
+        $get = in_array($method, self::GET_METHODS, true);
+        $headers = ['Accept' => 'application/json'];
+        if (!$get) {
+            $headers['Content-Type'] = $form ? 'application/x-www-form-urlencoded' : 'application/json; charset=utf-8';
+        }
         if ($token !== '') {
             $headers['Authorization'] = 'Bearer ' . $token;
         }
         $multipart = null;
         foreach ($data as $value) {
             if ($value instanceof MultipartFile) {
+                if ($get) {
+                    throw new \InvalidArgumentException('Conversation reads cannot upload files.');
+                }
                 $multipart = new MultipartForm($data);
                 break;
             }
         }
-        if ($multipart !== null) {
+        $url = rtrim($this->baseUrl, '/') . '/' . $method;
+        if ($get) {
+            $query = [];
+            foreach ($data as $key => $value) {
+                if ($value === null) {
+                    continue;
+                }
+                if (!is_scalar($value) || is_float($value) && !is_finite($value)) {
+                    throw new \InvalidArgumentException('Conversation read arguments must be finite scalar values.');
+                }
+                $query[$key] = is_bool($value) ? ($value ? 'true' : 'false') : $value;
+            }
+            if ($query !== []) {
+                $url .= '?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+            }
+            $body = '';
+        } elseif ($multipart !== null) {
             $headers['Content-Type'] = 'multipart/form-data; boundary=' . $multipart->boundary;
             $body = '';
         } else {
@@ -134,7 +163,7 @@ final readonly class Client
                 ? http_build_query($data, '', '&', PHP_QUERY_RFC3986)
                 : json_encode((object) $data, JSON_THROW_ON_ERROR);
         }
-        $request = new Request('POST', rtrim($this->baseUrl, '/') . '/' . $method, $headers, $body);
+        $request = new Request($get ? 'GET' : 'POST', $url, $headers, $body);
         $allowRetries = match ($method) {
             'openid.connect.token', 'functions.completeSuccess', 'functions.completeError' => false,
             default => !str_starts_with($method, 'oauth.'),
@@ -258,6 +287,10 @@ final readonly class Client
     public function paginate(string $method, array $arguments = []): \Generator
     {
         $seen = [];
+        $initial = $arguments['cursor'] ?? null;
+        if (is_string($initial) && trim($initial) !== '') {
+            $seen[trim($initial)] = true;
+        }
         do {
             $response = $this->call($method, $arguments);
             yield $response;

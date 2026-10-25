@@ -2,6 +2,10 @@
 
 `WebApi\Client` uses an injected PSR-18 transport. Named resources preserve Slack's hierarchy (`$client->admin()->conversations()->archive(...)`); `call()` accepts a dynamic method name. Arrays remain supported for forward compatibility. Generated request and response models follow the pinned Web API source, with native PHP properties and raw response data available through `data` and `get()`.
 
+`conversations.history`, `info`, `list`, `members` and `replies` use their documented GET contracts. Arguments are RFC 3986 query parameters with explicit `true`/`false` booleans, omitted nulls and unchanged timestamp strings; these reads accept scalar values. Tokens remain in the Authorization header. Other methods keep JSON POST, OAuth keeps form POST, and upload methods retain multipart handling. This is an explicit audited method set, not an inference from names like `list` or `info`.
+
+`paginate()` follows non-empty cursors even when a filtered page is empty and rejects cursor cycles, including the starting cursor of a resumed iterator. Consumers can stop iteration to bound live requests. See the [transport conformance notes](research/web-api-transport-conformance.md) for the live smoke suite and current coverage limits.
+
 ## Retry deliberately
 
 The default client sends once. Inline Slack handlers must acknowledge within three seconds, so a rate limit raises `RateLimited` with its `retryAfter` value. A queue worker or CLI command can use an immutable retrying copy:

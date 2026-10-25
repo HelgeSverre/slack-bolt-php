@@ -55,7 +55,7 @@ Focused tests cover session states/identity, streaming completion, durable tour 
 
 Validation: 527 PHPUnit tests / 3,420 assertions; Mago formatting, lint and analysis pass with no errors (advisories remain); seven generator-tooling tests and generated ownership checks pass. The live development workspace accepted both tour command names and session event subscriptions. A completed tour, a cancelled tour attempt, a real AI web search with citations, and the details modal were exercised through Slack. The cancelled attempt settled as `cancelled` with `JobCancelled` and one attempt.
 
-Release-conformance follow-up: a read-only probe found that the generic SDK's JSON encoding is rejected by `conversations.replies` (Slack reports missing form/query fields). This does not affect the file-backed session demo. Audit method-specific request encoding before declaring exhaustive Web API compatibility.
+Resolved 25 October 2026: the generic SDK's JSON POST to `conversations.replies` returned missing-field errors in the live probe. Conversation reads now use their documented GET/query contracts. The opt-in live suite verifies the Slack-metadata adapter's save/fresh-read round trip and message preservation; [transport audit](web-api-transport-conformance.md). This scoped fix does not establish exhaustive Web API compatibility.
 
 ## Primary sources
 

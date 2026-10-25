@@ -26,7 +26,8 @@
     "bin": ["bin/bolt", "bin/bolt-complete"],
     "extra": {"branch-alias": {"dev-main": "0.1.x-dev"}},
     "scripts": {
-        "test": "@php vendor/bin/phpunit",
+        "test": "@php vendor/bin/phpunit --exclude-group live",
+        "test:live": "@php vendor/bin/phpunit tests/Live",
         "analyse": "@php vendor/bin/mago analyze",
         "lint": "@php vendor/bin/mago lint",
         "format": "@php vendor/bin/mago format",

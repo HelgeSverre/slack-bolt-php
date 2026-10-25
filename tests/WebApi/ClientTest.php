@@ -27,8 +27,8 @@ final class ClientTest extends TestCase
 
         self::assertSame('https://slack.com/api/admin.conversations.archive', (string) $http->requests[0]->getUri());
         self::assertSame(['channel_id' => 'C123'], $http->sentPayload());
-        self::assertSame('https://slack.com/api/conversations.list', (string) $http->requests[1]->getUri());
-        self::assertSame(['limit' => 10], $http->sentPayload(1));
+        self::assertSame('https://slack.com/api/conversations.list?limit=10', (string) $http->requests[1]->getUri());
+        self::assertSame(['limit' => '10'], $http->sentQuery(1));
     }
 
     public function test_typed_request_sends_bearer_header_and_exact_json(): void
@@ -160,7 +160,7 @@ final class ClientTest extends TestCase
         self::assertCount(0, $http->requests);
         $results = iterator_to_array($pages);
         self::assertCount(2, $results);
-        self::assertSame(['limit' => 1, 'cursor' => 'next'], $http->sentPayload(1));
+        self::assertSame(['limit' => '1', 'cursor' => 'next'], $http->sentQuery(1));
     }
 
     public function test_rejects_invalid_json_without_returning_an_untyped_success(): void

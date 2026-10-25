@@ -350,6 +350,16 @@ composer format:check
 
 Mago 1.50.0 provides formatting, linting, and static analysis. Native types carry ordinary signatures; PHPDoc adds useful collection types, generics, and explanations. Local fixtures and recorded transports test behavior without sending Slack messages.
 
+`composer test` excludes live tests. For an explicit workspace smoke run, configure a private token file, a conversation and an existing thread:
+
+```sh
+SLACK_LIVE_TESTS=1 SLACK_LIVE_ENV_FILE=/absolute/path/to/.env \
+SLACK_LIVE_CHANNEL=D123 SLACK_LIVE_THREAD_TS=1700000000.000001 \
+composer test:live
+```
+
+The file supplies `SLACK_BOT_TOKEN` (or use `SLACK_LIVE_TOKEN`). Reads cover conversation info, history, list, members and replies with bounded pagination. Set `SLACK_LIVE_MEMBERS_CHANNEL` if members should use another conversation. Add `SLACK_LIVE_WRITES=1` to verify Slack-metadata context storage using a temporary thread; the test deletes only its own fixture messages. Use a dedicated development conversation. Scopes, conversation access and Slack rate limits apply. [Audited contracts and validation](docs/research/web-api-transport-conformance.md).
+
 Reference tooling requires Node 22+:
 
 ```sh
@@ -362,7 +372,7 @@ To regenerate from the pinned upstream archives, run `npm run sync:references`, 
 
 ## What's next
 
-Durable SQLite jobs and modern agent sessions are implemented, and the AI playground uses them. The next milestone is **release readiness**: a controlled live-workspace conformance suite, upgrade guidance and a first tagged release. Larger deployments will also need job retention and additional durable-store adapters.
+Durable SQLite jobs and modern agent sessions are implemented, and the AI playground uses them. Conversation reads and Slack-metadata context now have an opt-in live conformance suite. Release readiness still needs broader protocol coverage, upgrade guidance and a first tagged release. Larger deployments will also need job retention and additional durable-store adapters.
 
 Extended guides and API documentation will live on a separate docs site. Existing design notes and coverage inventories remain under `docs/` for maintainers. Controlled live-workspace tests and Linux/macOS CI are release gates; generated coverage alone does not establish full Bolt JS conformance.
 

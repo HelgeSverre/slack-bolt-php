@@ -1,0 +1,1126 @@
+{
+  "schema": 1,
+  "auditedAt": "2026-10-26",
+  "phpRevision": "21192afee5efbbd35f90bbcf3e6b07858f5227b2",
+  "baseline": {
+    "package": "@slack/bolt",
+    "version": "5.1.0",
+    "commit": "ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d"
+  },
+  "definitions": {
+    "covered": "Reviewed capability is implemented with source and behavioral-test evidence; not exhaustive differential conformance.",
+    "adapted": "PHP provides the relevant capability through a different interface or an explicit supported execution model.",
+    "partial": "Important behavior/configuration/typing is narrower; evidence documents current behavior, not the missing guarantee.",
+    "missing": "No packaged equivalent; custom user code is not implementation parity.",
+    "excluded": "Recommended deliberate non-goal, with PHP or legacy rationale.",
+    "extension": "Beyond the baseline; excluded from parity assessment."
+  },
+  "features": [
+    {
+      "id": "listeners",
+      "area": "Event, message and command listeners",
+      "status": "covered",
+      "assessment": "Exact/string/regex routing, multiple listeners, typed attributes and generic events work. Use message('', handler) or event('message', handler) for an unfiltered message listener.",
+      "php": [
+        "src/App.php",
+        "src/Routing/Matcher.php",
+        "src/Integration/BoltDiscovery.php"
+      ],
+      "tests": [
+        "tests/Runtime/AppTest.php",
+        "tests/Runtime/CallableTargetTest.php",
+        "tests/Integration/BoltDiscoveryTest.php"
+      ],
+      "upstream": [
+        "src/App.ts",
+        "src/types/events/index.ts",
+        "src/types/command/index.ts"
+      ]
+    },
+    {
+      "id": "interactions",
+      "area": "Actions, shortcuts, options and views",
+      "status": "covered",
+      "assessment": "Block/legacy selectors, first-action classification, regex constraints and submission-only view shorthand have explicit tests. view_closed is supported with explicit constraints.",
+      "php": [
+        "src/Invocation/Interaction.php",
+        "src/Routing/InteractionConstraints.php",
+        "src/Invocation/AcknowledgementValidator.php"
+      ],
+      "tests": [
+        "tests/Http/InteractivityTest.php",
+        "tests/Runtime/InteractivityRegistrationTest.php",
+        "tests/SocketMode/DeliveryIntegrationTest.php"
+      ],
+      "upstream": [
+        "src/App.ts",
+        "src/types/actions/index.ts",
+        "src/types/options/index.ts",
+        "src/types/shortcuts/index.ts",
+        "src/types/view/index.ts"
+      ]
+    },
+    {
+      "id": "pipeline",
+      "area": "Global/listener middleware and failures",
+      "status": "adapted",
+      "assessment": "Ordered synchronous middleware with short-circuiting and duplicate-next guards; listeners run sequentially and later listeners still run after earlier failures. No Promise scheduling parity is claimed.",
+      "php": [
+        "src/Invocation/InvocationPipeline.php",
+        "src/App.php"
+      ],
+      "tests": [
+        "tests/Runtime/AppTest.php"
+      ],
+      "upstream": [
+        "src/middleware/process.ts",
+        "src/App.ts"
+      ]
+    },
+    {
+      "id": "captures",
+      "area": "Regex captures and retry metadata",
+      "status": "covered",
+      "assessment": "Delivery exposes matches and per-constraint captures; HTTP and Socket Mode attach retry metadata. These are already implemented, not a missing Context feature.",
+      "php": [
+        "src/Invocation/Delivery.php",
+        "src/Routing/Matcher.php",
+        "src/Http/Receiver.php",
+        "src/SocketMode/Runner.php"
+      ],
+      "tests": [
+        "tests/Runtime/AppTest.php",
+        "tests/Http/ReceiverTest.php",
+        "tests/SocketMode/RunnerTest.php"
+      ],
+      "upstream": [
+        "src/middleware/builtin.ts",
+        "src/types/middleware.ts"
+      ]
+    },
+    {
+      "id": "scratch-context",
+      "area": "Delivery-local custom middleware context",
+      "status": "missing",
+      "assessment": "Readonly Delivery cannot carry arbitrary middleware enrichment, and next() cannot forward a replacement delivery. Conversation/thread stores persist data and are not a substitute for request-local auth claims, tracing or fetched records. Add a typed delivery-local context capability without persisting live services.",
+      "php": [
+        "src/Invocation/Delivery.php",
+        "src/Invocation/InvocationPipeline.php"
+      ],
+      "tests": [],
+      "upstream": [
+        "src/types/middleware.ts",
+        "src/App.ts"
+      ]
+    },
+    {
+      "id": "host-context",
+      "area": "Adapter-supplied custom properties",
+      "status": "partial",
+      "assessment": "dispatch(body, metadata) accepts host data in metadata, but the stock HTTP and Socket Mode adapters provide no context-extractor hook. Missing host enrichment is distinct from existing retry/capture support.",
+      "php": [
+        "src/App.php",
+        "src/Http/Receiver.php",
+        "src/SocketMode/Runner.php"
+      ],
+      "tests": [
+        "tests/Http/ReceiverTest.php"
+      ],
+      "upstream": [
+        "src/types/receiver.ts",
+        "src/receivers/HTTPReceiver.ts",
+        "src/receivers/SocketModeReceiver.ts"
+      ]
+    },
+    {
+      "id": "builtin-families",
+      "area": "Built-in family and matcher middleware",
+      "status": "adapted",
+      "assessment": "onlyEvents/onlyActions/etc and matchConstraints/message/command/event behavior live in typed registration and Matcher. Separate exported filter functions are unnecessary for this behavior.",
+      "php": [
+        "src/Routing/Matcher.php",
+        "src/Invocation/Interaction.php"
+      ],
+      "tests": [
+        "tests/Runtime/AppTest.php",
+        "tests/Http/InteractivityTest.php"
+      ],
+      "upstream": [
+        "src/middleware/builtin.ts"
+      ]
+    },
+    {
+      "id": "subtype-mention",
+      "area": "subtype and directMention helpers",
+      "status": "missing",
+      "assessment": "No reusable subtype/direct-mention filters exist. Applications can inspect payload.raw with custom middleware; add idiomatic reusable filters if these common operations should be first-class. Do not confuse app_mention with directMention filtering of message events.",
+      "php": [
+        "src/Middleware/Middleware.php",
+        "src/Payloads/Events/Message.php"
+      ],
+      "tests": [],
+      "upstream": [
+        "src/middleware/builtin.ts"
+      ]
+    },
+    {
+      "id": "authorization",
+      "area": "Installation-scoped authorization",
+      "status": "covered",
+      "assessment": "Static/custom authorization, tenant/user/enterprise identities, lifecycle exceptions and scoped clients work. User and bot grants remain separate.",
+      "php": [
+        "src/Authorization/AuthorizationSource.php",
+        "src/Authorization/InstallationAuthorizer.php",
+        "src/Invocation/InvocationScope.php"
+      ],
+      "tests": [
+        "tests/Authorization/AuthorizerTest.php",
+        "tests/Runtime/AuthorizationDispatchTest.php",
+        "tests/Integration/InstalledApplicationTest.php"
+      ],
+      "upstream": [
+        "src/App.ts"
+      ]
+    },
+    {
+      "id": "static-identity",
+      "area": "Static-token verification and self identity",
+      "status": "partial",
+      "assessment": "ignoreSelf works with supplied bot identities, including bot_id from an authorizer. A token-only App performs no startup auth.test identity hydration; BoltConfig lacks botId and botUserId is optional. Token-only defaults can therefore process their own messages. Add explicit verification/identity hydration without putting network calls in help or discovery.",
+      "php": [
+        "src/App.php",
+        "src/BoltConfig.php",
+        "src/Integration/AppInitializer.php"
+      ],
+      "tests": [
+        "tests/Runtime/ConversationDispatchTest.php",
+        "tests/Runtime/AuthorizationDispatchTest.php"
+      ],
+      "upstream": [
+        "src/App.ts",
+        "src/middleware/builtin.ts"
+      ]
+    },
+    {
+      "id": "oauth-core",
+      "area": "OAuth install, callback and state",
+      "status": "covered",
+      "assessment": "OAuth v2, bot/user scopes, one-time browser-bound state, denial handling, grant storage and OAuth callback endpoint handling are implemented. Opaque stored state deliberately replaces signed state-secret format.",
+      "php": [
+        "src/OAuth/Installer.php",
+        "src/OAuth/State/StateStore.php",
+        "src/Integration/OAuthController.php"
+      ],
+      "tests": [
+        "tests/OAuth/InstallerTest.php",
+        "tests/Integration/OAuthControllerTest.php"
+      ],
+      "upstream": [
+        "src/receivers/HTTPReceiver.ts",
+        "src/receivers/verify-redirect-opts.ts"
+      ]
+    },
+    {
+      "id": "oauth-options",
+      "area": "Advanced installation options and hooks",
+      "status": "partial",
+      "assessment": "Installer.begin() has no per-install request options: no metadata round trip, target-team hint, per-request scopes, install/callback hooks or built-in configurable paths/pages. Applications can own controllers, but that is not packaged installer-option parity. Prioritize metadata and success/failure hooks over visual install pages.",
+      "php": [
+        "src/OAuth/OAuthConfig.php",
+        "src/OAuth/Installer.php",
+        "src/OAuth/State/State.php",
+        "src/Integration/OAuthController.php"
+      ],
+      "tests": [
+        "tests/OAuth/InstallerTest.php"
+      ],
+      "upstream": [
+        "src/App.ts",
+        "src/receivers/HTTPReceiver.ts"
+      ]
+    },
+    {
+      "id": "rotation",
+      "area": "Token rotation and migration",
+      "status": "covered",
+      "assessment": "Both grants refresh independently with locked updates, expiry windows and explicit long-lived-token migration. OAuth exchanges remain single-attempt. Store adapters carry update locking responsibility.",
+      "php": [
+        "src/OAuth/TokenRotator.php",
+        "src/OAuth/InstallationStore.php"
+      ],
+      "tests": [
+        "tests/OAuth/TokenRotatorTest.php",
+        "tests/OAuth/TokenRotationProtocolTest.php",
+        "tests/OAuth/InstallationStoreTest.php"
+      ],
+      "upstream": [
+        "src/App.ts",
+        "src/receivers/HTTPReceiver.ts"
+      ]
+    },
+    {
+      "id": "conversation",
+      "area": "Conversation state and expiry",
+      "status": "adapted",
+      "assessment": "ConversationContext plus memory/file/SQLite stores implement read/update/expiry, with stronger installation scoping and explicit persistence rather than copying channel-only mutable JS state.",
+      "php": [
+        "src/Conversation/StoredContext.php",
+        "src/Conversation/ConversationStore.php"
+      ],
+      "tests": [
+        "tests/Conversation/ConversationStoreTest.php",
+        "tests/Runtime/ConversationDispatchTest.php"
+      ],
+      "upstream": [
+        "src/conversation-store.ts"
+      ]
+    },
+    {
+      "id": "thread-store",
+      "area": "Durable thread storage",
+      "status": "extension",
+      "assessment": "ThreadContext and durable adapters extend the Bolt baseline. Their presence is not evidence that unrelated Bolt features are implemented.",
+      "php": [
+        "src/Conversation/ThreadContext.php",
+        "src/Conversation/DeliveryContext.php"
+      ],
+      "tests": [
+        "tests/Conversation/DurableConversationTest.php"
+      ],
+      "upstream": [
+        "src/conversation-store.ts"
+      ]
+    },
+    {
+      "id": "replies",
+      "area": "say/respond utilities",
+      "status": "adapted",
+      "assessment": "Reply provides channel/thread/ephemeral and response_url calls with typed messages. Helpers select explicit destinations; response URLs do not receive bot credentials. This replaces JS closures, not their names.",
+      "php": [
+        "src/Reply.php",
+        "src/WebApi/Client.php"
+      ],
+      "tests": [
+        "tests/Runtime/AppTest.php",
+        "tests/WebApi/ResponseUrlTest.php"
+      ],
+      "upstream": [
+        "src/context/create-say.ts",
+        "src/context/create-respond.ts",
+        "src/types/utilities.ts"
+      ]
+    },
+    {
+      "id": "ack",
+      "area": "Acknowledgement behavior and slow work",
+      "status": "adapted",
+      "assessment": "Typed return values produce one acknowledgement after inline processing. There is no early-ack callback, per-listener autoAcknowledge option or processBeforeResponse toggle. Named durable jobs are the supported slow-work path; a warning does not enforce Slack's deadline. Retain this PHP model and document the timing difference; any future async host needs a separate design.",
+      "php": [
+        "src/Http/Receiver.php",
+        "src/Invocation/AcknowledgementValidator.php",
+        "src/SocketMode/Runner.php",
+        "src/Jobs.php"
+      ],
+      "tests": [
+        "tests/Http/InteractivityTest.php",
+        "tests/Jobs/DurableExecutionTest.php",
+        "tests/SocketMode/DeliveryIntegrationTest.php"
+      ],
+      "upstream": [
+        "src/receivers/HTTPResponseAck.ts",
+        "src/receivers/SocketModeResponseAck.ts",
+        "src/middleware/builtin.ts"
+      ]
+    },
+    {
+      "id": "http",
+      "area": "Signed HTTP ingress and URL verification",
+      "status": "covered",
+      "assessment": "Raw-body signature/timestamp checks, body limits, signed challenge, JSON/forms, retry headers and explicit error statuses are implemented. This does not include every configurable upstream receiver hook.",
+      "php": [
+        "src/Http/RequestVerifier.php",
+        "src/Http/Receiver.php"
+      ],
+      "tests": [
+        "tests/Http/RequestVerifierTest.php",
+        "tests/Http/ReceiverTest.php",
+        "tests/Integration/HttpControllerTest.php"
+      ],
+      "upstream": [
+        "src/receivers/verify-request.ts",
+        "src/receivers/verify-signing-secret.ts",
+        "src/receivers/HTTPReceiver.ts"
+      ]
+    },
+    {
+      "id": "ingress",
+      "area": "Trusted custom-host ingress",
+      "status": "adapted",
+      "assessment": "App.dispatch(body, metadata) already provides trusted parsed ingress, and Receiver.handle provides request/response verification. A new processEvent clone or generic receiver abstraction is not required. Future PSR/Laravel/Symfony adapters should reuse these methods.",
+      "php": [
+        "src/App.php",
+        "src/Http/Receiver.php"
+      ],
+      "tests": [
+        "tests/Runtime/AppTest.php",
+        "tests/Integration/HttpControllerTest.php"
+      ],
+      "upstream": [
+        "src/types/receiver.ts",
+        "src/App.ts"
+      ]
+    },
+    {
+      "id": "routing-lifecycle",
+      "area": "Routes, ports, server lifecycle and initialization",
+      "status": "adapted",
+      "assessment": "Tempest owns HTTP routes and serving; SocketMode.Runner owns socket lifecycle. Custom routes can be normal Tempest controllers; relocating the supplied Slack/OAuth paths requires an application controller. No universal App.start/stop/init belongs in PHP-FPM.",
+      "php": [
+        "src/Integration/HttpController.php",
+        "src/Integration/OAuthController.php",
+        "src/Console/BoltCommands.php",
+        "src/Console/SocketCommands.php"
+      ],
+      "tests": [
+        "tests/Console/ProjectScaffoldTest.php",
+        "tests/Console/SocketCommandsTest.php"
+      ],
+      "upstream": [
+        "src/App.ts",
+        "src/receivers/custom-routes.ts"
+      ]
+    },
+    {
+      "id": "errors",
+      "area": "Application/receiver error context and policy",
+      "status": "partial",
+      "assessment": "App.error receives HandlerFailures, parsed payload and metadata; independent failures are retained. It does not receive the selected listener, full delivery/authorization context or ack state. Receiver-stage exceptions map to fixed statuses/logging without configurable processing/unhandled hooks. Add structured PHP failure context and policy, not Node response callbacks.",
+      "php": [
+        "src/App.php",
+        "src/Exceptions/HandlerFailures.php",
+        "src/Http/Receiver.php",
+        "src/SocketMode/Runner.php"
+      ],
+      "tests": [
+        "tests/Runtime/AppTest.php",
+        "tests/Http/InteractivityTest.php",
+        "tests/SocketMode/RunnerTest.php"
+      ],
+      "upstream": [
+        "src/errors.ts",
+        "src/App.ts",
+        "src/receivers/HTTPReceiver.ts"
+      ]
+    },
+    {
+      "id": "logging",
+      "area": "Logging interfaces",
+      "status": "adapted",
+      "assessment": "PSR-3 logger injection replaces @slack/logger, log-level enums and app.logger. Public logger property spelling is not required; normal Tempest logging configuration owns levels.",
+      "php": [
+        "src/App.php",
+        "src/Integration/AppInitializer.php",
+        "src/SocketMode/Runner.php"
+      ],
+      "tests": [
+        "tests/Http/ReceiverTest.php"
+      ],
+      "upstream": [
+        "src/App.ts",
+        "src/index.ts"
+      ]
+    },
+    {
+      "id": "socket",
+      "area": "Socket Mode delivery and reconnection",
+      "status": "covered",
+      "assessment": "Envelope dispatch/ack payloads, hello/disconnect, health, bounds, reconnect/backoff and cooperative signal shutdown are implemented. No assertion of parity with every option in the separate Node Socket Mode SDK.",
+      "php": [
+        "src/SocketMode/Runner.php",
+        "src/SocketMode/Config.php",
+        "src/SocketMode/Transport/AmpConnection.php"
+      ],
+      "tests": [
+        "tests/SocketMode/RunnerTest.php",
+        "tests/SocketMode/Transport/AmpLocalServerTest.php",
+        "tests/SocketMode/DeliveryIntegrationTest.php"
+      ],
+      "upstream": [
+        "src/receivers/SocketModeReceiver.ts",
+        "src/receivers/SocketModeFunctions.ts"
+      ]
+    },
+    {
+      "id": "assistant",
+      "area": "Assistant lifecycle and context helpers",
+      "status": "covered",
+      "assessment": "Started/context-changed/user-message routing, scoped context, status/title/prompts, say and streaming helpers have behavioral coverage. Local durable context is the default; explicit Slack-metadata storage provides upstream-compatible storage behavior.",
+      "php": [
+        "src/Assistant.php",
+        "src/Assistant/Runtime.php",
+        "src/Assistant/Thread.php",
+        "src/Assistant/MessageStream.php"
+      ],
+      "tests": [
+        "tests/Assistant/RuntimeTest.php",
+        "tests/Assistant/ThreadTest.php",
+        "tests/Assistant/MessageStreamTest.php",
+        "tests/Assistant/SlackMetadataThreadContextStoreTest.php"
+      ],
+      "upstream": [
+        "src/Assistant.ts",
+        "src/AssistantThreadContextStore.ts",
+        "src/context/create-say-stream.ts",
+        "src/context/create-set-status.ts"
+      ]
+    },
+    {
+      "id": "functions",
+      "area": "Custom function routing, inputs and terminal helpers",
+      "status": "covered",
+      "assessment": "Named callbacks, strict typed inputs, function/interactivity execution context, workflow-scoped clients and complete/fail have behavioral tests. Execution guards duplicate and uncertain terminal calls per delivery; it does not promise global exactly-once completion across processes.",
+      "php": [
+        "src/Functions/Execution.php",
+        "src/Functions/ExecutionContext.php",
+        "src/Functions/Inputs.php",
+        "src/App.php"
+      ],
+      "tests": [
+        "tests/Functions/RuntimeTest.php",
+        "tests/Functions/ExecutionTest.php",
+        "tests/Functions/InputsTest.php"
+      ],
+      "upstream": [
+        "src/CustomFunction.ts",
+        "src/context/create-function-complete.ts",
+        "src/context/create-function-fail.ts"
+      ]
+    },
+    {
+      "id": "function-policy",
+      "area": "Workflow-token attachment policy",
+      "status": "partial",
+      "assessment": "Function workflow tokens take precedence when present. No attachFunctionToken=false option exists. Expose an explicit per-app policy if applications need ordinary installation credentials instead; this is independent of typed input/completion support.",
+      "php": [
+        "src/App.php",
+        "src/BoltConfig.php",
+        "src/Functions/ExecutionContext.php"
+      ],
+      "tests": [
+        "tests/Functions/RuntimeTest.php"
+      ],
+      "upstream": [
+        "src/App.ts"
+      ]
+    },
+    {
+      "id": "payload-types",
+      "area": "Inbound native payload and state typing",
+      "status": "partial",
+      "assessment": "Common events have dedicated classes and unknown events preserve raw data. Many JS action unions, view-state value variants and the @slack/types event universe remain generic/raw, not native PHP DTO equivalents. Routing those payloads is supported; claiming complete typed inbound coverage would be inaccurate.",
+      "php": [
+        "src/Payloads/Event.php",
+        "src/Payloads/Action.php",
+        "src/Payloads/View.php",
+        "src/App.php"
+      ],
+      "tests": [
+        "tests/Payloads/InteractionPayloadTest.php",
+        "tests/Runtime/TypedEventDispatchTest.php"
+      ],
+      "upstream": [
+        "src/types/actions/block-action.ts",
+        "src/types/view/index.ts",
+        "src/types/events/index.ts"
+      ]
+    },
+    {
+      "id": "client",
+      "area": "Web API calls and models",
+      "status": "covered",
+      "assessment": "273 pinned/supplemental endpoint pairs and generic call(), uploads, pagination and explicit retries are implemented. A Web API transport audit is separate evidence; model coverage is not full Bolt runtime parity or coverage of every future Slack endpoint.",
+      "php": [
+        "src/WebApi/Client.php",
+        "src/WebApi/MethodTransport.php"
+      ],
+      "tests": [
+        "tests/WebApi/GeneratedSurfaceTest.php",
+        "tests/WebApi/TransportContractTest.php",
+        "tests/WebApi/UploadTest.php",
+        "tests/WebApi/RetryPolicyTest.php"
+      ],
+      "upstream": [
+        "src/App.ts",
+        "src/index.ts"
+      ]
+    },
+    {
+      "id": "node-receivers",
+      "area": "Express, Node server and AWS event classes",
+      "status": "excluded",
+      "assessment": "Do not port Express middleware, Node server objects, raw Node request/response buffers or Lambda callback/event types. A concrete PHP serverless adapter can be added if requested, reusing existing ingress.",
+      "php": [
+        "src/Http/Receiver.php",
+        "src/Integration/HttpController.php"
+      ],
+      "tests": [],
+      "upstream": [
+        "src/receivers/ExpressReceiver.ts",
+        "src/receivers/AwsLambdaReceiver.ts",
+        "src/receivers/BufferedIncomingMessage.ts",
+        "src/receivers/ParamsIncomingMessage.ts",
+        "src/receivers/HTTPModuleFunctions.ts"
+      ]
+    },
+    {
+      "id": "js-types",
+      "area": "JavaScript types, re-exports and coded-error names",
+      "status": "excluded",
+      "assessment": "Do not clone TypeScript utility types, Promise helpers, SDK/logger re-exports or each JS error class. PHP native types, exceptions, PSR interfaces and its package-owned SDK are the replacement. Behavioral errors remain in scope under errors/ack.",
+      "php": [
+        "src/Exceptions/HandlerFailures.php",
+        "composer.json"
+      ],
+      "tests": [],
+      "upstream": [
+        "src/index.ts",
+        "src/types/index.ts",
+        "src/types/utilities.ts",
+        "src/errors.ts"
+      ]
+    },
+    {
+      "id": "unsafe-switches",
+      "area": "Unsigned production ingress and dev aliases",
+      "status": "excluded",
+      "assessment": "Keep signature verification mandatory in the signed HTTP receiver. Do not port an off switch merely for matching options. developerMode is a Node convenience preset; explicit PHP env/CLI configuration is sufficient.",
+      "php": [
+        "src/Http/Receiver.php",
+        "src/Http/RequestVerifier.php",
+        "src/Integration/bolt.config.php"
+      ],
+      "tests": [],
+      "upstream": [
+        "src/App.ts"
+      ]
+    },
+    {
+      "id": "legacy-ssl",
+      "area": "Slash-command ssl_check probe",
+      "status": "missing",
+      "assessment": "No dedicated ssl_check branch exists. Bolt returns an empty 200 for a sanitized probe; the PHP receiver rejects unsigned probes or reports an unsupported signed payload. Add this narrow compatibility path without allowing it to dispatch listener payloads or bypass verification for real deliveries. This is a Slack protocol gap, not a Node-only non-goal.",
+      "php": [
+        "src/Http/Receiver.php"
+      ],
+      "tests": [],
+      "upstream": [
+        "src/receivers/HTTPModuleFunctions.ts",
+        "src/receivers/ExpressReceiver.ts"
+      ]
+    },
+    {
+      "id": "jobs-sessions",
+      "area": "Durable jobs, agent sessions and Work Objects",
+      "status": "extension",
+      "assessment": "Named SQLite jobs, recovery/cancellation/retention, modern agent sessions and higher-level Work Object publishing are PHP product capabilities. They do not compensate for baseline gaps, and core function completion is only guarded per delivery.",
+      "php": [
+        "src/Jobs.php",
+        "src/Jobs/SqliteJobStore.php",
+        "src/Assistant/Session.php",
+        "src/WorkObjects/Publisher.php"
+      ],
+      "tests": [
+        "tests/Jobs/DurableExecutionTest.php",
+        "tests/Jobs/JobOperationsTest.php",
+        "tests/Assistant/SessionTest.php",
+        "tests/WorkObjects/PublisherTest.php"
+      ],
+      "upstream": [
+        "src/App.ts"
+      ]
+    }
+  ],
+  "appOptions": {
+    "signingSecret": {
+      "status": "covered",
+      "feature": "http",
+      "assessment": "Raw-body HMAC verifier."
+    },
+    "endpoints": {
+      "status": "adapted",
+      "feature": "routing-lifecycle",
+      "assessment": "Stock route is /slack/events; custom controller can call Receiver.handle. No endpoint-list config knob."
+    },
+    "port": {
+      "status": "adapted",
+      "feature": "routing-lifecycle",
+      "assessment": "Tempest server/controller configuration."
+    },
+    "customRoutes": {
+      "status": "adapted",
+      "feature": "routing-lifecycle",
+      "assessment": "Tempest server/controller configuration."
+    },
+    "processBeforeResponse": {
+      "status": "adapted",
+      "feature": "ack",
+      "assessment": "Always process inline before response; explicit jobs replace slow inline work. No early-ack mode."
+    },
+    "signatureVerification": {
+      "status": "excluded",
+      "feature": "unsafe-switches",
+      "assessment": "Verification cannot be disabled on the signed HTTP receiver."
+    },
+    "clientId": {
+      "status": "covered",
+      "feature": "oauth-core",
+      "assessment": "OAuthConfig and InstallationStore with installation-scoped grants."
+    },
+    "clientSecret": {
+      "status": "covered",
+      "feature": "oauth-core",
+      "assessment": "OAuthConfig and InstallationStore with installation-scoped grants."
+    },
+    "redirectUri": {
+      "status": "covered",
+      "feature": "oauth-core",
+      "assessment": "OAuthConfig and InstallationStore with installation-scoped grants."
+    },
+    "scopes": {
+      "status": "covered",
+      "feature": "oauth-core",
+      "assessment": "OAuthConfig and InstallationStore with installation-scoped grants."
+    },
+    "installationStore": {
+      "status": "covered",
+      "feature": "oauth-core",
+      "assessment": "OAuthConfig and InstallationStore with installation-scoped grants."
+    },
+    "stateSecret": {
+      "status": "adapted",
+      "feature": "oauth-core",
+      "assessment": "Opaque one-time state and browser binding replace signed state-secret encoding."
+    },
+    "installerOptions": {
+      "status": "partial",
+      "feature": "oauth-options",
+      "assessment": "Basic v2 flow exists; advanced per-install metadata, hooks and install controls do not."
+    },
+    "convoStore": {
+      "status": "adapted",
+      "feature": "conversation",
+      "assessment": "ConversationStore adapter or false, with stronger key scoping."
+    },
+    "token": {
+      "status": "covered",
+      "feature": "authorization",
+      "assessment": "BoltConfig token and Socket Mode Config appToken."
+    },
+    "appToken": {
+      "status": "covered",
+      "feature": "authorization",
+      "assessment": "BoltConfig token and Socket Mode Config appToken."
+    },
+    "botId": {
+      "status": "partial",
+      "feature": "static-identity",
+      "assessment": "Authorization can carry botId; static BoltConfig cannot."
+    },
+    "botUserId": {
+      "status": "covered",
+      "feature": "static-identity",
+      "assessment": "Explicit BoltConfig value; no automatic token-only hydration."
+    },
+    "authorize": {
+      "status": "covered",
+      "feature": "authorization",
+      "assessment": "Authorizer or App.authorizeUsing callback."
+    },
+    "receiver": {
+      "status": "adapted",
+      "feature": "ingress",
+      "assessment": "Compose Receiver.handle and App.dispatch with the host."
+    },
+    "logger": {
+      "status": "adapted",
+      "feature": "logging",
+      "assessment": "PSR-3 dependency."
+    },
+    "logLevel": {
+      "status": "adapted",
+      "feature": "logging",
+      "assessment": "Logger/host configuration."
+    },
+    "ignoreSelf": {
+      "status": "partial",
+      "feature": "static-identity",
+      "assessment": "Filtering exists but depends on explicitly supplied identity."
+    },
+    "clientOptions": {
+      "status": "adapted",
+      "feature": "client",
+      "assessment": "PSR-18 client plus explicit retry/upload configuration instead of Node options."
+    },
+    "socketMode": {
+      "status": "adapted",
+      "feature": "socket",
+      "assessment": "Explicit socket:serve command and Socket Mode Config."
+    },
+    "developerMode": {
+      "status": "excluded",
+      "feature": "unsafe-switches",
+      "assessment": "No need for the Node convenience preset."
+    },
+    "tokenVerificationEnabled": {
+      "status": "missing",
+      "feature": "static-identity",
+      "assessment": "No explicit startup token verifier/hydrator."
+    },
+    "deferInitialization": {
+      "status": "adapted",
+      "feature": "routing-lifecycle",
+      "assessment": "No equivalent async startup lifecycle to defer. Help/discovery need no token verification."
+    },
+    "extendedErrorHandler": {
+      "status": "partial",
+      "feature": "errors",
+      "assessment": "Parsed payload/metadata exist; complete delivery/listener/ack context does not."
+    },
+    "attachFunctionToken": {
+      "status": "partial",
+      "feature": "function-policy",
+      "assessment": "Workflow token attachment is automatic with no opt-out."
+    }
+  },
+  "appMembers": {
+    "client": {
+      "status": "adapted",
+      "feature": "client",
+      "assessment": "Inject WebApi.Client or Delivery.client instead of reading App.client."
+    },
+    "logger": {
+      "status": "adapted",
+      "feature": "logging",
+      "assessment": "Inject PSR-3 logger."
+    },
+    "(call signature)": {
+      "status": "adapted",
+      "feature": "authorization",
+      "assessment": "Constructor/container setup with typed BoltConfig."
+    },
+    "init": {
+      "status": "adapted",
+      "feature": "routing-lifecycle",
+      "assessment": "Host and runners own lifecycle; no Node server lifecycle clone. Token verification remains a separate gap."
+    },
+    "start": {
+      "status": "adapted",
+      "feature": "routing-lifecycle",
+      "assessment": "Host and runners own lifecycle; no Node server lifecycle clone. Token verification remains a separate gap."
+    },
+    "stop": {
+      "status": "adapted",
+      "feature": "routing-lifecycle",
+      "assessment": "Host and runners own lifecycle; no Node server lifecycle clone. Token verification remains a separate gap."
+    },
+    "webClientOptions": {
+      "status": "adapted",
+      "feature": "client",
+      "assessment": "Configure the PSR-18 transport and explicit retry policy."
+    },
+    "use": {
+      "status": "partial",
+      "feature": "scratch-context",
+      "assessment": "Pipeline exists, but arbitrary delivery-local context enrichment does not."
+    },
+    "assistant": {
+      "status": "covered",
+      "feature": "assistant",
+      "assessment": "Assistant builder and scoped runtime."
+    },
+    "function": {
+      "status": "partial",
+      "feature": "function-policy",
+      "assessment": "Function routing/completion exist; attachment policy and explicit auto-ack control differ."
+    },
+    "event": {
+      "status": "covered",
+      "feature": "listeners",
+      "assessment": "Typed/fluent registration; unfiltered messages use an empty selector or event(message)."
+    },
+    "message": {
+      "status": "covered",
+      "feature": "listeners",
+      "assessment": "Typed/fluent registration; unfiltered messages use an empty selector or event(message)."
+    },
+    "command": {
+      "status": "covered",
+      "feature": "listeners",
+      "assessment": "Typed/fluent registration; unfiltered messages use an empty selector or event(message)."
+    },
+    "action": {
+      "status": "covered",
+      "feature": "interactions",
+      "assessment": "Typed/fluent registration with constraints."
+    },
+    "shortcut": {
+      "status": "covered",
+      "feature": "interactions",
+      "assessment": "Typed/fluent registration with constraints."
+    },
+    "options": {
+      "status": "covered",
+      "feature": "interactions",
+      "assessment": "Typed/fluent registration with constraints."
+    },
+    "view": {
+      "status": "covered",
+      "feature": "interactions",
+      "assessment": "Typed/fluent registration with constraints."
+    },
+    "error": {
+      "status": "partial",
+      "feature": "errors",
+      "assessment": "Aggregate errors and metadata exist; extended/receiver failure context is incomplete."
+    },
+    "processEvent": {
+      "status": "adapted",
+      "feature": "ingress",
+      "assessment": "Existing trusted App.dispatch replaces the Node ingress shape."
+    }
+  },
+  "builtinMiddleware": {
+    "isSlackEventMiddlewareArgsOptions": "builtin-families",
+    "onlyActions": "builtin-families",
+    "onlyShortcuts": "builtin-families",
+    "onlyCommands": "builtin-families",
+    "onlyOptions": "builtin-families",
+    "onlyEvents": "builtin-families",
+    "onlyViewActions": "builtin-families",
+    "autoAcknowledge": "ack",
+    "matchConstraints": "interactions",
+    "matchMessage": "listeners",
+    "matchCommandName": "listeners",
+    "matchEventType": "listeners",
+    "ignoreSelf": "static-identity",
+    "subtype": "subtype-mention",
+    "directMention": "subtype-mention"
+  },
+  "upstreamModules": {
+    "src/App.ts": [
+      "listeners",
+      "authorization",
+      "errors",
+      "static-identity",
+      "function-policy"
+    ],
+    "src/Assistant.ts": [
+      "assistant"
+    ],
+    "src/AssistantThreadContextStore.ts": [
+      "assistant"
+    ],
+    "src/CustomFunction.ts": [
+      "functions"
+    ],
+    "src/context/create-function-complete.ts": [
+      "functions"
+    ],
+    "src/context/create-function-fail.ts": [
+      "functions"
+    ],
+    "src/context/create-respond.ts": [
+      "replies",
+      "captures",
+      "scratch-context"
+    ],
+    "src/context/create-say-stream.ts": [
+      "assistant"
+    ],
+    "src/context/create-say.ts": [
+      "replies",
+      "captures",
+      "scratch-context"
+    ],
+    "src/context/create-set-status.ts": [
+      "assistant"
+    ],
+    "src/context/index.ts": [
+      "replies",
+      "captures",
+      "scratch-context"
+    ],
+    "src/conversation-store.ts": [
+      "conversation"
+    ],
+    "src/errors.ts": [
+      "errors",
+      "js-types"
+    ],
+    "src/helpers.ts": [
+      "authorization",
+      "interactions",
+      "ingress"
+    ],
+    "src/index.ts": [
+      "js-types"
+    ],
+    "src/middleware/builtin.ts": [
+      "builtin-families",
+      "subtype-mention",
+      "ack",
+      "static-identity"
+    ],
+    "src/middleware/process.ts": [
+      "pipeline"
+    ],
+    "src/receivers/AwsLambdaReceiver.ts": [
+      "node-receivers",
+      "http",
+      "legacy-ssl"
+    ],
+    "src/receivers/BufferedIncomingMessage.ts": [
+      "node-receivers",
+      "http",
+      "legacy-ssl"
+    ],
+    "src/receivers/ExpressReceiver.ts": [
+      "node-receivers",
+      "http",
+      "legacy-ssl"
+    ],
+    "src/receivers/HTTPModuleFunctions.ts": [
+      "node-receivers",
+      "http",
+      "legacy-ssl"
+    ],
+    "src/receivers/HTTPReceiver.ts": [
+      "http",
+      "ack",
+      "routing-lifecycle",
+      "oauth-options"
+    ],
+    "src/receivers/HTTPResponseAck.ts": [
+      "http",
+      "ack",
+      "routing-lifecycle",
+      "oauth-options"
+    ],
+    "src/receivers/ParamsIncomingMessage.ts": [
+      "node-receivers",
+      "http",
+      "legacy-ssl"
+    ],
+    "src/receivers/SocketModeFunctions.ts": [
+      "socket",
+      "ack"
+    ],
+    "src/receivers/SocketModeReceiver.ts": [
+      "socket",
+      "ack"
+    ],
+    "src/receivers/SocketModeResponseAck.ts": [
+      "socket",
+      "ack"
+    ],
+    "src/receivers/custom-routes.ts": [
+      "http",
+      "ack",
+      "routing-lifecycle",
+      "oauth-options"
+    ],
+    "src/receivers/verify-redirect-opts.ts": [
+      "http",
+      "ack",
+      "routing-lifecycle",
+      "oauth-options"
+    ],
+    "src/receivers/verify-request.ts": [
+      "http",
+      "ack",
+      "routing-lifecycle",
+      "oauth-options"
+    ],
+    "src/receivers/verify-signing-secret.ts": [
+      "http",
+      "ack",
+      "routing-lifecycle",
+      "oauth-options"
+    ],
+    "src/types/actions/block-action.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/actions/dialog-action.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/actions/index.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/actions/interactive-message.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/command/index.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/events/index.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/index.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/middleware.ts": [
+      "scratch-context",
+      "captures",
+      "host-context"
+    ],
+    "src/types/options/index.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/receiver.ts": [
+      "ingress",
+      "host-context",
+      "ack"
+    ],
+    "src/types/shortcuts/global-shortcut.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/shortcuts/index.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/shortcuts/message-shortcut.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/utilities.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ],
+    "src/types/view/index.ts": [
+      "payload-types",
+      "interactions",
+      "js-types"
+    ]
+  }
+}

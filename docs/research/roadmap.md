@@ -1,6 +1,14 @@
 # Implementation plan
 
-Current ordering refreshed 24 October 2026; earlier milestone sections below retain their historical scope. The target remains capability and protocol parity with the pinned Bolt JS framework, expressed through idiomatic PHP. HTTP events, interactivity, installation, authorization, conversation/thread storage, Socket Mode, Work Objects, assistant threads and custom functions now run alongside the reference scaffold. See the [current inventory and evidence](codebase-inventory-2026-10-24.md); this does not establish full framework parity.
+Current ordering refreshed 26 October 2026; earlier milestone sections below retain their historical scope. The [Bolt JS parity audit](bolt-js-parity-audit.md) is the current compatibility assessment. The target is useful capability and protocol coverage of pinned Bolt JS 5.1.0 through idiomatic PHP, with explicit host adaptations and Node-specific exclusions. The v0.1.0 preview is tagged; further demos and package publishing should not displace the meaningful gaps found in that audit.
+
+## Next compatibility slices
+
+1. Add delivery-local custom context, structured failure context/policy and explicit static-token identity verification/hydration. Keep help and discovery network-free.
+2. Fill the small compatibility gaps: workflow-token opt-out, reusable subtype/direct-mention filters, sanitized SSL probes and stock-adapter context extraction.
+3. Add typed OAuth installation request options and hooks; expand inbound DTOs and live verification where real use cases justify them.
+
+Keep existing `App::dispatch`, capture/retry metadata and function terminal guards. Do not add Node start/stop/Express/AWS interfaces for naming parity. Preserve typed returned acknowledgements, explicit named jobs, tenant/thread scoping, PSR logging and PSR-18 transport. The audit matrix records constraints; inventory counts alone are not implementation progress.
 
 ## Agreed foundation
 

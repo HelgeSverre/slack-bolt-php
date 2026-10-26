@@ -6,6 +6,8 @@ Thunder Bolt is built on **PHP 8.5+** and **Tempest 3**, with inspiration from B
 
 **v0.1.0 experimental preview.** HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet. [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md). The package is not yet registered on Packagist.
 
+The [Bolt JS parity audit](docs/research/bolt-js-parity-audit.md) distinguishes implemented capabilities, PHP adaptations, useful gaps and Node-specific exclusions. Endpoint/model counts do not establish full framework parity.
+
 ## A Slack app, one handler at a time
 
 ```php
@@ -379,6 +381,7 @@ npm ci
 npm run test:tooling
 npm run verify:generated
 npm run verify:transport
+npm run verify:parity
 ```
 
 To regenerate from the pinned upstream archives, run `npm run sync:references`, then `npm run generate`. Ownership checks protect generated files from accidental overwrites. JavaScript tooling is not a runtime dependency.

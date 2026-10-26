@@ -52,7 +52,7 @@ final class UploadTest extends TestCase
             [
                 'filename' => 'hello.txt',
                 'length' => 5,
-                'alt_text' => 'Five greeting bytes',
+                'alt_txt' => 'Five greeting bytes',
                 'snippet_type' => 'text',
             ],
             $api->sentPayload(0),

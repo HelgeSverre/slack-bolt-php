@@ -4,7 +4,7 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 
 Thunder Bolt is built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style. The `Thunder\Bolt` namespace and package name are provisional.
 
-**Experimental and unpublished.** HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet.
+**v0.1.0 experimental preview.** HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet. [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md). The package is not yet registered on Packagist.
 
 ## A Slack app, one handler at a time
 
@@ -30,7 +30,7 @@ Put the class in your application's `app/` directory. Tempest discovers the hand
 You need PHP 8.5+ and Composer 2. Node is only required when maintaining the reference generators.
 
 ```sh
-git clone https://github.com/HelgeSverre/slack-bolt-php.git
+git clone --branch v0.1.0 https://github.com/HelgeSverre/slack-bolt-php.git
 cd slack-bolt-php
 composer install
 
@@ -352,12 +352,15 @@ The CLI scaffolds local code; Slack app configuration and installation still hap
 
 ```sh
 composer test
+composer test:project
 composer analyse
 composer lint
 composer format:check
 ```
 
 Mago 1.50.0 provides formatting, linting, and static analysis. Native types carry ordinary signatures; PHPDoc adds useful collection types, generics, and explanations. Local fixtures and recorded transports test behavior without sending Slack messages.
+
+`composer test:project` creates a disposable app, installs production dependencies through Composer, exercises discovered mention/button handlers with signed fixtures, and recovers an abandoned SQLite job in a separate worker process. It needs network access to package repositories, uses a fixture Slack transport, and removes its temporary app afterward. No Slack credentials are required.
 
 `composer test` excludes live tests. For an explicit workspace smoke run, configure a private token file, a conversation and an existing thread:
 
@@ -375,13 +378,14 @@ Reference tooling requires Node 22+:
 npm ci
 npm run test:tooling
 npm run verify:generated
+npm run verify:transport
 ```
 
 To regenerate from the pinned upstream archives, run `npm run sync:references`, then `npm run generate`. Ownership checks protect generated files from accidental overwrites. JavaScript tooling is not a runtime dependency.
 
 ## What's next
 
-Durable SQLite jobs, operator history, retention and modern agent sessions are implemented, and the AI playground uses them. Conversation reads and Slack-metadata context have an opt-in live conformance suite. Release readiness still needs broader protocol coverage, upgrade guidance and a first tagged release. Larger deployments may need additional durable-store adapters and an explicit deduplication-key expiry policy.
+The preview includes a transport contract inventory for all 273 catalogued endpoints, a fresh-project integration check, and upgrade guidance. Next comes adopter feedback, broader opt-in live coverage and filling remaining Bolt JS parity gaps. Larger deployments may need additional durable-store adapters and an explicit deduplication-key expiry policy.
 
 Extended guides and API documentation will live on a separate docs site. Existing design notes and coverage inventories remain under `docs/` for maintainers. Controlled live-workspace tests and Linux/macOS CI are release gates; generated coverage alone does not establish full Bolt JS conformance.
 

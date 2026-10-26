@@ -1,5 +1,21 @@
 # Web API transport conformance
 
+## Preview audit — 26 October 2026
+
+The versioned [transport inventory](web-api-transport.json) now records current HTTP verbs, accepted request content types, source URLs and SHA-256 document hashes for all 273 catalogued endpoints. Run `node scripts/audit-web-api-transport.mjs --refresh` to retrieve current official method Markdown; review changes before committing. `npm run verify:transport` verifies inventory coverage and deterministic PHP transport generation offline. It never silently refreshes references in CI.
+
+Slack lists GET for 63 methods and POST for 210. The client uses GET for 49 scalar read methods. Fourteen documented GET methods retain supported JSON POST: twelve mutate state or credentials, and two (`admin.roles.listAssignments`, `team.externalTeams.list`) accept array filters. Explicit exceptions are documented in the audit script; verbs are never inferred from names. The content-type inventory supports these exceptions, but is not live proof of every enterprise method. Unknown methods retain JSON POST.
+
+Two non-OAuth methods list only form encoding: [auth.teams.list](https://docs.slack.dev/reference/methods/auth.teams.list/) and [admin.apps.activities.list](https://docs.slack.dev/reference/methods/admin.apps.activities.list/). They now use URL-encoded POST. Existing OAuth form handling, streamed multipart bodies, single-attempt external transfers, and opt-in retry policies remain intact. External upload reservations now send the documented `alt_txt`; the public `altText()` builder is unchanged. See [Slack's upload contract](https://docs.slack.dev/reference/methods/files.getUploadURLExternal/).
+
+[admin.analytics.getFile](https://docs.slack.dev/reference/methods/admin.analytics.getFile/) is a gzip/NDJSON response exception. The client decodes it into the existing `file_data` typed response, requires zlib for that response, rejects malformed rows and limits decompressed data to 32 MiB. Normal Slack error envelopes still use the usual exception path. This is a bounded in-memory preview implementation; larger enterprise exports need a future streaming download interface.
+
+Recorded contract tests exercise the transport of every catalogued endpoint, plus typed complex filters, gzip analytics, form escaping and upload alternate text. Existing upload and retry tests remain part of the suite. These verify wire construction and response handling against fixtures; enterprise-only endpoints have not all been called live.
+
+`composer test:project` installs a newly scaffolded application with production Composer dependencies. Signed mention and button fixtures exercise discovered handlers, with a project-configured PSR-18 transport. It deduplicates a repeated action, persists an abandoned lease, then starts a separate CLI worker process and verifies recovery, completion and no replay. It cleans only its disposable project and never follows the local package symlink during cleanup. Linux/macOS CI runs this check separately from the offline unit suite. Actual Slack connectivity remains the opt-in live suite below.
+
+The earlier audit and live results are retained below as historical evidence for the five conversation endpoints.
+
 Verified 25 October 2026. This scoped audit follows the live agent-session demo, where a JSON POST to `conversations.replies` failed with missing `channel` and `ts` errors despite both fields being in the JSON body. Slack's current method pages list GET for these reads (their content-type tables also list JSON). The fix follows the documented verb and places arguments in the query string; it does not claim every Slack method rejects JSON POST.
 
 ## Audited methods
@@ -35,6 +51,6 @@ Live validation in the development workspace passed **2 tests / 24 assertions**,
 
 Offline validation passed **545 tests / 3,563 assertions**. Mago formatting, lint and analysis pass with no errors; advisory findings remain visible. Seven reference-tooling tests pass, and generated ownership checks verify 273 endpoint/model pairs without modifying generated code. Independent standards and specification reviews found no remaining material issues. The preceding agent-session commit's Linux/macOS and generated-code CI run also completed successfully.
 
-## Remaining release work
+## Limits of the earlier live suite
 
-Audit method-specific transport for the rest of the SDK before claiming exhaustive conformance. This suite does not cover OAuth redirect flows, uploads, every Slack surface, paid-plan workflows, or full Bolt JS behavior. Broader live coverage should remain opt-in and target a dedicated development workspace. Protocol fixes belong in the handwritten client; generated declarations remain source-owned.
+The preview audit above expands recorded transport coverage to the catalogued SDK. This live suite still does not cover OAuth redirect flows, uploads, every Slack surface, paid-plan workflows, or full Bolt JS behavior. Broader live coverage should remain opt-in and target a dedicated development workspace. Protocol behavior belongs in the client and reviewed transport policy; generated declarations remain source-owned.

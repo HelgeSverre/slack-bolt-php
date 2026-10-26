@@ -15,15 +15,6 @@ final readonly class Client
 {
     use HasResources;
 
-    // Audited against Slack's method contracts; do not infer verbs from method names.
-    private const array GET_METHODS = [
-        'conversations.history',
-        'conversations.info',
-        'conversations.list',
-        'conversations.members',
-        'conversations.replies',
-    ];
-
     public function workObjects(): \Thunder\Bolt\WorkObjects\Publisher
     {
         return new \Thunder\Bolt\WorkObjects\Publisher($this);
@@ -116,12 +107,8 @@ final readonly class Client
         if (!is_string($token)) {
             throw new \InvalidArgumentException('A Slack token must be a string.');
         }
-        $form = in_array(
-            $method,
-            ['oauth.access', 'oauth.v2.access', 'oauth.v2.exchange', 'openid.connect.token'],
-            true,
-        );
-        $get = in_array($method, self::GET_METHODS, true);
+        $form = in_array($method, MethodTransport::FORM, true);
+        $get = in_array($method, MethodTransport::GET, true);
         $headers = ['Accept' => 'application/json'];
         if (!$get) {
             $headers['Content-Type'] = $form ? 'application/x-www-form-urlencoded' : 'application/json; charset=utf-8';
@@ -133,7 +120,7 @@ final readonly class Client
         foreach ($data as $value) {
             if ($value instanceof MultipartFile) {
                 if ($get) {
-                    throw new \InvalidArgumentException('Conversation reads cannot upload files.');
+                    throw new \InvalidArgumentException('GET methods cannot upload files.');
                 }
                 $multipart = new MultipartForm($data);
                 break;
@@ -147,7 +134,7 @@ final readonly class Client
                     continue;
                 }
                 if (!is_scalar($value) || is_float($value) && !is_finite($value)) {
-                    throw new \InvalidArgumentException('Conversation read arguments must be finite scalar values.');
+                    throw new \InvalidArgumentException('GET arguments must be finite scalar values.');
                 }
                 $query[$key] = is_bool($value) ? ($value ? 'true' : 'false') : $value;
             }
@@ -172,7 +159,46 @@ final readonly class Client
 
         $this->assertSuccessfulStatus($response);
         try {
-            $result = json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+            $body = (string) $response->getBody();
+            $analytics = $method === 'admin.analytics.getFile';
+            $compressed = $analytics && str_starts_with($body, "\x1f\x8b");
+            if ($compressed) {
+                if (!function_exists('gzdecode')) {
+                    throw new SlackApiException('analytics_requires_zlib');
+                }
+                set_error_handler(static function (): never {
+                    throw new SlackApiException('invalid_or_oversized_analytics');
+                });
+                try {
+                    $decoded = gzdecode($body, 33_554_433);
+                } finally {
+                    restore_error_handler();
+                }
+                if ($decoded === false || strlen($decoded) > 33_554_432) {
+                    throw new SlackApiException('invalid_or_oversized_analytics');
+                }
+                $body = $decoded;
+            }
+            // Some PSR-18 transports transparently decompress Content-Encoding.
+            if ($analytics && ($compressed || !isset(json_decode($body, true)['ok']))) {
+                if (strlen($body) > 33_554_432) {
+                    throw new SlackApiException('invalid_or_oversized_analytics');
+                }
+                $rows = [];
+                foreach (explode("\n", $body) as $line) {
+                    if (trim($line) === '') {
+                        continue;
+                    }
+                    $row = json_decode($line, true, flags: JSON_THROW_ON_ERROR);
+                    if (!is_array($row) || !str_starts_with(ltrim($line), '{')) {
+                        throw new SlackApiException('invalid_analytics_row');
+                    }
+                    $rows[] = $row;
+                }
+                $result = ['ok' => true, 'file_data' => $rows];
+            } else {
+                $result = json_decode($body, true, flags: JSON_THROW_ON_ERROR);
+            }
         } catch (\JsonException $exception) {
             throw new SlackApiException('invalid_json', previous: $exception);
         }

@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Jobs;
+
+use Tempest\CommandBus\CommandHandler;
+use Thunder\Bolt\Jobs\JobExecution;
+
+final readonly class SmokeJobHandler
+{
+    public function __construct(
+        private JobExecution $execution,
+    ) {}
+
+    #[CommandHandler]
+    public function handle(SmokeJob $job): void
+    {
+        $this->execution->checkpoint();
+        // Replacing the same value is safe if a recovered attempt repeats.
+        file_put_contents(getcwd() . '/receipt.txt', $job->text);
+    }
+}

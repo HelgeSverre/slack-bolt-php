@@ -66,7 +66,7 @@ final readonly class Uploader
             [
                 'filename' => $upload->filename,
                 'length' => $upload->length(),
-                'alt_text' => $upload->metadata->text('alt_text'),
+                'alt_txt' => $upload->metadata->text('alt_text'),
                 'snippet_type' => $upload->metadata->text('snippet_type'),
             ],
             static fn(mixed $value): bool => $value !== null,

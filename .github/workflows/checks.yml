@@ -28,6 +28,7 @@ jobs:
       - run: php -l bin/bolt
       - run: php bin/bolt --version
       - run: composer test
+      - run: composer test:project
       - run: mago format --check
       - run: mago lint
         if: success() || failure()
@@ -45,3 +46,4 @@ jobs:
       - run: npm ci
       - run: npm run test:tooling
       - run: npm run verify:generated
+      - run: npm run verify:transport

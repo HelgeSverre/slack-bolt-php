@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use App\Jobs\SmokeJob;
+use Thunder\Bolt\Attributes\Action;
+use Thunder\Bolt\Jobs;
+use Thunder\Bolt\Jobs\RetryPolicy;
+use Thunder\Bolt\Responses\ActionResponse;
+
+final readonly class SmokeAction
+{
+    #[Action('smoke')]
+    public function __invoke(Jobs $jobs): ActionResponse
+    {
+        $jobs->dispatch(new SmokeJob('durable hello'), key: 'smoke-button', retry: RetryPolicy::idempotent(3, 0, 0));
+        return ActionResponse::empty();
+    }
+}

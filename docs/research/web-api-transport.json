@@ -1,0 +1,2461 @@
+{
+  "schema": 1,
+  "retrievedAt": "2026-10-26",
+  "methods": {
+    "admin.analytics.getFile": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.analytics.getFile.md",
+      "sha256": "d5ce4613807a9b224f76abdb58152584627b7b51ccfd7359e993f0f18fc7c7a5"
+    },
+    "admin.apps.activities.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.activities.list.md",
+      "sha256": "beeb0b0b115b513c3bdb5ec59aa8c94068a70add136c388481f974f9f37609f3"
+    },
+    "admin.apps.approve": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.approve.md",
+      "sha256": "dfbf6e2321dbd55095657d34171ef2a76fba41bc4965d6d0b240119688aab78c"
+    },
+    "admin.apps.approved.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.approved.list.md",
+      "sha256": "19410595a9224db73bebbf1f51e09527349434507df8a77e0037cb4d4f87d3b1"
+    },
+    "admin.apps.clearResolution": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.clearResolution.md",
+      "sha256": "69d5864d6b38e939392a593a84780bf848081ec2a7ab3126bf826f55bdfc47d0"
+    },
+    "admin.apps.config.lookup": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.config.lookup.md",
+      "sha256": "ca6700a84c137e8e6eaa6dfda7ebb6648ac4f4fc70d0e08a2025450e7f08b5dd"
+    },
+    "admin.apps.config.set": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.config.set.md",
+      "sha256": "7f6648822c9117a7c1b1a7ec3dc512d11c62990a60a019dd448f04fa10680043"
+    },
+    "admin.apps.requests.cancel": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.requests.cancel.md",
+      "sha256": "2296ed76d4cab8c212ef70540253f3de7244d6094fd8ebf78d5ad58edfba25cc"
+    },
+    "admin.apps.requests.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.requests.list.md",
+      "sha256": "6d14a1db420bbed4ed90c1e5e18239ce8fafaa21233df4194390972b7df97657"
+    },
+    "admin.apps.restrict": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.restrict.md",
+      "sha256": "dd6c5cdabbb5b6c7f09f550491f706be23dbc8fed6bedc7db62ad9fae1b6ceb6"
+    },
+    "admin.apps.restricted.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.restricted.list.md",
+      "sha256": "f83748970da05ede8a1c60b96474fbe18b9169b29745badd175e25033206cbc9"
+    },
+    "admin.apps.uninstall": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.apps.uninstall.md",
+      "sha256": "3eb3e3d26008913feaee04707f5a9de3b45cbcbd3c462bba71dc5f9080ed4ef8"
+    },
+    "admin.auth.policy.assignEntities": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.auth.policy.assignEntities.md",
+      "sha256": "2e641f403063ed24f547dd67da58c885ca5ea974ed465d9fb2eba61a3cebfe8a"
+    },
+    "admin.auth.policy.getEntities": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.auth.policy.getEntities.md",
+      "sha256": "ef0d10f889d7ced0105d124d71a854f0045e12c98e396c86dc1bdcb9ce08ecfc"
+    },
+    "admin.auth.policy.removeEntities": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.auth.policy.removeEntities.md",
+      "sha256": "7f19c751cf493310ef5696ac3b865987f61efeb9bb5f37c3f7e5eb17111f4ddc"
+    },
+    "admin.barriers.create": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.barriers.create.md",
+      "sha256": "a6afd56a3490691f81974c9f641ee5515e2bdd97472ab201f3ad020a384f2f48"
+    },
+    "admin.barriers.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.barriers.delete.md",
+      "sha256": "6213137da0a1e0494746981f048c6b95b8d7c38a1ab060a15de1db91dda5c2ae"
+    },
+    "admin.barriers.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.barriers.list.md",
+      "sha256": "5181a2d8f8f07610e8c2bab72697ab47591e1f073370ed3bd03b8801afac04b2"
+    },
+    "admin.barriers.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.barriers.update.md",
+      "sha256": "a791384659ecf56892972f0dbb18aea7be9229241ca760eeed38ab45fbbbf0ba"
+    },
+    "admin.conversations.archive": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.archive.md",
+      "sha256": "82ea921467d134c87517dec00c80576977797e01101500f77c005e81960f3723"
+    },
+    "admin.conversations.bulkArchive": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.bulkArchive.md",
+      "sha256": "086a0bfaf27a7dd4b4b182b4de57daf759634364519eb7ee0de4090eabb15b97"
+    },
+    "admin.conversations.bulkDelete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.bulkDelete.md",
+      "sha256": "b7fd9c3a9248b01e467059b3533cd0cfe94c3a8d832f222a6cbfa4efeb4b0996"
+    },
+    "admin.conversations.bulkMove": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.bulkMove.md",
+      "sha256": "5cca0a7b26d7ac1abfb26084a0acd538fd94707c14580cd1f4079c0afcffcdec"
+    },
+    "admin.conversations.convertToPrivate": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.convertToPrivate.md",
+      "sha256": "86f54f2e56ad49fd88d3ffc198a0567bf1c140f39a6032b17fb4423aa5d9c853"
+    },
+    "admin.conversations.convertToPublic": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.convertToPublic.md",
+      "sha256": "e9537628372f3f3a0079d5daef71dc9914404a7945e02bf7545fa83ca7ec1428"
+    },
+    "admin.conversations.create": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.create.md",
+      "sha256": "8506068bb830f780eb40617b84ca3a8f7d9b3a69f9d8281548866faaa208adda"
+    },
+    "admin.conversations.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.delete.md",
+      "sha256": "84c45c71c34e984915ab692bc4e2d058e0431ab982a5d74b954c729ac317bcc1"
+    },
+    "admin.conversations.disconnectShared": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.disconnectShared.md",
+      "sha256": "5cb649162bc0633b5cb041a4dd33a998bbed551c61b98ba54bb4766e8011130f"
+    },
+    "admin.conversations.ekm.listOriginalConnectedChannelInfo": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.ekm.listOriginalConnectedChannelInfo.md",
+      "sha256": "de8d4fcf0195c7eedaa1efe2e7e26e9a8c0525a2fa9c9f0e65ce576f4295da55"
+    },
+    "admin.conversations.getConversationPrefs": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.getConversationPrefs.md",
+      "sha256": "27c2e5c5c321d1788406804ede3eb1934e0557d90292f4c269443d3131c23cab"
+    },
+    "admin.conversations.getCustomRetention": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.getCustomRetention.md",
+      "sha256": "8ccd6e70147d55ff86f07aec195c56fdefce9341b722d68029ea074059626a8e"
+    },
+    "admin.conversations.getTeams": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.getTeams.md",
+      "sha256": "2e2814a9b583e2a92e3981dccfe7fcdf4f6413020ca3e905b37245a78b06db9e"
+    },
+    "admin.conversations.invite": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.invite.md",
+      "sha256": "ecef660aa0c3336c2e0461c05d0f479150a71995f32e4e6e75cda52048ec98ae"
+    },
+    "admin.conversations.lookup": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.lookup.md",
+      "sha256": "37f1f3036ddd811d6cad2bb8d68e982dfc4f05c15d2fd227a7e625e1d92ece91"
+    },
+    "admin.conversations.removeCustomRetention": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.removeCustomRetention.md",
+      "sha256": "722519995d230028a6fb68606acb46a64804d7d968175ca33e49f141a6b1180b"
+    },
+    "admin.conversations.rename": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.rename.md",
+      "sha256": "76d9111e65de3afff7871e215ecdce2bf69ad5d49e7b3dbd5a5c6d59c7050faa"
+    },
+    "admin.conversations.restrictAccess.addGroup": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.restrictAccess.addGroup.md",
+      "sha256": "a4fdbf8a9a42e905f3291863c2c147401358b99e2f9061cbad1836b2512b55fa"
+    },
+    "admin.conversations.restrictAccess.listGroups": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.restrictAccess.listGroups.md",
+      "sha256": "a80edee23d8ac496eec3fd7e41623b514f23af7a1e88971d789a77de4018a9b1"
+    },
+    "admin.conversations.restrictAccess.removeGroup": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.restrictAccess.removeGroup.md",
+      "sha256": "8ebc45616ca247d450b083e8cd3a04092c62f8367f1c78ea79bc5622cd538dd8"
+    },
+    "admin.conversations.search": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.search.md",
+      "sha256": "31d7295b8c36925becfbbdc2df785453a7bebdb4cfe4659b0f697c326012a98e"
+    },
+    "admin.conversations.setConversationPrefs": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.setConversationPrefs.md",
+      "sha256": "0f308bb4c390f28d304299d1140e8e7164c2c7475afb78f847e711e2aefe7978"
+    },
+    "admin.conversations.setCustomRetention": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.setCustomRetention.md",
+      "sha256": "b83c285a652e52832e19e0454fc947ad972f3e6a95bd82cb5024357d45ad0f27"
+    },
+    "admin.conversations.setTeams": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.setTeams.md",
+      "sha256": "b7b41655a672205a842ba17e9a8a7821915dfb853b135ecf39834ef124bc8b75"
+    },
+    "admin.conversations.unarchive": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.conversations.unarchive.md",
+      "sha256": "415ab038367edd27be1adbc9c8bbfd70ddb8619b820e4f170b6162636041683a"
+    },
+    "admin.emoji.add": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.emoji.add.md",
+      "sha256": "e4b92ee4336f81f0940149c7609ebeeca5628c8f905b6acaa3212769d1d4f266"
+    },
+    "admin.emoji.addAlias": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.emoji.addAlias.md",
+      "sha256": "353573165a6149c1a1f6ff2a53209267f4798a88bd054d8e945c60152c41e490"
+    },
+    "admin.emoji.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.emoji.list.md",
+      "sha256": "cce238ebf5a8321d5a53fcea59784109663b7c8145c7f0fa2a74d57ae4049f94"
+    },
+    "admin.emoji.remove": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.emoji.remove.md",
+      "sha256": "0be4c5c21c33207a465e4d9c1f13d3e7dfb9bd94efedbc7d8da9eb53d6d915ff"
+    },
+    "admin.emoji.rename": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.emoji.rename.md",
+      "sha256": "710afd0a30c8e474e7f996d362d500e6a6e4d669cc1e17f2f70a9c8fccc78394"
+    },
+    "admin.functions.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.functions.list.md",
+      "sha256": "5b67fa5831bde532bb846e86fe2121448fa79bbd1555a3f33b35c5639d835d86"
+    },
+    "admin.functions.permissions.lookup": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.functions.permissions.lookup.md",
+      "sha256": "91e86b1ed12d7f744541b7c314b4e2400aed9aa9a94307858fb020c02122308f"
+    },
+    "admin.functions.permissions.set": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.functions.permissions.set.md",
+      "sha256": "91e5787b5794fe2bb6397c6d1a24d4282d3b4db105cb19741df630eb532ff45c"
+    },
+    "admin.inviteRequests.approve": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.inviteRequests.approve.md",
+      "sha256": "e37ff68a00473ed060d42708cd65f150b5869e3ca57e171fc0c70e04011b9524"
+    },
+    "admin.inviteRequests.approved.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.inviteRequests.approved.list.md",
+      "sha256": "69ef8e869b3a96a02da9359d23405550b8325cb080722556c98f2e5ad826600f"
+    },
+    "admin.inviteRequests.denied.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.inviteRequests.denied.list.md",
+      "sha256": "01391b163bd01a1891422b9aa9f4812030e64df574f608c70812d81f9257ff8f"
+    },
+    "admin.inviteRequests.deny": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.inviteRequests.deny.md",
+      "sha256": "ae7e0933dc22716adaa6808a900b4cdce79e329791d6102e5fe26e70f2f3fbc0"
+    },
+    "admin.inviteRequests.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.inviteRequests.list.md",
+      "sha256": "ba8ce8092d513ce1b8aac1cf7cc26f962936d47f49c533551b47a4b9fe7c5414"
+    },
+    "admin.roles.addAssignments": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.roles.addAssignments.md",
+      "sha256": "7a985eb470e07c760df64de3b75aa3ef9e0ea5d263c59af708124a503d06a3b7"
+    },
+    "admin.roles.listAssignments": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.roles.listAssignments.md",
+      "sha256": "16d1846680d9aee6f6e8fff3855d002e0c84cfd308aa192a565165fd13b0a943"
+    },
+    "admin.roles.removeAssignments": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.roles.removeAssignments.md",
+      "sha256": "7e7e07370720c53e13152edb20ba95446d8131b14618f1d893e3420b9b53e619"
+    },
+    "admin.teams.admins.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.teams.admins.list.md",
+      "sha256": "cfc8e7a1fd18c324d6a2beb6b3bd6e2e41c74129046ac614695ecb713c312da4"
+    },
+    "admin.teams.create": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.teams.create.md",
+      "sha256": "72c832d597b050eb29b331dcd14c84b88671fb1551e435f1a4ef963e5c321418"
+    },
+    "admin.teams.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.teams.list.md",
+      "sha256": "fe97caa71b56deee9397852db21b928fe5e065df4f4a936c5e93ee18fe7823dd"
+    },
+    "admin.teams.owners.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.teams.owners.list.md",
+      "sha256": "fb2fb024f216cbcc5c7d4374893e49cb9e4f5e85f8a5014450a21eb7515ab869"
+    },
+    "admin.teams.settings.info": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.teams.settings.info.md",
+      "sha256": "fe782b4a6a20d471dc1ff5d0115d9e077b30bf39ea232ad10a607d74e617fb75"
+    },
+    "admin.teams.settings.setDefaultChannels": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.teams.settings.setDefaultChannels.md",
+      "sha256": "f49fb9a4111ba602481473f41aa34eb36991f69ee4b20d009bf2a7a6196a1c82"
+    },
+    "admin.teams.settings.setDescription": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.teams.settings.setDescription.md",
+      "sha256": "c35a372636fecb79dae349cf0784d6abe07c17daf3f5770cae70818c2e152291"
+    },
+    "admin.teams.settings.setDiscoverability": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.teams.settings.setDiscoverability.md",
+      "sha256": "66aa0c4609d4cc45d60b734c42b297dc0dc85e5d6d1aa39015096800a28cdd30"
+    },
+    "admin.teams.settings.setIcon": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.teams.settings.setIcon.md",
+      "sha256": "e0c775d083edc3aafb23659f5bfbb00119a8f71ce1a9fea4719f5a921107c440"
+    },
+    "admin.teams.settings.setName": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.teams.settings.setName.md",
+      "sha256": "f58b062b43337d82c35bdb009e9b8fcfddd0359d2e1acdf5828d9d2726122865"
+    },
+    "admin.usergroups.addChannels": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.usergroups.addChannels.md",
+      "sha256": "70110d930378bdb9307c0bcdbafb4b858a6ef7099ff2806b0382959396bf2694"
+    },
+    "admin.usergroups.addTeams": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.usergroups.addTeams.md",
+      "sha256": "f46ac557a78f69d7434cc6c80848843a53d7970f81cf19481719f5ce8a8a737d"
+    },
+    "admin.usergroups.listChannels": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.usergroups.listChannels.md",
+      "sha256": "bb91b56bcfd4a913f5ffd88440b095012b9f4d312acfa34dfbbb08137ed74680"
+    },
+    "admin.usergroups.removeChannels": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.usergroups.removeChannels.md",
+      "sha256": "bb348b4e233bf7a27a88f5efdbe113b2ed3b3c0cf7f52005c073f8a697f14739"
+    },
+    "admin.users.assign": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.assign.md",
+      "sha256": "2fd981dc912c11432600ef59082ae18e2479a971e90b7f9dbd8cc2b4d9e4bf67"
+    },
+    "admin.users.getExpiration": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.getExpiration.md",
+      "sha256": "2fa90fa0b2da9db4435d3b178f8aeb5dcacafe02d977cecde64b66bf223ef32f"
+    },
+    "admin.users.invite": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.invite.md",
+      "sha256": "7e2d7a0f28b07ea88aa6aceb256a63ceed4969b2b1891eaf4ab3af5ec011163c"
+    },
+    "admin.users.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.list.md",
+      "sha256": "a06738067652ad62d018e9d5ba5e518aff0c0e5b0d8c0ad0d8100659dc6db92b"
+    },
+    "admin.users.remove": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.remove.md",
+      "sha256": "4eae7b0e1d60fea646ee02e2290502eeff8368ead7878c4e0450f0e440bdc9e9"
+    },
+    "admin.users.session.clearSettings": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.session.clearSettings.md",
+      "sha256": "ba0b31075b6cb9d34bc5ff5494281c0df3a7e1ea26b67a31f24d446742c03ab7"
+    },
+    "admin.users.session.getSettings": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.session.getSettings.md",
+      "sha256": "c608ccb30e75bfad5ac48f88115e2bc21b0a56445b40fd28d8a3e5dbfabdd30f"
+    },
+    "admin.users.session.invalidate": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.session.invalidate.md",
+      "sha256": "f805da4898a1c6fb51b1d0f0e15eefa674343fbecdc210cb10a3986bf1f55de6"
+    },
+    "admin.users.session.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.session.list.md",
+      "sha256": "f27e39f1c4dcc9f3f05a8572e42b35d6ab8e7bd87b337fa6e23938508b9efeef"
+    },
+    "admin.users.session.reset": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.session.reset.md",
+      "sha256": "ae4fd427d785cfe2d61d1e12257b1ef909f2c9a7573a8844ed13f6e5d7809603"
+    },
+    "admin.users.session.resetBulk": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.session.resetBulk.md",
+      "sha256": "864b15de2e179405dcb57544691a7e26b35cc0ee5a7731601345c4f5b7bd96b2"
+    },
+    "admin.users.session.setSettings": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.session.setSettings.md",
+      "sha256": "07f0e0b8c13599a90b72adc1ce4c40483877eae91a53de7193d9499429a70049"
+    },
+    "admin.users.setAdmin": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.setAdmin.md",
+      "sha256": "038444ade226fb66bfb6b094b88c2749d433ad9782f4c0af158c20f6d168512a"
+    },
+    "admin.users.setExpiration": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.setExpiration.md",
+      "sha256": "e7c0e03d7f6cd41c78ade94df3921bcff23f78f7ab6f28b7c6169513a1657be3"
+    },
+    "admin.users.setOwner": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.setOwner.md",
+      "sha256": "f798f76c7bdbe35ec941a13740fbadc5a8e2efb4c68fc04042e4a76529795388"
+    },
+    "admin.users.setRegular": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.setRegular.md",
+      "sha256": "333498ad41117f8e574fdc5ab4cdae7d42337500d13d758848572097873105a2"
+    },
+    "admin.users.unsupportedVersions.export": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.users.unsupportedVersions.export.md",
+      "sha256": "21a35f0b181966b1a3302fe82568fa1fdb2192baee8e34c33fd0de8f9b22a5b8"
+    },
+    "admin.workflows.collaborators.add": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.workflows.collaborators.add.md",
+      "sha256": "5463a57b1336439654827f6dff6e4ef15746dc53ba544d235dcf80f25cc8d266"
+    },
+    "admin.workflows.collaborators.remove": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.workflows.collaborators.remove.md",
+      "sha256": "ebdbc9decbcebcf8386f7daf3b7d72825f3722e57000414dd09a8709a14c9bdf"
+    },
+    "admin.workflows.permissions.lookup": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.workflows.permissions.lookup.md",
+      "sha256": "6719e68ff9a33ffbc618aaa8acef9070e81c1ccb866d8fe5c23fbba673adabcf"
+    },
+    "admin.workflows.search": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.workflows.search.md",
+      "sha256": "53814b6c3272f3dc5eff0672e6668d6eb58c9514035a4b4cce8b0b7767a4736b"
+    },
+    "admin.workflows.unpublish": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/admin.workflows.unpublish.md",
+      "sha256": "91646b0845667dad174acd8669988d2235a1974ce0118399581f7f45e2180e70"
+    },
+    "agents.sessions.rename": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/agents.sessions.rename.md",
+      "sha256": "665c8b7a833dacb08528e3a51fc489c25b7c9883dc0e1dffcce5b3d12532c624"
+    },
+    "agents.sessions.setStatus": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/agents.sessions.setStatus.md",
+      "sha256": "934183734de9f0c17879e159e8461b607bfa5c08860d50cf9873178038f59986"
+    },
+    "api.test": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/api.test.md",
+      "sha256": "70e68c76e3ecd08eb823c20b07037cd2c4c84bef0eb89690c25deec6173219d1"
+    },
+    "apps.connections.open": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/apps.connections.open.md",
+      "sha256": "4c19aa1c0a946925445846d511febbc1cb039bc0165bf904018413b2bc3f2d7b"
+    },
+    "apps.event.authorizations.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/apps.event.authorizations.list.md",
+      "sha256": "3d9b9fba1b0af9b3596c8e6e10b0e1883e98eeae0e9efbf207c4787017e2e525"
+    },
+    "apps.manifest.create": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/apps.manifest.create.md",
+      "sha256": "6554aa518b2d1674d6f74c239ebe8b20c942143901a7e7ecf1bdacee548152bd"
+    },
+    "apps.manifest.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/apps.manifest.delete.md",
+      "sha256": "4371748d09521c29a40012ca20568003b9138c9983e1c3028018f53653e70f83"
+    },
+    "apps.manifest.export": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/apps.manifest.export.md",
+      "sha256": "4657368520b751f1b64e299633743d05c4785433bb8b0efe5d80f19d18890535"
+    },
+    "apps.manifest.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/apps.manifest.update.md",
+      "sha256": "8b77b1e820890e149a4f5941b9394073e3bcd7f78cfecd0a96e898f1998514dc"
+    },
+    "apps.manifest.validate": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/apps.manifest.validate.md",
+      "sha256": "36061f69099abf5922db9bcac3a541220ae4d8edc542ebb74c0545085f2fb8ee"
+    },
+    "apps.uninstall": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/apps.uninstall.md",
+      "sha256": "7c1f6a2f6dfba8fea9f6fcc582686e73f20aa8783eead1eb62faff8ffae94b04"
+    },
+    "apps.user.connection.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/apps.user.connection.update.md",
+      "sha256": "826f0fda22119ec460b73ca4020e8b22be2e8d7338f2de7a94b987f717c760e1"
+    },
+    "assistant.threads.setStatus": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/assistant.threads.setStatus.md",
+      "sha256": "aa8b77b934e0644edf23aa303928e31fb6e02c77712c6fa87447515e952eef30"
+    },
+    "assistant.threads.setSuggestedPrompts": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/assistant.threads.setSuggestedPrompts.md",
+      "sha256": "49f19feed65d42566d170c1aa8119c2f25c7c1e9d4e8e33fab6a90ddd4ee8729"
+    },
+    "assistant.threads.setTitle": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/assistant.threads.setTitle.md",
+      "sha256": "bf2f5ddd2476d97fa64ec5ec566d7ddee152fa59165c1abe0016d4752378d51d"
+    },
+    "auth.revoke": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/auth.revoke.md",
+      "sha256": "0089e4fd2bdf37450223bec87fa014ade606c2c2262f8706745203a16b65454b"
+    },
+    "auth.teams.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/auth.teams.list.md",
+      "sha256": "2a29a7cde47bfebd35e54038d14f396bf041de107493cebbb7c10d6b050df382"
+    },
+    "auth.test": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/auth.test.md",
+      "sha256": "c5145215e592c2ce86f9a46049c6ce97df88d95f25631cb412546cafbb6d4f02"
+    },
+    "blocks.validate": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/blocks.validate.md",
+      "sha256": "ef3317100fa782348952184209a8286066cafa977a44fe4b1a95ec8dc987c620"
+    },
+    "bookmarks.add": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/bookmarks.add.md",
+      "sha256": "5b52968ef2517edb216e9f86117d6ede439e50de0db125a7e6738c56d1c8c57e"
+    },
+    "bookmarks.edit": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/bookmarks.edit.md",
+      "sha256": "8eba871adaf9cb4138573e5990226e84f9f9e0eb24ace5904df0c4bfb0a07668"
+    },
+    "bookmarks.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/bookmarks.list.md",
+      "sha256": "8f19b49e5ae8ac9c811110d49c94a770946486ecc48417d12874842c4b1ae380"
+    },
+    "bookmarks.remove": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/bookmarks.remove.md",
+      "sha256": "ee2be55defc5ef5c8509c8fc790e01b3e03c3423369a57456d77c3d3de185b75"
+    },
+    "bots.info": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/bots.info.md",
+      "sha256": "01b9ef19539dd9314734249bb2ffb5ec3ccb5c3d005c8078b6cbaf4e81235619"
+    },
+    "calls.add": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/calls.add.md",
+      "sha256": "f290ea2788c687d7f326e91f7050616c77c7decbbb0229ac52b11bc3aa981b0a"
+    },
+    "calls.end": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/calls.end.md",
+      "sha256": "2173d6c918c3763aa1c11736f370188123a22ac4753a2d21d4ec6e265fe36442"
+    },
+    "calls.info": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/calls.info.md",
+      "sha256": "45551e9c76fa399ebb820172af47787bc77c1e211b020adb2a0211f4fa66a289"
+    },
+    "calls.participants.add": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/calls.participants.add.md",
+      "sha256": "2a4315a8e77e5842ad7688a463b2b95e3e95efae1f9fd8dc2c6e87af74f8fb50"
+    },
+    "calls.participants.remove": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/calls.participants.remove.md",
+      "sha256": "b7f75aa6a879c54a12fc763060c302a4d87d84210e91451806069dd589415311"
+    },
+    "calls.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/calls.update.md",
+      "sha256": "bd857733c5a63217b27b8cd1886e2cf7fd8c18daf72e68afec99473e3ab94e20"
+    },
+    "canvases.access.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/canvases.access.delete.md",
+      "sha256": "becc623eb89150ac10b199d6cc9d4c8f683562a42f58ed808922991aaeeced15"
+    },
+    "canvases.access.set": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/canvases.access.set.md",
+      "sha256": "41376b1c057a6081ade22729216173a2de675c62c33a9c46d7e3076a80fdadc8"
+    },
+    "canvases.create": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/canvases.create.md",
+      "sha256": "7b75b8458109448bdedcc5779ac6aea7293384391e13f1b5041e23215dfbd20c"
+    },
+    "canvases.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/canvases.delete.md",
+      "sha256": "52625c59ab06c04f0e5ac50797ee7e1972d66c6168fd4bc5fc70de564ab514e6"
+    },
+    "canvases.edit": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/canvases.edit.md",
+      "sha256": "945e1f751f488fb497b8daf327a5cc7ffb328090d5eb8a5b9363e4aca20e874d"
+    },
+    "canvases.sections.lookup": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/canvases.sections.lookup.md",
+      "sha256": "417d8b167c1e8599b121e804e09033e76f2a3dffc187b5a1ce8c3f7b9328f334"
+    },
+    "chat.appendStream": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.appendStream.md",
+      "sha256": "44bf9f2b01e3d79dcb8a42451b8cd2ed7c45e856ab5b0a550046c78082052924"
+    },
+    "chat.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.delete.md",
+      "sha256": "466d6617f85ca1b1e77006f18bff0a304842a453168cbac0f29a03ae8d71e633"
+    },
+    "chat.deleteScheduledMessage": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.deleteScheduledMessage.md",
+      "sha256": "0d1aa3bd603cf0a579c62d49f38adc0bd8f48a73561b747f640917681d79e997"
+    },
+    "chat.getPermalink": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.getPermalink.md",
+      "sha256": "aef123a69089444f883cc37ff6be11440262ddd437010cd17694aafcde522b93"
+    },
+    "chat.meMessage": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.meMessage.md",
+      "sha256": "a2da51051f68f106cb18be47b667400d7b519bd8a7fb34fa71320ca99ce2a9ad"
+    },
+    "chat.postEphemeral": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.postEphemeral.md",
+      "sha256": "40dace1b55aee0af39c019dbccb6f3807bf7d3d3ca8c59fa4184b4f91e60f416"
+    },
+    "chat.postMessage": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.postMessage.md",
+      "sha256": "e766bb0aff1d2a17b9c626fca9944fb72db894f31335c4a856da43bc66a9b2dc"
+    },
+    "chat.scheduleMessage": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.scheduleMessage.md",
+      "sha256": "61b0722f6f9a3b7b64debd9536880a864a8435b163a9f1f814662195ea953827"
+    },
+    "chat.scheduledMessages.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.scheduledMessages.list.md",
+      "sha256": "3899d5570d5f9286e1c4da590be7252540f6f6489a23399b13461b08660d9511"
+    },
+    "chat.startStream": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.startStream.md",
+      "sha256": "79cb5f3a3ecbe240fb9a819e5faa03be2cc271e01efff08ed4fb305927515e6c"
+    },
+    "chat.stopStream": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.stopStream.md",
+      "sha256": "cc11cf88a41cbf3984f08d53a5b5050067ad88120feb7139d5f17d4626aebe2e"
+    },
+    "chat.unfurl": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.unfurl.md",
+      "sha256": "1bcff36932a6254d7d2024a95c82366980e5e598bf9276ce1bf8c551cb24858e"
+    },
+    "chat.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/chat.update.md",
+      "sha256": "136cd982a7725e0fe13ec0e2d43163efd6c8d62024403b0b16cb02b6fb2fa1a4"
+    },
+    "conversations.acceptSharedInvite": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.acceptSharedInvite.md",
+      "sha256": "fda683c21130e70092abb4d0222bf6560e6561b204ee6207c597c258544a089a"
+    },
+    "conversations.approveSharedInvite": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.approveSharedInvite.md",
+      "sha256": "d11d29ee7eea60d36367de0f2332405d1b06646286588708b0f79b765bab05e7"
+    },
+    "conversations.archive": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.archive.md",
+      "sha256": "9b75a5b709af91a1bf8cecc886a228f73573806593373494ab5e7e1005b48979"
+    },
+    "conversations.canvases.create": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.canvases.create.md",
+      "sha256": "4750d61a9f4360952c862ecbeca5ba3ddbced6fd497462be812986450622a985"
+    },
+    "conversations.close": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.close.md",
+      "sha256": "1ceef066923415a20b08eef2c40a5bda56bc1a82ee397ddbe60bc88ef065b7ba"
+    },
+    "conversations.create": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.create.md",
+      "sha256": "9bd4ddffb38b434eafc5cd6e9253df8148ac9835e65ae81504083c1208d7ec18"
+    },
+    "conversations.declineSharedInvite": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.declineSharedInvite.md",
+      "sha256": "c667a1401b7cd443f6c2325382c0a294d8386998a3d371d44dcda9f10e5a50ca"
+    },
+    "conversations.externalInvitePermissions.set": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.externalInvitePermissions.set.md",
+      "sha256": "b414a5e6ee17e59a9bab448efd919ccc848bb8758683d626a337b720d7b39935"
+    },
+    "conversations.history": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.history.md",
+      "sha256": "7469f138eddadc5a5865a0bda7f0caeee08ed9279982a1f3c66cf26f3f52b182"
+    },
+    "conversations.info": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.info.md",
+      "sha256": "9743dabd57695406c2000c389807b0fbe3d0f6b4cb76432e622a1ccc8d9aa678"
+    },
+    "conversations.invite": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.invite.md",
+      "sha256": "3417d8ca4b8cdf7cc36d2e5db04e53866bbb0695eebec2dc5e20a8164f5a3b7c"
+    },
+    "conversations.inviteShared": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.inviteShared.md",
+      "sha256": "610a651895d7537721f20731062c9e1f387a84f81e876a697986a8b586f0a1fa"
+    },
+    "conversations.join": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.join.md",
+      "sha256": "5386506c30c5ee7a3b69d7502734d0474a9e951b9ca3da2676c5320552717231"
+    },
+    "conversations.kick": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.kick.md",
+      "sha256": "131cdbaac938a5eefa9a5c10daab6bef433c2cd3dcf4af03d7ed084ec9321408"
+    },
+    "conversations.leave": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.leave.md",
+      "sha256": "8cfa19034351f7e0798a055848f9c0cb0c54e1293c8598fabdd350e0aeb47282"
+    },
+    "conversations.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.list.md",
+      "sha256": "60774300b288b2432918534c4f28a57bc297b2ab26c2a1ae4078d091f1de5b7c"
+    },
+    "conversations.listConnectInvites": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.listConnectInvites.md",
+      "sha256": "3fa053ea270b4bd3d1f7b43fac7477013b241da5877969276604a90c6c8c01c6"
+    },
+    "conversations.mark": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.mark.md",
+      "sha256": "00092c1c660eaa3b0905131e081cc472f4531c4105bd848aaa5be2df39e7b169"
+    },
+    "conversations.members": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.members.md",
+      "sha256": "0919e02146399eae7fa75833bf77b15d1f9aa9e049a237a6005c7621859ff93a"
+    },
+    "conversations.open": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.open.md",
+      "sha256": "85f2a33856cf22cd3f873235443b481551c81a0294d25ccb5ab88d4d1c0ff8eb"
+    },
+    "conversations.rename": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.rename.md",
+      "sha256": "8898032facf4e989a6ee10175d0759cd6bdeeb97f7015f960ec6da0c9cf71f34"
+    },
+    "conversations.replies": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.replies.md",
+      "sha256": "8adc058e89d645e7a504072194acc8a674fe25c66a1c6a014c89b9d067835621"
+    },
+    "conversations.requestSharedInvite.approve": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.requestSharedInvite.approve.md",
+      "sha256": "39919ab0495f7d9be118f509658343d8bc46f56a7726f1d90cd852b6908f1368"
+    },
+    "conversations.requestSharedInvite.deny": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.requestSharedInvite.deny.md",
+      "sha256": "93d5b899338bc8ad0672c01bae8a1c7fe1bd6faf51b4e8e9fd0ef88404f537ec"
+    },
+    "conversations.requestSharedInvite.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.requestSharedInvite.list.md",
+      "sha256": "bbe0118afde795d076a6b0191c5146ecaf345da3448f780df9ff8f43504ee85e"
+    },
+    "conversations.setPurpose": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.setPurpose.md",
+      "sha256": "36d202fe31cfde483204a5fa848a9c058593cd58c2c03786bfe90f00f50f79ca"
+    },
+    "conversations.setTopic": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.setTopic.md",
+      "sha256": "de3cb86ed4b4bd2af160ce6cd04b2704e72efdbdcd18f85b57e2301c4cd15979"
+    },
+    "conversations.unarchive": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/conversations.unarchive.md",
+      "sha256": "6c012c45e1456ab5259d0fb51b0b31eede7f66267f0543247288ef9712b0b22d"
+    },
+    "dialog.open": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/dialog.open.md",
+      "sha256": "2a13c9250e77662400ad1f9f7a9362e4369ab2f6cd886a82d155f6049d75b9a5"
+    },
+    "dnd.endDnd": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/dnd.endDnd.md",
+      "sha256": "9126d8894e2908e9ce94acd77d7a08011769e1e45f791b2a663bdc7f46f09e24"
+    },
+    "dnd.endSnooze": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/dnd.endSnooze.md",
+      "sha256": "498acf460608fa38e174e928516ae83b30359e85a2a1bf57f96f3ea5a7205bdf"
+    },
+    "dnd.info": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/dnd.info.md",
+      "sha256": "b27a08e8af55dda79a6209c9395a327d973c5d7abf1a697bc2953416300fb381"
+    },
+    "dnd.setSnooze": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/dnd.setSnooze.md",
+      "sha256": "7d6286a767c13f042402d7ae24a72ed66b39fa02e2550303f596ecff39217ebd"
+    },
+    "dnd.teamInfo": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/dnd.teamInfo.md",
+      "sha256": "dbcd42de8770ead5d05ed365c2092446679edb30ddca08078a02295fcc91db07"
+    },
+    "emoji.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/emoji.list.md",
+      "sha256": "0305f6d8fbd5d427ae864d8c65b3b9f7876644825afeb7bbd0ababac2a449d9e"
+    },
+    "entity.acknowledgeCommentAction": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/entity.acknowledgeCommentAction.md",
+      "sha256": "80474039a4068e286b85af54b8878e68321d751d27c2e0604c4929d065eabc7b"
+    },
+    "entity.presentComments": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/entity.presentComments.md",
+      "sha256": "960b6dd51fb98a3031a672640b983543ad765aeb0671bfb41118e21c60fa1148"
+    },
+    "entity.presentDetails": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/entity.presentDetails.md",
+      "sha256": "6fe38154825606fc0f5c3162e5d5078997bfa4e9a8f97d25c94830df6f278354"
+    },
+    "files.comments.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.comments.delete.md",
+      "sha256": "b0069ce68b5d71ea12491734d3334bba14d1461629202a6627db9af91effbc09"
+    },
+    "files.completeUploadExternal": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.completeUploadExternal.md",
+      "sha256": "d54132c1e9a3e4239bf287d171c0260d384337dc7916f780f4f191f67c4bcc3b"
+    },
+    "files.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.delete.md",
+      "sha256": "cea8f389461d8a7513da7e37fc7e05f313ad699d50de1c13121023a6187faf5b"
+    },
+    "files.getUploadURLExternal": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.getUploadURLExternal.md",
+      "sha256": "7bb1cb464bb6361d32b7fbf2ca86fa15e35c0cb4802a9a7e5eed6e0f47d859a8"
+    },
+    "files.info": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.info.md",
+      "sha256": "cd86f8520c606b130bcdccb3d276c647623eb9a89567d7c7c407074ca6343042"
+    },
+    "files.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.list.md",
+      "sha256": "e9c6808e94f8865cf5e2d1a3d98a8a9febc053fbcb5a3d8a18ee42144dbc6ef0"
+    },
+    "files.remote.add": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.remote.add.md",
+      "sha256": "bfaab353f0d7955775c5c44e924514f96be5d01b29018855b4ccae25f3e9f8ed"
+    },
+    "files.remote.info": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.remote.info.md",
+      "sha256": "f6fad4f5d5aae52620c139ad52be00c04fd9de91bdce31c8e8f272976e16dc0b"
+    },
+    "files.remote.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.remote.list.md",
+      "sha256": "8e10b78a1844b1e70d794b3227b9096879070282391ad319174c7433e7f44b1a"
+    },
+    "files.remote.remove": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.remote.remove.md",
+      "sha256": "9a19fadb16d1c71f5802fc321286bf844cec1220080ce3c00f93d333d3d3d075"
+    },
+    "files.remote.share": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.remote.share.md",
+      "sha256": "52d494931a8a81d5f512bf8fa8c3ddbddc542311fd9579ee5382bf7e70b6b3ff"
+    },
+    "files.remote.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.remote.update.md",
+      "sha256": "a1624c21eb75c384964e51c7e0837352b3630276c43d6a47baa99d739d083602"
+    },
+    "files.revokePublicURL": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.revokePublicURL.md",
+      "sha256": "05c6ee75eee02373f3ba3f7880550e95fe770ca1b9811e024dec73e4286c6f19"
+    },
+    "files.sharedPublicURL": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/files.sharedPublicURL.md",
+      "sha256": "7c09134fc2aa15d19b9779b9392c3e97128dffe1780b38225e5e1c3ea4cb3756"
+    },
+    "functions.completeError": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/functions.completeError.md",
+      "sha256": "9ef63cab752ed4fa8157aa983acd2905183336b135ec274e77a6c63b7f3493be"
+    },
+    "functions.completeSuccess": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/functions.completeSuccess.md",
+      "sha256": "002fa9e149e645a9436906a40fa859eb93ee224d28decbed55db2b3e2c0a10ab"
+    },
+    "migration.exchange": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/migration.exchange.md",
+      "sha256": "c5046c5ba4ec7c66695056f8cda9aea221288fe2fd550236d5da8827c1cb8c76"
+    },
+    "oauth.access": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/oauth.access.md",
+      "sha256": "d49f9f64d2835f83b58f3e52c5a1f720d23a55e3825d1fbb5f078dab0012e6da"
+    },
+    "oauth.v2.access": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/oauth.v2.access.md",
+      "sha256": "2401c4a7910c17af392997bb398c1a5d7f6111c8f4a51ffa06fc4cee8c4e2a23"
+    },
+    "oauth.v2.exchange": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/oauth.v2.exchange.md",
+      "sha256": "e71f994af77463867250629c7518ff4fd76a6d8125d3cfeb7ca97aa54da06e3b"
+    },
+    "openid.connect.token": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/openid.connect.token.md",
+      "sha256": "9950687caddc028f9175ecdd0ec4666c1df8222ceda60d1ddd4667001b1833a3"
+    },
+    "openid.connect.userInfo": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/openid.connect.userInfo.md",
+      "sha256": "41ad43b029b0a3f3607f4724b77251aa7deb6401aea5db48017b2813b38d5b3c"
+    },
+    "pins.add": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/pins.add.md",
+      "sha256": "7b1a994de8ab8e42db84821cb685a25bb8d2f81cd146a79ed5358c17e89f48d5"
+    },
+    "pins.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/pins.list.md",
+      "sha256": "24b8efcc3c3522e08efe3bc2f51361f35fe11e10a9d05c11a40438936bc3deaf"
+    },
+    "pins.remove": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/pins.remove.md",
+      "sha256": "79eda2fd9b77faf2b6cc50f012ae490a54356c064fbbf475e8fd9e9ff7b64039"
+    },
+    "reactions.add": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/reactions.add.md",
+      "sha256": "c685b7d5c8f374024e403ce19f4e33ad7ffd633e1680ce4e189272c565b30681"
+    },
+    "reactions.get": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/reactions.get.md",
+      "sha256": "471dde91ba6eb66c6cfbcdae2ca4696e5e7c3582f61b23c72f31963d87b435ee"
+    },
+    "reactions.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/reactions.list.md",
+      "sha256": "97a95ac1c0c9acb32529d2cb96692393af58bf3e46ac60f96e1eda0ad1a8e01d"
+    },
+    "reactions.remove": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/reactions.remove.md",
+      "sha256": "a924e05624d68c6d7253308f8b0deda5d5ddac146ddff543925af7d372c99157"
+    },
+    "reminders.add": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/reminders.add.md",
+      "sha256": "5160d78d94e98950493403bf304252e183457f8bf273af79a9ecac6cc197771d"
+    },
+    "reminders.complete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/reminders.complete.md",
+      "sha256": "f8b48b593e7b0530e4793e01bfe724e777a736db11d3ac8eeb2b6dad3584639d"
+    },
+    "reminders.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/reminders.delete.md",
+      "sha256": "784889bf43a56bfe742f075a56457ce07ac3a69c78a85a311534cbd5e7c3fce8"
+    },
+    "reminders.info": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/reminders.info.md",
+      "sha256": "aa9428909374065b290df8e5fcec84cc4c118f6c41b2ded12123fb4eaf59779e"
+    },
+    "reminders.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/reminders.list.md",
+      "sha256": "14372b5200a123626d38e0701c4f8c66aa402464f762d015081a220f2547b74b"
+    },
+    "rtm.connect": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/rtm.connect.md",
+      "sha256": "dcd0cedb140dbddfbcc5a99471536d097c3dc85141db97ed0249c38cca8262a8"
+    },
+    "search.all": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/search.all.md",
+      "sha256": "dbefe66ace008b6559e0c6bb1b08125458ae8e0145cc4b61e5ed9a113d0d2eb1"
+    },
+    "search.files": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/search.files.md",
+      "sha256": "9db147f01a062dad55f8602be1683b763c204a0c4a20c5c21cc3f065773f11cd"
+    },
+    "search.messages": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/search.messages.md",
+      "sha256": "0a7edbf25f8a6fee80ffad87d87dd8dcecc98480eff70d96de8c594e1ebcef1d"
+    },
+    "slackLists.access.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.access.delete.md",
+      "sha256": "7156e38a3edbd0349b4b6b9f644179b2e47977e968cac792c5f5558ef17f16ae"
+    },
+    "slackLists.access.set": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.access.set.md",
+      "sha256": "c7e38a8d5c8b354e65da1ec1efe61a889663cb5a85f2812709c3824688cc9e8f"
+    },
+    "slackLists.create": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.create.md",
+      "sha256": "b23a8f404bfaa88b5a65029678919da6e448c50fcfcef25c8274fca8ebaaaa93"
+    },
+    "slackLists.download.get": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.download.get.md",
+      "sha256": "37837995ad5ab05f9725689b3ebe92f1815d09b4bff1356054322e929c5a8e5e"
+    },
+    "slackLists.download.start": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.download.start.md",
+      "sha256": "838742fe5a50e408eb7324c3d78ff945630280c5e6a9dfb77c5d52c54ffce63f"
+    },
+    "slackLists.items.create": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.items.create.md",
+      "sha256": "341ab669a103b49a8c963a94db2b94e3387ec189a534011b5acc895f0e33ffe8"
+    },
+    "slackLists.items.delete": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.items.delete.md",
+      "sha256": "0db5c825ba158ed77302cc444f7d941834c1e8acc03dad65d4222ef27febf1f0"
+    },
+    "slackLists.items.deleteMultiple": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.items.deleteMultiple.md",
+      "sha256": "ab55465fbfa5385503bf017568a50857eab80f527b91feee1962aa03eebce537"
+    },
+    "slackLists.items.info": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.items.info.md",
+      "sha256": "a917e9956af31d8504e438b5814f39a0eb63222c2238fadc160a264cfc4c9a2b"
+    },
+    "slackLists.items.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.items.list.md",
+      "sha256": "6ec9c935a1216f5ff1dce67acb10827b3b680e17e1cc01cb5c4391d3c2263364"
+    },
+    "slackLists.items.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.items.update.md",
+      "sha256": "1f6b3fabe0df9fc02e31ca123959a9941e61b5eb893d2443514035c6723f73b3"
+    },
+    "slackLists.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/slackLists.update.md",
+      "sha256": "7f5a6f3677d05aba188431c510c5d7fb748d662ee8f2d868741746603b7ca9e5"
+    },
+    "stars.add": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/stars.add.md",
+      "sha256": "791269c15b3f03f3c7c0471d716ea40a6e5daf707c6a0bcaa22a029e4b7db882"
+    },
+    "stars.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/stars.list.md",
+      "sha256": "705630f944203e716e8a47f182c36ee043e524a3107b8ebbe579d62bfcfa6bbd"
+    },
+    "stars.remove": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/stars.remove.md",
+      "sha256": "864ad0d61e07602ac6895f060541007cfa907e0e46cf2ca690069451de2439d9"
+    },
+    "team.accessLogs": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/team.accessLogs.md",
+      "sha256": "0f32b2fe90496f30ae671565071b5eaf953b8fd3a293074d7482fb8cf4013328"
+    },
+    "team.billableInfo": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/team.billableInfo.md",
+      "sha256": "4b0a82aa9a070f4276fb47250af68d6c1c1c7f869f98a58077dba3f26d045ed2"
+    },
+    "team.billing.info": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/team.billing.info.md",
+      "sha256": "0cab86520a0c9d4a632d97609194aaf1a4e2d983a969d542e6262bf94d05064a"
+    },
+    "team.externalTeams.disconnect": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/team.externalTeams.disconnect.md",
+      "sha256": "498997a4628d51749404638fb3a6b9694cb1cb4264cbab0c2ee6c3147c0bd4d9"
+    },
+    "team.externalTeams.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/team.externalTeams.list.md",
+      "sha256": "2210e78192a910e6680e7d89dc5762d216c8ccbe39964a60b08f8ef5391beac9"
+    },
+    "team.info": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/team.info.md",
+      "sha256": "454482d62cf9fd5ec30ab2973fd4c685c31aa742ca7c5eb4da0f90167936fd71"
+    },
+    "team.integrationLogs": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/team.integrationLogs.md",
+      "sha256": "db7bcb8b5e130e244a82cab50a3f83335f757091f6f48abee193952c7c9fec35"
+    },
+    "team.preferences.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/team.preferences.list.md",
+      "sha256": "5a36a5f5cbaa5934e35f817def14401400877f5941e1a1b049d16994497a48e2"
+    },
+    "team.profile.get": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/team.profile.get.md",
+      "sha256": "5486189656c619a636a4d5c7f926ccb4091902151cf321f62a89b47ca99fef02"
+    },
+    "tooling.tokens.rotate": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/tooling.tokens.rotate.md",
+      "sha256": "e28b3edff63269ef6c5c01e6485ed8ba6254cc2cf7f672125bceb219369ca180"
+    },
+    "usergroups.create": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/usergroups.create.md",
+      "sha256": "7041d01f35f4caac00fd83379291dc710ba6626981de4a244a8fe0b9d282605b"
+    },
+    "usergroups.disable": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/usergroups.disable.md",
+      "sha256": "a481fddf95710d668fa69b61ad4f32a71db0b45691b5a48018bdd6e6c857b340"
+    },
+    "usergroups.enable": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/usergroups.enable.md",
+      "sha256": "6479d14418a527fbeaef71db02b0d9470a50bf4f94bfe25c186ce86a9a6d2169"
+    },
+    "usergroups.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/usergroups.list.md",
+      "sha256": "d3d1e1059de8d64c564cc94235edb796997300e2f07d1304a620b0b0e4dda37a"
+    },
+    "usergroups.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/usergroups.update.md",
+      "sha256": "5c5828fcb60310995af9aef0e0fdf611d66eddb03b6b1cadd3c5e0cce67e90cc"
+    },
+    "usergroups.users.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/usergroups.users.list.md",
+      "sha256": "38ece356f929495185b959b01c3ce04498383ddd0df9ee21aac322fd23a4c427"
+    },
+    "usergroups.users.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/usergroups.users.update.md",
+      "sha256": "df8cc55163f51b66396d3b97efabdfc3593b3e913fc264bcc45433151d2b4fa3"
+    },
+    "users.conversations": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.conversations.md",
+      "sha256": "d208bf6331a2211b064643ec596585ca41e6e1cef00c84e59c4063fb2ca20e40"
+    },
+    "users.deletePhoto": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.deletePhoto.md",
+      "sha256": "f234a1b0cdff7c23f72e2e160cddcd541936a9248b2dbe7f1b369491e17ca190"
+    },
+    "users.discoverableContacts.lookup": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.discoverableContacts.lookup.md",
+      "sha256": "cfccb289eab76b7e4f54298a895c0226235d919d390e14208199686556060c8c"
+    },
+    "users.getPresence": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.getPresence.md",
+      "sha256": "88c1d76a76fe5381e0e943ca968dbbf854448ce2e07b499730663ebb85cc5bf7"
+    },
+    "users.identity": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.identity.md",
+      "sha256": "e7358466a14a5c359d58a998991a8ae8d93095991371fe1c54faeb516bffd244"
+    },
+    "users.info": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.info.md",
+      "sha256": "2af0ad0aa02e118da56abc67ad20989d22141e5be6b2145fe7c5f849b28c4aa1"
+    },
+    "users.list": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.list.md",
+      "sha256": "d8bdbee49ac578bf8342f50c8f82807a6e02e7a106c7f8df789fe110b3380deb"
+    },
+    "users.lookupByEmail": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.lookupByEmail.md",
+      "sha256": "175f317b232a287636056ceb2da6791e04c91089ddfdd2fc57a13a4591631791"
+    },
+    "users.profile.get": {
+      "verb": "GET",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.profile.get.md",
+      "sha256": "05cb52a64d71b1c57c2981db43df39231b4ce6a8e7a569d817824e9e4deb7c1b"
+    },
+    "users.profile.set": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.profile.set.md",
+      "sha256": "bf9e211f89eabc62ad10125c46ee6e7203d819e71de5813cbad2f502c3f7bcda"
+    },
+    "users.setPhoto": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.setPhoto.md",
+      "sha256": "77f4cac023dca6b49eee2a46acb5201b411e82422e1de4d31df0319da5a48056"
+    },
+    "users.setPresence": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/users.setPresence.md",
+      "sha256": "dbc891a5ff60bf59aa9ae0339bbb9b03e552c6e51617d658ed28571e8eeed99c"
+    },
+    "views.open": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/views.open.md",
+      "sha256": "cc649645ed9b306490dac26eea37426c8f4bbd1e517221074757f3756f384014"
+    },
+    "views.publish": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/views.publish.md",
+      "sha256": "5f2d19982c306931f46d3d165cd792c38c3c863625ce7011318a871124ec7dea"
+    },
+    "views.push": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/views.push.md",
+      "sha256": "824535bb896cd6e5b94e13b23327cc6b9a14606a129ca2d5b93ae77d7e949826"
+    },
+    "views.update": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/views.update.md",
+      "sha256": "d1269adc40908ce6e869e7d96295ea07ea8bb62fb0174e5983107d29ef3b04ea"
+    },
+    "workflows.featured.add": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/workflows.featured.add.md",
+      "sha256": "940532403b5058d0fa867241b1c297a609a443786a5fda629f680132466f5247"
+    },
+    "workflows.featured.list": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/workflows.featured.list.md",
+      "sha256": "9fd031296ce704da24a22c8041bb653680c9eca105f8ded577e40aabf9071303"
+    },
+    "workflows.featured.remove": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/workflows.featured.remove.md",
+      "sha256": "afff6e32c699ab8ff79e2d927e8931bff0de37e197769416feb3507af4ff305b"
+    },
+    "workflows.featured.set": {
+      "verb": "POST",
+      "contentTypes": [
+        "application/json",
+        "application/x-www-form-urlencoded"
+      ],
+      "source": "https://docs.slack.dev/reference/methods/workflows.featured.set.md",
+      "sha256": "b6b8029662d98777f36d14ff03599d8b3edd64b7dbac785b1c643f3049818d0a"
+    }
+  }
+}

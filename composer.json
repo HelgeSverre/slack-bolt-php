@@ -28,6 +28,7 @@
     "scripts": {
         "test": "@php vendor/bin/phpunit --exclude-group live",
         "test:live": "@php vendor/bin/phpunit tests/Live",
+        "test:project": "@php scripts/smoke-project.php",
         "analyse": "@php vendor/bin/mago analyze",
         "lint": "@php vendor/bin/mago lint",
         "format": "@php vendor/bin/mago format",

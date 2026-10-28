@@ -28,6 +28,14 @@ final class HandlerInvoker
     public function invoke(HandlerTarget $target, Delivery $delivery, ?Container $scope = null): mixed
     {
         $callable = $target->callable();
+        if ($scope === null && is_array($callable) && $this->needsContext($callable[0])) {
+            $scope = InvocationScope::create(
+                $this->container,
+                $delivery->client ?? throw new \LogicException('No delivery client.'),
+                $delivery->authorization ?? throw new \LogicException('No delivery authorization.'),
+            );
+            $scope->singleton(\Thunder\Bolt\Context::class, $delivery->context);
+        }
         if (is_array($callable)) {
             $callable = MethodReflector::fromParts($callable[0], $callable[1]);
         } elseif (is_string($callable) && function_exists($callable)) {
@@ -35,6 +43,31 @@ final class HandlerInvoker
         }
 
         return ($scope ?? $this->container)->invoke($callable, ...$this->deliveryArguments($target, $delivery));
+    }
+
+    private function needsContext(string $class, array $visited = []): bool
+    {
+        if ($class === \Thunder\Bolt\Context::class) {
+            return true;
+        }
+        if (isset($visited[$class]) || !class_exists($class)) {
+            return false;
+        }
+        $visited[$class] = true;
+        foreach (new \ReflectionClass($class)->getConstructor()?->getParameters() ?? [] as $parameter) {
+            $type = $parameter->getType();
+            $types = $type instanceof ReflectionUnionType ? $type->getTypes() : [$type];
+            foreach ($types as $dependency) {
+                if (
+                    $dependency instanceof ReflectionNamedType
+                    && !$dependency->isBuiltin()
+                    && $this->needsContext($dependency->getName(), $visited)
+                ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /** @return array<string, object> */
@@ -63,6 +96,7 @@ final class HandlerInvoker
                 'payload' => $delivery->payload,
                 'reply' => $delivery->reply,
                 'delivery' => $delivery,
+                'context' => $delivery->context,
                 'jobs' => $delivery->jobs ?? throw new \LogicException('No delivery jobs capability.'),
                 'client' => $delivery->client ?? throw new \LogicException('No delivery client.'),
                 'authorization' => $delivery->authorization ?? throw new \LogicException('No delivery authorization.'),
@@ -107,6 +141,8 @@ final class HandlerInvoker
                 $plan[$parameter->getName()] = 'reply';
             } elseif ($this->accepts($parameter, $delivery)) {
                 $plan[$parameter->getName()] = 'delivery';
+            } elseif ($this->accepts($parameter, $delivery->context)) {
+                $plan[$parameter->getName()] = 'context';
             } elseif ($delivery->jobs !== null && $this->accepts($parameter, $delivery->jobs)) {
                 $plan[$parameter->getName()] = 'jobs';
             } elseif ($delivery->client !== null && $this->accepts($parameter, $delivery->client)) {

@@ -15,6 +15,9 @@ final class SmokeHttp implements ClientInterface
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         $this->requests[] = $request;
+        if (str_ends_with($request->getUri()->getPath(), '/auth.test')) {
+            return new \GuzzleHttp\Psr7\Response(200, [], '{"ok":true,"user_id":"U-smoke-bot","bot_id":"B-smoke","team_id":"T-smoke"}');
+        }
         return new \GuzzleHttp\Psr7\Response(200, [], '{"ok":true,"channel":"C-smoke","ts":"1.000001"}');
     }
 }

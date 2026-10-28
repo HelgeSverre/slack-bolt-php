@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Explicit cached static-token verification through `App::verifyToken()`, `auth:verify` and `socket:serve --verify-token`, plus `SLACK_BOT_ID` for network-free self-message filtering.
+- Delivery-local `Context` shared by middleware and handlers, with isolated constructor scopes when needed and fresh job-attempt context.
+- Structured `App::onError()` policy with original errors, listener/delivery/stage identity and buffered acknowledgement state; safe HTTP processing-error responses. Legacy `error()` remains supported.
+- Updated parity assessments and evidence for the first three compatibility gaps.
+
 ## v0.1.0 — 2026-10-26
 
 First experimental preview. The namespace and interfaces may change before 1.0.

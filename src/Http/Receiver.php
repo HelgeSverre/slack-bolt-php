@@ -7,7 +7,11 @@ namespace Thunder\Bolt\Http;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Thunder\Bolt\App;
+use Thunder\Bolt\Authorization\AuthorizationSource;
 use Thunder\Bolt\BoltConfig;
+use Thunder\Bolt\Errors\FailureContext;
+use Thunder\Bolt\Errors\FailureStage;
+use Thunder\Bolt\Exceptions\HandlerFailures;
 use Thunder\Bolt\Exceptions\InvalidPayload;
 use Thunder\Bolt\Invocation\Interaction;
 
@@ -17,14 +21,18 @@ final readonly class Receiver
 
     private LoggerInterface $logger;
 
+    private ?\Closure $errorHandler;
+
     public function __construct(
         private App $app,
         private BoltConfig $config,
         ?RequestVerifier $verifier = null,
         ?LoggerInterface $logger = null,
+        ?callable $errorHandler = null,
     ) {
         $this->verifier = $verifier ?? new RequestVerifier($config->signingSecret, $config->maxTimestampSkewSeconds);
         $this->logger = $logger ?? new NullLogger();
+        $this->errorHandler = $errorHandler === null ? null : \Closure::fromCallable($errorHandler);
     }
 
     /** @param array<string, string|list<string>> $headers */
@@ -62,9 +70,13 @@ final readonly class Receiver
         $retry = $normalized['x-slack-retry-num'] ?? null;
         $reason = $normalized['x-slack-retry-reason'] ?? null;
         $metadata = [
+            'transport' => 'http',
             'retryNum' => is_string($retry) && ctype_digit($retry) ? (int) $retry : null,
             'retryReason' => is_string($reason) ? $reason : null,
         ];
+        if (is_string($body['event_id'] ?? null) && $body['event_id'] !== '') {
+            $metadata['eventId'] = $body['event_id'];
+        }
         try {
             if (!$this->app->hasAuthorization($body)) {
                 return new Response(
@@ -76,6 +88,26 @@ final readonly class Receiver
         } catch (InvalidPayload $exception) {
             return new Response(400, 'Malformed Slack delivery payload.');
         } catch (\Throwable $exception) {
+            if ($this->errorHandler !== null) {
+                try {
+                    $response = ($this->errorHandler)(
+                        new FailureContext(
+                            $exception,
+                            FailureStage::Receiver,
+                            source: AuthorizationSource::fromArray($body),
+                            metadata: $metadata,
+                        ),
+                    );
+                    if (!$response instanceof Response || $response->status < 400 || $response->status > 599) {
+                        throw new \UnexpectedValueException(
+                            'Receiver error handlers must return an HTTP error response (400–599).',
+                        );
+                    }
+                    return $response;
+                } catch (\Throwable $handlerFailure) {
+                    $exception = new HandlerFailures([$exception, $handlerFailure]);
+                }
+            }
             $this->logger->error('Slack delivery failed before its HTTP response was emitted.', [
                 'exception' => $exception,
             ]);

@@ -1,5 +1,7 @@
 # Bolt JS parity audit — 26 October 2026
 
+**28 October follow-up:** the first three gaps below now have PHP implementations: explicit static-token identity verification/hydration, delivery-local Context and structured failure context/policy. See the [implementation and evidence](delivery-context-identity-errors.md) and refreshed [matrix](bolt-js-parity-matrix.md). The dated findings and counts below describe the v0.1.0 baseline; the current matrix records the changes. Identity and receiver policies deliberately retain explicit PHP execution boundaries.
+
 **Verdict: the main Slack application capabilities work, but meaningful framework gaps remain. Literal API parity is neither achieved nor the right PHP target.** We should close the practical gaps below, retain the documented PHP adaptations, and exclude Node-only interfaces. No percentage is claimed.
 
 This audit compares PHP revision [`21192af`](https://github.com/HelgeSverre/slack-bolt-php/tree/21192afee5efbbd35f90bbcf3e6b07858f5227b2) (the v0.1.0 preview) with `@slack/bolt` **5.1.0**, pinned at [`ffbe0b6…`](https://github.com/slackapi/bolt-js/tree/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d). It does not claim parity with a moving upstream release or every Slack API. The [upstream research](bolt-js-parity-upstream.md) cites the primary source contract; the [detailed matrix](bolt-js-parity-matrix.md) links PHP implementation and behavioral tests. The [machine-readable manifest](bolt-js-parity.json) is the reviewed assessment.

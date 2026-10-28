@@ -7,8 +7,11 @@ namespace Thunder\Bolt\Assistant;
 use Closure;
 use Tempest\Container\Container;
 use Thunder\Bolt\Assistant;
+use Thunder\Bolt\Context;
+use Thunder\Bolt\Errors\FailureStage;
 use Thunder\Bolt\Invocation\Delivery;
 use Thunder\Bolt\Invocation\HandlerInvoker;
+use Thunder\Bolt\Invocation\InvocationFailure;
 use Thunder\Bolt\Invocation\InvocationPipeline;
 use Thunder\Bolt\Invocation\InvocationScope;
 use Thunder\Bolt\Payloads\Events\AssistantThreadContextChanged;
@@ -74,20 +77,41 @@ final readonly class Runtime
             $delivery->thread,
             $thread,
             jobs: $delivery->jobs,
+            context: $delivery->context,
         );
         if ($handler === null) {
             $thread->saveContext();
             return null;
         }
         $scope = $scoped ? InvocationScope::create($this->container, $client, $authorization) : null;
+        $scope?->singleton(Context::class, $delivery->context);
         if ($scope !== null && $prepared->jobs !== null) {
             $scope->singleton(\Thunder\Bolt\Jobs::class, $prepared->jobs);
         }
-        return new InvocationPipeline()->run($handler->middleware, $prepared, fn(): mixed => $this->invoker->invoke(
-            $handler->target,
-            $prepared,
-            $scope,
-        ));
+        $stage = FailureStage::Middleware;
+        $handlerFailure = null;
+        try {
+            return new InvocationPipeline()->run($handler->middleware, $prepared, function () use (
+                $handler,
+                $prepared,
+                $scope,
+                &$stage,
+                &$handlerFailure,
+            ): mixed {
+                try {
+                    return $this->invoker->invoke($handler->target, $prepared, $scope);
+                } catch (\Throwable $error) {
+                    $stage = FailureStage::Listener;
+                    $handlerFailure = $error;
+                    throw $error;
+                }
+            });
+        } catch (\Throwable $error) {
+            if ($stage === FailureStage::Listener && $handlerFailure !== $error) {
+                $stage = FailureStage::Middleware;
+            }
+            throw new InvocationFailure($error, $prepared, $stage);
+        }
     }
 
     private function isUserMessage(object $payload): bool

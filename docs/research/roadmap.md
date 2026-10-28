@@ -1,10 +1,10 @@
 # Implementation plan
 
-Current ordering refreshed 26 October 2026; earlier milestone sections below retain their historical scope. The [Bolt JS parity audit](bolt-js-parity-audit.md) is the current compatibility assessment. The target is useful capability and protocol coverage of pinned Bolt JS 5.1.0 through idiomatic PHP, with explicit host adaptations and Node-specific exclusions. The v0.1.0 preview is tagged; further demos and package publishing should not displace the meaningful gaps found in that audit.
+Current ordering refreshed 28 October 2026; earlier milestone sections below retain their historical scope. The [Bolt JS parity audit](bolt-js-parity-audit.md) is the current compatibility assessment. The target is useful capability and protocol coverage of pinned Bolt JS 5.1.0 through idiomatic PHP, with explicit host adaptations and Node-specific exclusions. The v0.1.0 preview is tagged; further demos and package publishing should not displace the meaningful gaps found in that audit.
 
 ## Next compatibility slices
 
-1. Add delivery-local custom context, structured failure context/policy and explicit static-token identity verification/hydration. Keep help and discovery network-free.
+1. Completed 28 October: delivery-local Context, structured failure context/policy and explicit static-token identity verification/hydration. [Implementation and evidence](delivery-context-identity-errors.md). Help and discovery stay network-free.
 2. Fill the small compatibility gaps: workflow-token opt-out, reusable subtype/direct-mention filters, sanitized SSL probes and stock-adapter context extraction.
 3. Add typed OAuth installation request options and hooks; expand inbound DTOs and live verification where real use cases justify them.
 

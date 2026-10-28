@@ -64,6 +64,10 @@ try {
         copy($root . '/tests/Fixtures/project-smoke/' . $fixture . '.stub', $project . '/' . $destination);
     }
     echo $command([PHP_BINARY, 'bolt', 'listener:list', '--format=json'], $project);
+    $identity = json_decode($command([PHP_BINARY, 'bolt', 'auth:verify'], $project), true, flags: JSON_THROW_ON_ERROR);
+    if (($identity['bot_id'] ?? null) !== 'B-smoke' || ($identity['user_id'] ?? null) !== 'U-smoke-bot') {
+        throw new RuntimeException('Static token verification did not return the fixture identity.');
+    }
     echo $command([PHP_BINARY, $root . '/tests/Fixtures/project-smoke/dispatch.php.stub'], $project);
     $outcome = json_decode(
         $command([PHP_BINARY, 'bolt', 'jobs:work', '--once'], $project),

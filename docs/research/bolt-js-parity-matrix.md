@@ -2,7 +2,7 @@
 
 Generated from [the reviewed audit manifest](bolt-js-parity.json) by `node scripts/audit-bolt-parity.mjs`. The human verdict and priorities are in [the audit](bolt-js-parity-audit.md).
 
-Baseline: Bolt JS 5.1.0, commit `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. PHP revision: `21192afee5efbbd35f90bbcf3e6b07858f5227b2`. Audited 2026-10-26.
+Baseline: Bolt JS 5.1.0, commit `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. PHP revision: `28 October 2026 implementation, based on 4b03c1b`. Audited 2026-10-28.
 
 Mapping presence is a bookkeeping check, not proof of behavioral equality. No percentage is reported: features differ in importance, and excluded Node APIs/type aliases are not missing PHP capabilities.
 
@@ -59,11 +59,11 @@ Upstream: [src/middleware/builtin.ts](https://github.com/slackapi/bolt-js/blob/f
 
 ### scratch-context
 
-**Delivery-local custom middleware context — missing.** Readonly Delivery cannot carry arbitrary middleware enrichment, and next() cannot forward a replacement delivery. Conversation/thread stores persist data and are not a substitute for request-local auth claims, tracing or fetched records. Add a typed delivery-local context capability without persisting live services.
+**Delivery-local custom middleware context — covered.** Context is a delivery-local mutable capability shared across middleware, method/constructor-injected handlers and assistants in GenericContainer scopes. Separate deliveries/tenants/jobs get fresh contexts; the context is non-serializable and print_r/var_dump omit its values. Stock-adapter context factories remain separate.
 
-PHP: [src/Invocation/Delivery.php](../../src/Invocation/Delivery.php), [src/Invocation/InvocationPipeline.php](../../src/Invocation/InvocationPipeline.php).
+PHP: [src/Context.php](../../src/Context.php), [src/Invocation/Delivery.php](../../src/Invocation/Delivery.php), [src/Invocation/HandlerInvoker.php](../../src/Invocation/HandlerInvoker.php), [src/App.php](../../src/App.php), [src/Jobs/Worker.php](../../src/Jobs/Worker.php).
 
-No dedicated behavioral test is cited for the missing/excluded contract; the source establishes its absence or scope.
+Behavioral evidence: [tests/Runtime/ContextAndIdentityTest.php](../../tests/Runtime/ContextAndIdentityTest.php), [tests/Assistant/RuntimeTest.php](../../tests/Assistant/RuntimeTest.php), [tests/Jobs/JobRequestContextTest.php](../../tests/Jobs/JobRequestContextTest.php).
 
 Upstream: [src/types/middleware.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/middleware.ts), [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts).
 
@@ -109,11 +109,11 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 
 ### static-identity
 
-**Static-token verification and self identity — partial.** ignoreSelf works with supplied bot identities, including bot_id from an authorizer. A token-only App performs no startup auth.test identity hydration; BoltConfig lacks botId and botUserId is optional. Token-only defaults can therefore process their own messages. Add explicit verification/identity hydration without putting network calls in help or discovery.
+**Static-token verification and self identity — adapted.** App.verifyToken explicitly verifies and caches identity per App, hydrates both bot identifiers and checks verified tenant identity. auth:verify reports identity; socket:serve --verify-token hydrates the worker before connecting. SLACK_BOT_USER_ID/SLACK_BOT_ID support network-free HTTP. Help/discovery and ordinary dispatch do not perform hidden lookups; the CLI does not warm another process.
 
-PHP: [src/App.php](../../src/App.php), [src/BoltConfig.php](../../src/BoltConfig.php), [src/Integration/AppInitializer.php](../../src/Integration/AppInitializer.php).
+PHP: [src/App.php](../../src/App.php), [src/BoltConfig.php](../../src/BoltConfig.php), [src/Integration/AppInitializer.php](../../src/Integration/AppInitializer.php), [src/Authorization/TokenIdentity.php](../../src/Authorization/TokenIdentity.php), [src/Console/AuthCommands.php](../../src/Console/AuthCommands.php).
 
-Behavioral evidence: [tests/Runtime/ConversationDispatchTest.php](../../tests/Runtime/ConversationDispatchTest.php), [tests/Runtime/AuthorizationDispatchTest.php](../../tests/Runtime/AuthorizationDispatchTest.php).
+Behavioral evidence: [tests/Runtime/ConversationDispatchTest.php](../../tests/Runtime/ConversationDispatchTest.php), [tests/Runtime/AuthorizationDispatchTest.php](../../tests/Runtime/AuthorizationDispatchTest.php), [tests/Runtime/ContextAndIdentityTest.php](../../tests/Runtime/ContextAndIdentityTest.php).
 
 Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts), [src/middleware/builtin.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts).
 
@@ -219,11 +219,11 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 
 ### errors
 
-**Application/receiver error context and policy — partial.** App.error receives HandlerFailures, parsed payload and metadata; independent failures are retained. It does not receive the selected listener, full delivery/authorization context or ack state. Receiver-stage exceptions map to fixed statuses/logging without configurable processing/unhandled hooks. Add structured PHP failure context and policy, not Node response callbacks.
+**Application/receiver error context and policy — adapted.** App.onError receives original errors with listener/source/stage and buffered acknowledgement context; explicit Handled/Rethrow policy preserves originals, aggregates failures and cannot suppress failed authorization, durable intake or missing/duplicate acknowledgements. Legacy App.error remains. The HTTP receiver accepts non-success processing error responses; verification/rejection statuses and host route policy remain host-owned, with no early-ack/unhandled timer.
 
-PHP: [src/App.php](../../src/App.php), [src/Exceptions/HandlerFailures.php](../../src/Exceptions/HandlerFailures.php), [src/Http/Receiver.php](../../src/Http/Receiver.php), [src/SocketMode/Runner.php](../../src/SocketMode/Runner.php).
+PHP: [src/App.php](../../src/App.php), [src/Exceptions/HandlerFailures.php](../../src/Exceptions/HandlerFailures.php), [src/Http/Receiver.php](../../src/Http/Receiver.php), [src/SocketMode/Runner.php](../../src/SocketMode/Runner.php), [src/Errors/FailureContext.php](../../src/Errors/FailureContext.php), [src/Errors/ErrorHandling.php](../../src/Errors/ErrorHandling.php).
 
-Behavioral evidence: [tests/Runtime/AppTest.php](../../tests/Runtime/AppTest.php), [tests/Http/InteractivityTest.php](../../tests/Http/InteractivityTest.php), [tests/SocketMode/RunnerTest.php](../../tests/SocketMode/RunnerTest.php).
+Behavioral evidence: [tests/Runtime/AppTest.php](../../tests/Runtime/AppTest.php), [tests/Http/InteractivityTest.php](../../tests/Http/InteractivityTest.php), [tests/SocketMode/RunnerTest.php](../../tests/SocketMode/RunnerTest.php), [tests/Runtime/FailureContextTest.php](../../tests/Runtime/FailureContextTest.php), [tests/Http/ReceiverFailurePolicyTest.php](../../tests/Http/ReceiverFailurePolicyTest.php).
 
 Upstream: [src/errors.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/errors.ts), [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts), [src/receivers/HTTPReceiver.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPReceiver.ts).
 
@@ -367,19 +367,19 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 | `convoStore` | adapted | [conversation](#conversation) | ConversationStore adapter or false, with stronger key scoping. |
 | `token` | covered | [authorization](#authorization) | BoltConfig token and Socket Mode Config appToken. |
 | `appToken` | covered | [authorization](#authorization) | BoltConfig token and Socket Mode Config appToken. |
-| `botId` | partial | [static-identity](#static-identity) | Authorization can carry botId; static BoltConfig cannot. |
+| `botId` | covered | [static-identity](#static-identity) | Static BoltConfig.botId, SLACK_BOT_ID and explicit verification hydration. |
 | `botUserId` | covered | [static-identity](#static-identity) | Explicit BoltConfig value; no automatic token-only hydration. |
 | `authorize` | covered | [authorization](#authorization) | Authorizer or App.authorizeUsing callback. |
 | `receiver` | adapted | [ingress](#ingress) | Compose Receiver.handle and App.dispatch with the host. |
 | `logger` | adapted | [logging](#logging) | PSR-3 dependency. |
 | `logLevel` | adapted | [logging](#logging) | Logger/host configuration. |
-| `ignoreSelf` | partial | [static-identity](#static-identity) | Filtering exists but depends on explicitly supplied identity. |
+| `ignoreSelf` | adapted | [static-identity](#static-identity) | Filters supplied or explicitly verified bot identity; no hidden boot/network lookup. |
 | `clientOptions` | adapted | [client](#client) | PSR-18 client plus explicit retry/upload configuration instead of Node options. |
 | `socketMode` | adapted | [socket](#socket) | Explicit socket:serve command and Socket Mode Config. |
 | `developerMode` | excluded | [unsafe-switches](#unsafe-switches) | No need for the Node convenience preset. |
-| `tokenVerificationEnabled` | missing | [static-identity](#static-identity) | No explicit startup token verifier/hydrator. |
+| `tokenVerificationEnabled` | adapted | [static-identity](#static-identity) | Explicit App.verifyToken, auth:verify and socket:serve --verify-token replace eager initialization. |
 | `deferInitialization` | adapted | [routing-lifecycle](#routing-lifecycle) | No equivalent async startup lifecycle to defer. Help/discovery need no token verification. |
-| `extendedErrorHandler` | partial | [errors](#errors) | Parsed payload/metadata exist; complete delivery/listener/ack context does not. |
+| `extendedErrorHandler` | adapted | [errors](#errors) | Typed App.onError(FailureContext):ErrorHandling plus safe HTTP processing-error response hook; legacy error callback retained. |
 | `attachFunctionToken` | partial | [function-policy](#function-policy) | Workflow token attachment is automatic with no opt-out. |
 
 ## All public App member names (overloads grouped)
@@ -393,7 +393,7 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 | `start` | adapted | [routing-lifecycle](#routing-lifecycle) | Host and runners own lifecycle; no Node server lifecycle clone. Token verification remains a separate gap. |
 | `stop` | adapted | [routing-lifecycle](#routing-lifecycle) | Host and runners own lifecycle; no Node server lifecycle clone. Token verification remains a separate gap. |
 | `webClientOptions` | adapted | [client](#client) | Configure the PSR-18 transport and explicit retry policy. |
-| `use` | partial | [scratch-context](#scratch-context) | Pipeline exists, but arbitrary delivery-local context enrichment does not. |
+| `use` | covered | [scratch-context](#scratch-context) | Ordered pipeline with shared delivery-local Context. |
 | `assistant` | covered | [assistant](#assistant) | Assistant builder and scoped runtime. |
 | `function` | partial | [function-policy](#function-policy) | Function routing/completion exist; attachment policy and explicit auto-ack control differ. |
 | `event` | covered | [listeners](#listeners) | Typed/fluent registration; unfiltered messages use an empty selector or event(message). |
@@ -403,7 +403,7 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 | `shortcut` | covered | [interactions](#interactions) | Typed/fluent registration with constraints. |
 | `options` | covered | [interactions](#interactions) | Typed/fluent registration with constraints. |
 | `view` | covered | [interactions](#interactions) | Typed/fluent registration with constraints. |
-| `error` | partial | [errors](#errors) | Aggregate errors and metadata exist; extended/receiver failure context is incomplete. |
+| `error` | adapted | [errors](#errors) | Legacy error callback remains; onError supplies typed delivery/stage/listener/ack context with explicit policy. |
 | `processEvent` | adapted | [ingress](#ingress) | Existing trusted App.dispatch replaces the Node ingress shape. |
 
 ## All built-in middleware exports

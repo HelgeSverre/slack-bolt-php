@@ -17,6 +17,7 @@ $scopes = static function (string $name): array {
     return is_string($value) ? array_values(array_filter(array_map('trim', explode(',', $value)))) : [];
 };
 $botUserId = env('SLACK_BOT_USER_ID');
+$botId = env('SLACK_BOT_ID');
 $installationStorePath = env('SLACK_INSTALLATION_STORE_PATH');
 $conversationStorePath = env('SLACK_CONTEXT_STORE_PATH');
 
@@ -25,6 +26,7 @@ return new BoltConfig(
     signingSecret: (string) env('SLACK_SIGNING_SECRET', ''),
     ignoreSelf: filter_var(env('SLACK_IGNORE_SELF', 'true'), FILTER_VALIDATE_BOOL),
     botUserId: is_string($botUserId) && $botUserId !== '' ? $botUserId : null,
+    botId: is_string($botId) && $botId !== '' ? $botId : null,
     oauth: $clientId !== '' && $clientSecret !== '' && $redirectUri !== ''
         ? new OAuthConfig(
             $clientId,

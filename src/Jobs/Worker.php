@@ -69,6 +69,7 @@ final readonly class Worker
             }
             $client = $this->client->withToken($authorization->token());
             $scope = InvocationScope::create($this->container, $client, $authorization);
+            $scope->singleton(\Thunder\Bolt\Context::class, new \Thunder\Bolt\Context());
             $scope->singleton(JobContext::class, $record->context);
             $scope->singleton(JobExecution::class, $execution);
             $scope->singleton(

@@ -1,16 +1,16 @@
 # API parity map
 
-The current source-backed assessment is the [26 October 2026 Bolt JS parity audit](bolt-js-parity-audit.md), comparing the v0.1.0 preview with **Bolt JS 5.1.0** at `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. Use its [detailed matrix](bolt-js-parity-matrix.md) and [reviewed JSON manifest](bolt-js-parity.json) for individual capabilities, source/test evidence, all AppOptions, public App member names, built-ins and module coverage.
+The source-backed [26 October 2026 Bolt JS parity audit](bolt-js-parity-audit.md) compares v0.1.0 with **Bolt JS 5.1.0** at `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. Its first three gaps were addressed on 28 October: [identity, request context and failures](delivery-context-identity-errors.md). Use the refreshed [matrix](bolt-js-parity-matrix.md) and [JSON manifest](bolt-js-parity.json) for the current capability assessment.
 
 **Broad capability coverage is implemented; full Bolt JS parity has not been established.** PHP-native replacements and deliberate exclusions are assessed separately from gaps. No overall parity percentage is claimed.
 
 | Area | Assessment |
 | --- | --- |
 | Listener families, interactivity and matching | Implemented with behavioral evidence, including regex captures and legacy interaction classification. Reusable subtype/direct-mention filters are missing. |
-| Middleware and delivery context | Ordered pipelines work; custom request-local enrichment and stock-adapter context factories are gaps. Persistent conversation state is a different concern. |
-| Authorization and OAuth | Scoped clients, basic OAuth v2, one-time state, stores and rotation work. Static-token identity hydration and advanced installer controls remain narrower than Bolt. |
+| Middleware and delivery context | Ordered pipelines and shared request-local Context work. Stock-adapter context factories remain a gap. Persistent conversation state is a different concern. |
+| Authorization and OAuth | Scoped clients, basic OAuth v2, state, stores and rotation work. Static identity verification is explicit and cached per App; advanced installer controls remain narrower than Bolt. |
 | HTTP and Socket Mode | Verified ingress, acknowledgements and Socket Mode lifecycle work. Inline returned responses plus named jobs intentionally replace early-ack continuation. Receiver/error hooks and SSL probes are not fully equivalent. |
-| Error handling | Aggregate failures, parsed payload and metadata are available; structured listener/delivery/stage context and configurable receiver policy are incomplete. |
+| Error handling | Structured listener/delivery/stage/acknowledgement context, explicit handling policy and safe HTTP processing-error responses are implemented. Host route policy and verification rejection statuses remain separate; no asynchronous unhandled timer exists. |
 | Assistant and custom functions | Lifecycle/context/streaming and typed function inputs/complete/fail are implemented. Workflow-token opt-out is missing; paid-plan live validation remains limited. |
 | Web API and Block Kit | 273 typed request/response pairs, generated resources, uploads, pagination/retries and reviewed transport policy exist. This is separate from inbound Bolt parity. Some nested/polymorphic model fields remain raw. |
 | Conversation/thread state | Implemented through memory/file/SQLite adapters with stronger tenant/thread scoping than the baseline. |

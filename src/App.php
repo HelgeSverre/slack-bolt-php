@@ -26,14 +26,19 @@ use Thunder\Bolt\Attributes\SlackFunction as FunctionAttribute;
 use Thunder\Bolt\Attributes\SlashCommand as SlashCommandAttribute;
 use Thunder\Bolt\Attributes\View as ViewAttribute;
 use Thunder\Bolt\Authorization\Authorization;
+use Thunder\Bolt\Authorization\AuthorizationException;
 use Thunder\Bolt\Authorization\AuthorizationSource;
 use Thunder\Bolt\Authorization\Authorizer;
 use Thunder\Bolt\Authorization\CallbackAuthorizer;
+use Thunder\Bolt\Authorization\TokenIdentity;
 use Thunder\Bolt\Conversation\ConversationContext;
 use Thunder\Bolt\Conversation\ConversationStore;
 use Thunder\Bolt\Conversation\DeliveryContext;
 use Thunder\Bolt\Conversation\Stores\MemoryConversationStore;
 use Thunder\Bolt\Conversation\ThreadContext;
+use Thunder\Bolt\Errors\ErrorHandling;
+use Thunder\Bolt\Errors\FailureContext;
+use Thunder\Bolt\Errors\FailureStage;
 use Thunder\Bolt\Exceptions\DoubleAcknowledgement;
 use Thunder\Bolt\Exceptions\DuplicateListener;
 use Thunder\Bolt\Exceptions\HandlerFailures;
@@ -47,6 +52,7 @@ use Thunder\Bolt\Invocation\AcknowledgementValidator;
 use Thunder\Bolt\Invocation\Delivery;
 use Thunder\Bolt\Invocation\HandlerInvoker;
 use Thunder\Bolt\Invocation\Interaction;
+use Thunder\Bolt\Invocation\InvocationFailure;
 use Thunder\Bolt\Invocation\InvocationPipeline;
 use Thunder\Bolt\Invocation\InvocationScope;
 use Thunder\Bolt\Middleware\Middleware;
@@ -100,11 +106,13 @@ final class App
 
     private ?Closure $errorHandler = null;
 
+    private ?Closure $failureHandler = null;
+
+    private ?TokenIdentity $tokenIdentity = null;
+
     private ?Assistant $registeredAssistant = null;
 
     private readonly HandlerInvoker $invoker;
-
-    private readonly InvocationPipeline $pipeline;
 
     private readonly ConversationStore|false $conversationStore;
 
@@ -125,7 +133,6 @@ final class App
             );
         }
         $this->invoker = new HandlerInvoker($container);
-        $this->pipeline = new InvocationPipeline();
         $this->conversationStore = $conversationStore ?? new MemoryConversationStore();
         $this->logger = $logger ?? new NullLogger();
     }
@@ -171,6 +178,50 @@ final class App
         return $this;
     }
 
+    /** Structured policy takes precedence over the legacy aggregate error callback. */
+    public function onError(callable $handler): self
+    {
+        $this->failureHandler = Closure::fromCallable($handler);
+        return $this;
+    }
+
+    public function verifyToken(): TokenIdentity
+    {
+        if ($this->authorizer !== null || $this->config->oauth !== null || $this->config->token === '') {
+            throw new \LogicException(
+                'Token verification requires a configured static token without a custom authorizer.',
+            );
+        }
+        if ($this->tokenIdentity !== null) {
+            return $this->tokenIdentity;
+        }
+        $result = $this->client->withToken($this->config->token)->auth()->test();
+        $identifier = static function (mixed $value): ?string {
+            if ($value !== null && (!is_string($value) || trim($value) === '')) {
+                throw new AuthorizationException('Slack returned an invalid token identity.');
+            }
+            return $value;
+        };
+        $userId = $identifier($result->get('user_id'));
+        $botId = $identifier($result->get('bot_id'));
+        $teamId = $identifier($result->get('team_id'));
+        $enterpriseId = $identifier($result->get('enterprise_id'));
+        if (!is_string($userId) || $teamId === null && $enterpriseId === null) {
+            throw new AuthorizationException('Slack returned an incomplete token identity.');
+        }
+        if (
+            $this->config->botUserId !== null && $this->config->botUserId !== $userId
+            || $this->config->botId !== null && $this->config->botId !== $botId
+        ) {
+            throw new AuthorizationException('Configured bot identity does not match the verified token.');
+        }
+        $enterpriseInstall = $result->get('is_enterprise_install', $teamId === null && $enterpriseId !== null);
+        if (!is_bool($enterpriseInstall) || $enterpriseInstall && $enterpriseId === null) {
+            throw new AuthorizationException('Slack returned an invalid installation identity.');
+        }
+        return $this->tokenIdentity = new TokenIdentity($userId, $botId, $teamId, $enterpriseId, $enterpriseInstall);
+    }
+
     public function authorizeUsing(Authorizer|callable $authorizer): self
     {
         if (!$this->container instanceof GenericContainer) {
@@ -196,11 +247,22 @@ final class App
     /** @internal Deferred work resolves the current authorizer, never an old client. */
     public function authorizeSource(AuthorizationSource $source): Authorization
     {
+        if ($this->authorizer === null && $this->tokenIdentity !== null) {
+            $identity = $this->tokenIdentity;
+            if (
+                $source->isEnterpriseInstall !== $identity->isEnterpriseInstall
+                || $identity->isEnterpriseInstall && $source->enterpriseId !== $identity->enterpriseId
+                || !$identity->isEnterpriseInstall && $source->teamId !== $identity->teamId
+            ) {
+                throw new AuthorizationException('Delivery does not match the verified installation.');
+            }
+        }
         return (
             $this->authorizer?->authorize($source) ?? new Authorization(
                 botToken: $this->config->token,
-                botUserId: $this->config->botUserId,
-                teamId: $source->teamId,
+                botUserId: $this->tokenIdentity?->userId ?? $this->config->botUserId,
+                botId: $this->tokenIdentity?->botId ?? $this->config->botId,
+                teamId: $source->teamId ?? $this->tokenIdentity?->teamId,
                 enterpriseId: $source->enterpriseId,
                 isEnterpriseInstall: $source->isEnterpriseInstall,
             )
@@ -441,11 +503,23 @@ final class App
         if (is_string($body['event_id'] ?? null) && $body['event_id'] !== '') {
             $metadata['eventId'] = $body['event_id'];
         }
-        $payload = $this->payloadFrom($body);
-        $functionContext = $payload instanceof FunctionExecuted
-            ? $payload->execution
-            : ExecutionContext::fromArray($body);
         $source = AuthorizationSource::fromArray($body);
+        try {
+            $payload = $this->payloadFrom($body);
+            $functionContext = $payload instanceof FunctionExecuted
+                ? $payload->execution
+                : ExecutionContext::fromArray($body);
+        } catch (Throwable $error) {
+            if ($this->failureHandler !== null) {
+                $this->reportFailures([$error], new \stdClass(), $metadata, [new FailureContext(
+                    $error,
+                    FailureStage::Payload,
+                    source: $source,
+                    metadata: $metadata,
+                )]);
+            }
+            throw $error;
+        }
         try {
             $lifecycle =
                 ($body['type'] ?? null) === 'event_callback'
@@ -460,115 +534,132 @@ final class App
             $client = $this->client->withToken(
                 $lifecycle ? '' : $functionContext?->workflowToken() ?? $authorization->token(),
             );
-        } catch (Throwable $exception) {
-            $this->reportFailures([$exception], $payload, $metadata);
-
-            // Reporting an authorization failure cannot turn an unauthorised
-            // delivery into a handler invocation or successful acknowledgement.
-            throw $exception;
+        } catch (Throwable $error) {
+            $this->reportFailures([$error], $payload, $metadata, [new FailureContext(
+                $error,
+                FailureStage::Authorization,
+                source: $source,
+                metadata: $metadata,
+            )]);
+            throw $error;
         }
-
         if ($this->shouldIgnore($payload, $authorization)) {
             return null;
         }
-
         $reply = $this->replyFor($payload, $client);
-        $context = DeliveryContext::fromArray($body, $source, $authorization);
+        $keys = DeliveryContext::fromArray($body, $source, $authorization);
         $store = $this->conversationStore === false ? null : $this->conversationStore;
-        $conversation = new ConversationContext($store, $context->conversation, $this->logger);
-        $thread = new ThreadContext($store, $context->thread, $this->logger);
+        $conversation = new ConversationContext($store, $keys->conversation, $this->logger);
+        $thread = new ThreadContext($store, $keys->thread, $this->logger);
         $scope =
             $this->authorizer === null && $functionContext?->workflowToken() === null && $this->jobs === null
                 ? null
                 : InvocationScope::create($this->container, $client, $authorization);
         $execution = $functionContext === null ? null : new Execution($client, $functionContext);
+        $context = new Context();
+        $scope?->singleton(Context::class, $context);
+        $global = $this->withJobs(
+            new Delivery(
+                $payload,
+                $reply,
+                $metadata,
+                null,
+                client: $client,
+                authorization: $authorization,
+                authorizationSource: $source,
+                conversation: $conversation,
+                thread: $thread,
+                execution: $execution,
+                context: $context,
+            ),
+        );
         $responses = [];
         $failures = [];
-
+        $failureContexts = [];
+        $globalStage = FailureStage::Middleware;
         try {
-            $globalResult = $this->pipeline->run(
-                $this->globalMiddleware,
-                $this->withJobs(
-                    new Delivery(
-                        $payload,
-                        $reply,
-                        $metadata,
-                        null,
-                        client: $client,
-                        authorization: $authorization,
-                        authorizationSource: $source,
-                        conversation: $conversation,
-                        thread: $thread,
-                        execution: $execution,
-                    ),
-                ),
-                function () use (
-                    $payload,
-                    $reply,
-                    $metadata,
-                    $client,
-                    $authorization,
-                    $source,
-                    $scope,
-                    $conversation,
-                    $thread,
-                    $execution,
-                    &$responses,
-                    &$failures,
-                ): mixed {
-                    foreach ($this->registeredListeners as $listener) {
-                        $matches = Matcher::match($listener, $payload);
-                        if ($matches === null) {
-                            continue;
-                        }
-
-                        try {
-                            $delivery = $this->withJobs(
-                                new Delivery(
-                                    $payload,
-                                    $reply,
-                                    $metadata,
-                                    $listener,
-                                    $matches['matches'],
-                                    $matches['constraintMatches'],
-                                    $client,
-                                    $authorization,
-                                    $source,
-                                    $conversation,
-                                    $thread,
-                                    execution: $execution,
-                                ),
-                            );
-                            if ($scope !== null && $delivery->jobs !== null) {
-                                $scope->singleton(Jobs::class, $delivery->jobs);
-                            }
-                            $result = $this->pipeline->run(
-                                $listener->middleware,
-                                $delivery,
-                                fn(): mixed => $this->invoker->invoke($listener->handler, $delivery, $scope),
-                            );
-
-                            if ($result instanceof Acknowledgement) {
-                                $responses[] = AcknowledgementValidator::forPayload($payload, $result);
-                            }
-                        } catch (Throwable $throwable) {
-                            $failures[] = $throwable;
-                        }
+            $result = new InvocationPipeline()->run($this->globalMiddleware, $global, function () use (
+                $global,
+                $payload,
+                $scope,
+                &$responses,
+                &$failures,
+                &$failureContexts,
+            ): mixed {
+                foreach ($this->registeredListeners as $listener) {
+                    $matches = Matcher::match($listener, $payload);
+                    if ($matches === null) {
+                        continue;
                     }
-
-                    return null;
-                },
-            );
-
-            if ($globalResult instanceof Acknowledgement) {
-                $responses[] = AcknowledgementValidator::forPayload($payload, $globalResult);
+                    $delivery = $global->forListener($listener, $matches['matches'], $matches['constraintMatches']);
+                    $stage = FailureStage::Middleware;
+                    $handlerFailure = null;
+                    try {
+                        if ($scope !== null && $delivery->jobs !== null) {
+                            $scope->singleton(Jobs::class, $delivery->jobs);
+                        }
+                        $result = new InvocationPipeline()->run($listener->middleware, $delivery, function () use (
+                            $listener,
+                            $delivery,
+                            $scope,
+                            &$stage,
+                            &$handlerFailure,
+                        ): mixed {
+                            try {
+                                return $this->invoker->invoke($listener->handler, $delivery, $scope);
+                            } catch (Throwable $error) {
+                                $stage = FailureStage::Listener;
+                                $handlerFailure = $error;
+                                throw $error;
+                            }
+                        });
+                        if ($result instanceof Acknowledgement) {
+                            $stage = FailureStage::Acknowledgement;
+                            $responses[] = AcknowledgementValidator::forPayload($payload, $result);
+                        }
+                    } catch (Throwable $error) {
+                        if ($stage === FailureStage::Listener && $handlerFailure !== $error) {
+                            $stage = FailureStage::Middleware;
+                        }
+                        $failures[] = $error;
+                        $failureContexts[] = new FailureContext(
+                            $error,
+                            $stage,
+                            $delivery,
+                            metadata: $delivery->metadata,
+                            acknowledgementPrepared: $responses !== [],
+                        );
+                    }
+                }
+                return null;
+            });
+            if ($result instanceof Acknowledgement) {
+                $globalStage = FailureStage::Acknowledgement;
+                $responses[] = AcknowledgementValidator::forPayload($payload, $result);
             }
-        } catch (Throwable $throwable) {
-            $failures[] = $throwable;
+        } catch (Throwable $error) {
+            $failedDelivery = $global;
+            if ($error instanceof InvocationFailure) {
+                $failedDelivery = $error->delivery;
+                $globalStage = $error->stage;
+                $error = $error->error;
+            }
+            $failures[] = $error;
+            $failureContexts[] = new FailureContext(
+                $error,
+                $globalStage,
+                $failedDelivery,
+                metadata: $metadata,
+                acknowledgementPrepared: $responses !== [],
+            );
         }
-
-        $this->reportFailures($failures, $payload, $metadata);
-
+        $failureContexts = array_map(
+            static fn(FailureContext $failure): FailureContext => $failure->withAcknowledgementPrepared(
+                $responses !== [],
+            ),
+            $failureContexts,
+        );
+        $this->reportFailures($failures, $payload, $metadata, $failureContexts);
         $expected = AcknowledgementValidator::expected($payload);
         if ($expected === null) {
             return null;
@@ -578,14 +669,27 @@ final class App
         if (!is_string($identity)) {
             throw new InvalidPayload('Slack payload acknowledgement identity must be a string.');
         }
-
-        return match (count($responses)) {
-            0 => throw $payload instanceof SlashCommand
-                ? new MissingCommandResponse($identity)
-                : new MissingAcknowledgement($identity, $responseName),
-            1 => $responses[0],
-            default => throw new DoubleAcknowledgement($identity, $responseName),
-        };
+        if (count($responses) === 1) {
+            return $responses[0];
+        }
+        $error = $responses === []
+            ? (
+                $payload instanceof SlashCommand
+                    ? new MissingCommandResponse($identity)
+                    : new MissingAcknowledgement($identity, $responseName)
+            )
+            : new DoubleAcknowledgement($identity, $responseName);
+        if ($this->failureHandler !== null) {
+            $this->reportFailures([$error], $payload, $metadata, [new FailureContext(
+                $error,
+                FailureStage::Acknowledgement,
+                $global,
+                metadata: $metadata,
+                acknowledgementPrepared: $responses !== [],
+            )]);
+        }
+        // Observing a missing/duplicate acknowledgement never manufactures a valid one.
+        throw $error;
     }
 
     /**
@@ -732,12 +836,38 @@ final class App
      * @param  list<Throwable>  $failures
      * @param  array<array-key, mixed>  $metadata
      */
-    private function reportFailures(array $failures, object $payload, array $metadata): void
+    private function reportFailures(array $failures, object $payload, array $metadata, array $contexts = []): void
     {
         if ($failures === []) {
             return;
         }
 
+        if ($this->failureHandler !== null) {
+            $rethrow = false;
+            foreach ($failures as $index => $failure) {
+                $context = $contexts[$index] ?? new FailureContext(
+                    $failure,
+                    FailureStage::Listener,
+                    metadata: $metadata,
+                );
+                try {
+                    $policy = ($this->failureHandler)($context);
+                    if (!$policy instanceof ErrorHandling) {
+                        throw new \UnexpectedValueException(
+                            'Structured error handlers must return ErrorHandling::Handled or ErrorHandling::Rethrow.',
+                        );
+                    }
+                    $rethrow = $rethrow || $policy === ErrorHandling::Rethrow;
+                } catch (Throwable $handlerFailure) {
+                    throw new HandlerFailures([...$failures, $handlerFailure]);
+                }
+                $rethrow = $rethrow || $failure instanceof \Thunder\Bolt\Jobs\IntakeFailed;
+            }
+            if ($rethrow) {
+                throw count($failures) === 1 ? $failures[0] : new HandlerFailures($failures);
+            }
+            return;
+        }
         $aggregate = new HandlerFailures($failures);
         if ($this->errorHandler === null) {
             throw count($failures) === 1 ? $failures[0] : $aggregate;

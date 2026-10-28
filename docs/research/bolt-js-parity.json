@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "auditedAt": "2026-10-26",
-  "phpRevision": "21192afee5efbbd35f90bbcf3e6b07858f5227b2",
+  "auditedAt": "2026-10-28",
+  "phpRevision": "28 October 2026 implementation, based on 4b03c1b",
   "baseline": {
     "package": "@slack/bolt",
     "version": "5.1.0",
@@ -101,13 +101,20 @@
     {
       "id": "scratch-context",
       "area": "Delivery-local custom middleware context",
-      "status": "missing",
-      "assessment": "Readonly Delivery cannot carry arbitrary middleware enrichment, and next() cannot forward a replacement delivery. Conversation/thread stores persist data and are not a substitute for request-local auth claims, tracing or fetched records. Add a typed delivery-local context capability without persisting live services.",
+      "status": "covered",
+      "assessment": "Context is a delivery-local mutable capability shared across middleware, method/constructor-injected handlers and assistants in GenericContainer scopes. Separate deliveries/tenants/jobs get fresh contexts; the context is non-serializable and print_r/var_dump omit its values. Stock-adapter context factories remain separate.",
       "php": [
+        "src/Context.php",
         "src/Invocation/Delivery.php",
-        "src/Invocation/InvocationPipeline.php"
+        "src/Invocation/HandlerInvoker.php",
+        "src/App.php",
+        "src/Jobs/Worker.php"
       ],
-      "tests": [],
+      "tests": [
+        "tests/Runtime/ContextAndIdentityTest.php",
+        "tests/Assistant/RuntimeTest.php",
+        "tests/Jobs/JobRequestContextTest.php"
+      ],
       "upstream": [
         "src/types/middleware.ts",
         "src/App.ts"
@@ -185,16 +192,19 @@
     {
       "id": "static-identity",
       "area": "Static-token verification and self identity",
-      "status": "partial",
-      "assessment": "ignoreSelf works with supplied bot identities, including bot_id from an authorizer. A token-only App performs no startup auth.test identity hydration; BoltConfig lacks botId and botUserId is optional. Token-only defaults can therefore process their own messages. Add explicit verification/identity hydration without putting network calls in help or discovery.",
+      "status": "adapted",
+      "assessment": "App.verifyToken explicitly verifies and caches identity per App, hydrates both bot identifiers and checks verified tenant identity. auth:verify reports identity; socket:serve --verify-token hydrates the worker before connecting. SLACK_BOT_USER_ID/SLACK_BOT_ID support network-free HTTP. Help/discovery and ordinary dispatch do not perform hidden lookups; the CLI does not warm another process.",
       "php": [
         "src/App.php",
         "src/BoltConfig.php",
-        "src/Integration/AppInitializer.php"
+        "src/Integration/AppInitializer.php",
+        "src/Authorization/TokenIdentity.php",
+        "src/Console/AuthCommands.php"
       ],
       "tests": [
         "tests/Runtime/ConversationDispatchTest.php",
-        "tests/Runtime/AuthorizationDispatchTest.php"
+        "tests/Runtime/AuthorizationDispatchTest.php",
+        "tests/Runtime/ContextAndIdentityTest.php"
       ],
       "upstream": [
         "src/App.ts",
@@ -393,18 +403,22 @@
     {
       "id": "errors",
       "area": "Application/receiver error context and policy",
-      "status": "partial",
-      "assessment": "App.error receives HandlerFailures, parsed payload and metadata; independent failures are retained. It does not receive the selected listener, full delivery/authorization context or ack state. Receiver-stage exceptions map to fixed statuses/logging without configurable processing/unhandled hooks. Add structured PHP failure context and policy, not Node response callbacks.",
+      "status": "adapted",
+      "assessment": "App.onError receives original errors with listener/source/stage and buffered acknowledgement context; explicit Handled/Rethrow policy preserves originals, aggregates failures and cannot suppress failed authorization, durable intake or missing/duplicate acknowledgements. Legacy App.error remains. The HTTP receiver accepts non-success processing error responses; verification/rejection statuses and host route policy remain host-owned, with no early-ack/unhandled timer.",
       "php": [
         "src/App.php",
         "src/Exceptions/HandlerFailures.php",
         "src/Http/Receiver.php",
-        "src/SocketMode/Runner.php"
+        "src/SocketMode/Runner.php",
+        "src/Errors/FailureContext.php",
+        "src/Errors/ErrorHandling.php"
       ],
       "tests": [
         "tests/Runtime/AppTest.php",
         "tests/Http/InteractivityTest.php",
-        "tests/SocketMode/RunnerTest.php"
+        "tests/SocketMode/RunnerTest.php",
+        "tests/Runtime/FailureContextTest.php",
+        "tests/Http/ReceiverFailurePolicyTest.php"
       ],
       "upstream": [
         "src/errors.ts",
@@ -722,9 +736,9 @@
       "assessment": "BoltConfig token and Socket Mode Config appToken."
     },
     "botId": {
-      "status": "partial",
+      "status": "covered",
       "feature": "static-identity",
-      "assessment": "Authorization can carry botId; static BoltConfig cannot."
+      "assessment": "Static BoltConfig.botId, SLACK_BOT_ID and explicit verification hydration."
     },
     "botUserId": {
       "status": "covered",
@@ -752,9 +766,9 @@
       "assessment": "Logger/host configuration."
     },
     "ignoreSelf": {
-      "status": "partial",
+      "status": "adapted",
       "feature": "static-identity",
-      "assessment": "Filtering exists but depends on explicitly supplied identity."
+      "assessment": "Filters supplied or explicitly verified bot identity; no hidden boot/network lookup."
     },
     "clientOptions": {
       "status": "adapted",
@@ -772,9 +786,9 @@
       "assessment": "No need for the Node convenience preset."
     },
     "tokenVerificationEnabled": {
-      "status": "missing",
+      "status": "adapted",
       "feature": "static-identity",
-      "assessment": "No explicit startup token verifier/hydrator."
+      "assessment": "Explicit App.verifyToken, auth:verify and socket:serve --verify-token replace eager initialization."
     },
     "deferInitialization": {
       "status": "adapted",
@@ -782,9 +796,9 @@
       "assessment": "No equivalent async startup lifecycle to defer. Help/discovery need no token verification."
     },
     "extendedErrorHandler": {
-      "status": "partial",
+      "status": "adapted",
       "feature": "errors",
-      "assessment": "Parsed payload/metadata exist; complete delivery/listener/ack context does not."
+      "assessment": "Typed App.onError(FailureContext):ErrorHandling plus safe HTTP processing-error response hook; legacy error callback retained."
     },
     "attachFunctionToken": {
       "status": "partial",
@@ -829,9 +843,9 @@
       "assessment": "Configure the PSR-18 transport and explicit retry policy."
     },
     "use": {
-      "status": "partial",
+      "status": "covered",
       "feature": "scratch-context",
-      "assessment": "Pipeline exists, but arbitrary delivery-local context enrichment does not."
+      "assessment": "Ordered pipeline with shared delivery-local Context."
     },
     "assistant": {
       "status": "covered",
@@ -879,9 +893,9 @@
       "assessment": "Typed/fluent registration with constraints."
     },
     "error": {
-      "status": "partial",
+      "status": "adapted",
       "feature": "errors",
-      "assessment": "Aggregate errors and metadata exist; extended/receiver failure context is incomplete."
+      "assessment": "Legacy error callback remains; onError supplies typed delivery/stage/listener/ack context with explicit policy."
     },
     "processEvent": {
       "status": "adapted",

@@ -34,10 +34,20 @@ final readonly class Delivery
         public ?\Thunder\Bolt\Assistant\Thread $assistant = null,
         public ?\Thunder\Bolt\Functions\Execution $execution = null,
         public ?\Thunder\Bolt\Jobs $jobs = null,
+        public \Thunder\Bolt\Context $context = new \Thunder\Bolt\Context(),
     ) {}
 
     public function withJobs(\Thunder\Bolt\Jobs $jobs): self
     {
         return clone($this, ['jobs' => $jobs]);
+    }
+
+    public function forListener(ListenerDescriptor $listener, array $matches, array $constraintMatches): self
+    {
+        return clone($this, [
+            'listener' => $listener,
+            'matches' => $matches,
+            'constraintMatches' => $constraintMatches,
+        ]);
     }
 }

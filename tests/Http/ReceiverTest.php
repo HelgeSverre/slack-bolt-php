@@ -136,7 +136,7 @@ final class ReceiverTest extends TestCase
             'X-Slack-Retry-Reason' => 'http_timeout',
         ]);
         self::assertSame(200, $response->status);
-        self::assertSame(['retryNum' => 2, 'retryReason' => 'http_timeout'], $metadata);
+        self::assertSame(['transport' => 'http', 'retryNum' => 2, 'retryReason' => 'http_timeout'], $metadata);
     }
 
     /** @return array{App, Receiver, RecordingHttpClient} */

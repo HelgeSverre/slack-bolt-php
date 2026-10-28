@@ -23,6 +23,7 @@ final readonly class BoltConfig
         public string $conversationStoreDriver = 'file',
         public ?string $conversationStorePath = null,
         public ?SocketModeConfig $socketMode = null,
+        public ?string $botId = null,
     ) {
         if ($maxBodyBytes < 1 || $maxTimestampSkewSeconds < 0) {
             throw new \InvalidArgumentException(

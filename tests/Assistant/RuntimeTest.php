@@ -26,6 +26,34 @@ use Thunder\Bolt\WebApi\Client;
 
 final class RuntimeTest extends TestCase
 {
+    public function test_assistant_preserves_delivery_context_and_reports_its_listener_identity(): void
+    {
+        $seen = null;
+        $app = $this
+            ->app()
+            ->use(static function (\Thunder\Bolt\Invocation\Delivery $delivery, \Closure $next): mixed {
+                $delivery->context->set('request-value', 'local');
+                return $next();
+            })
+            ->assistant(Assistant::make()
+                ->threadStarted(static fn() => null)
+                ->userMessage(static function (\Thunder\Bolt\Context $context): never {
+                    self::assertSame('local', $context->require('request-value'));
+                    throw new \RuntimeException('assistant fixture');
+                }))
+            ->onError(static function (\Thunder\Bolt\Errors\FailureContext $failure) use (
+                &$seen,
+            ): \Thunder\Bolt\Errors\ErrorHandling {
+                $seen = $failure;
+                return \Thunder\Bolt\Errors\ErrorHandling::Handled;
+            });
+        $app->dispatch($this->userMessage());
+        self::assertSame(\Thunder\Bolt\Errors\FailureStage::Listener, $seen->stage);
+        self::assertSame('Assistant configuration', $seen->delivery->listener->source);
+        self::assertNotNull($seen->delivery->assistant);
+        self::assertSame('assistant fixture', $seen->error->getMessage());
+    }
+
     public function test_lifecycle_delivery_injects_a_rooted_thread_and_routes_helpers_through_the_selected_installation(): void
     {
         $http = new RecordingHttpClient();

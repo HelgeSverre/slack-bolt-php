@@ -4,7 +4,7 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 
 Thunder Bolt is built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style. The `Thunder\Bolt` namespace and package name are provisional.
 
-**v0.1.0 experimental preview.** HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet. [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md). The package is not yet registered on Packagist.
+**Experimental preview.** The latest tag is `v0.1.0`; this README follows `main`, including newer context, identity and error APIs. HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet. [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md). The package is not yet registered on Packagist.
 
 The [Bolt JS parity audit](docs/research/bolt-js-parity-audit.md) distinguishes implemented capabilities, PHP adaptations, useful gaps and Node-specific exclusions. Endpoint/model counts do not establish full framework parity.
 
@@ -32,7 +32,7 @@ Put the class in your application's `app/` directory. Tempest discovers the hand
 You need PHP 8.5+ and Composer 2. Node is only required when maintaining the reference generators.
 
 ```sh
-git clone --branch v0.1.0 https://github.com/HelgeSverre/slack-bolt-php.git
+git clone --branch main https://github.com/HelgeSverre/slack-bolt-php.git
 cd slack-bolt-php
 composer install
 
@@ -44,6 +44,8 @@ php bolt serve
 ```
 
 Set `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` in `.env`. Configure your Slack app's Events API and interactivity request URL as a publicly reachable HTTPS `/slack/events` endpoint, install the app with the scopes in the generated manifest, and invite it to a channel. Use an HTTPS tunnel for local HTTP development.
+
+Run `php bolt auth:verify` to check a static token and print its identity. For HTTP apps, put the returned `user_id` and `bot_id` in `SLACK_BOT_USER_ID` and `SLACK_BOT_ID` so self-message filtering needs no request-time lookup. For Socket Mode, `php bolt socket:serve --verify-token` verifies and caches identity in the worker. Verification is explicit; help and discovery stay network-free.
 
 Until the package is published, generated apps use a local Composer path repository pointing at this checkout. Keep the checkout available. `serve` starts a development server; production serves `public/index.php` through your PHP host.
 
@@ -88,6 +90,12 @@ $modal = Modal::make('Approve deployment',
 ```
 
 Dedicated builders cover the pinned Block Kit families, including selectors, rich text, tables, cards, and workflow controls. Raw extension points support newer Slack payloads. Message builders also support metadata, legacy attachments, unfurls, and threading.
+
+## Delivery context and errors
+
+Middleware can attach ephemeral values through `Delivery::context`; handlers inject `Thunder\Bolt\Context` and read them with `get()` or `require()`. Context is shared within one delivery and isolated from subsequent deliveries and job attempts. Use conversation/thread stores for persistent state and named job DTOs for durable work.
+
+For structured errors, register `$app->onError(function (FailureContext $failure): ErrorHandling { ... })` using types from `Thunder\Bolt\Errors`. The context exposes the original error, listener, processing stage, available delivery and buffered response state. Return `ErrorHandling::Handled` or `ErrorHandling::Rethrow`; log `$failure->summary()` for metadata without payloads or credentials. The existing `error()` callback remains supported. [Interface details and examples](docs/research/delivery-context-identity-errors.md).
 
 ## Return acknowledgements explicitly
 

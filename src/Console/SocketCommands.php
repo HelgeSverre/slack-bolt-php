@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thunder\Bolt\Console;
 
 use Tempest\Console\Console;
+use Tempest\Console\ConsoleArgument;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Console\ExitCode;
 use Thunder\Bolt\App;
@@ -20,8 +21,13 @@ final readonly class SocketCommands
     ) {}
 
     #[ConsoleCommand(name: 'socket:serve', description: 'Run the Slack Socket Mode worker')]
-    public function serve(): ExitCode
-    {
+    public function serve(
+        #[ConsoleArgument(
+            name: 'verify-token',
+            description: 'Verify and hydrate static-token identity before connecting',
+        )]
+        bool $verifyToken = false,
+    ): ExitCode {
         // Resolving App first runs the application composition root. This binds
         // the Web API client and Socket Mode configuration without making help
         // or other console commands require an app-level token.
@@ -41,6 +47,16 @@ final readonly class SocketCommands
             return ExitCode::INVALID;
         }
 
+        if ($verifyToken) {
+            try {
+                $app->verifyToken();
+            } catch (\Throwable) {
+                $this->error(
+                    'Static token verification failed. Check the token and configured identity before connecting.',
+                );
+                return ExitCode::ERROR;
+            }
+        }
         return $this->run(\Tempest\Container\get(Runner::class));
     }
 

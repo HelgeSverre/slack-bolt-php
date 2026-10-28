@@ -9,6 +9,9 @@ use Thunder\Bolt\SocketMode\Config as SocketModeConfig;
 
 final readonly class BoltConfig
 {
+    /** @var null|\Closure(\Thunder\Bolt\Http\ContextInput): void */
+    public ?\Closure $httpContextFactory;
+
     public function __construct(
         #[\SensitiveParameter]
         public string $token = '',
@@ -25,7 +28,9 @@ final readonly class BoltConfig
         public ?SocketModeConfig $socketMode = null,
         public ?string $botId = null,
         public bool $attachFunctionToken = true,
+        ?callable $httpContextFactory = null,
     ) {
+        $this->httpContextFactory = $httpContextFactory === null ? null : \Closure::fromCallable($httpContextFactory);
         if ($maxBodyBytes < 1 || $maxTimestampSkewSeconds < 0) {
             throw new \InvalidArgumentException(
                 'Body limit must be positive and timestamp tolerance must not be negative.',

@@ -13,6 +13,7 @@ use Thunder\Bolt\Errors\FailureContext;
 use Thunder\Bolt\Errors\FailureStage;
 use Thunder\Bolt\Exceptions\HandlerFailures;
 use Thunder\Bolt\Exceptions\InvalidPayload;
+use Thunder\Bolt\Invocation\Delivery;
 use Thunder\Bolt\Invocation\Interaction;
 
 final readonly class Receiver
@@ -88,7 +89,14 @@ final readonly class Receiver
                     'Configure a Slack bot token or installation authorizer before dispatching Slack deliveries.',
                 );
             }
-            $ack = $this->app->dispatch($body, $metadata);
+            $factory = $this->config->httpContextFactory;
+            $ack = $this->app->dispatch(
+                $body,
+                $metadata,
+                $factory === null
+                    ? null
+                    : fn(Delivery $delivery) => $factory(new ContextInput($delivery, $headers, $rawBody, $contentType)),
+            );
         } catch (InvalidPayload $exception) {
             return new Response(400, 'Malformed Slack delivery payload.');
         } catch (\Throwable $exception) {

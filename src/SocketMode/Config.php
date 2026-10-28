@@ -13,6 +13,9 @@ namespace Thunder\Bolt\SocketMode;
  */
 final readonly class Config
 {
+    /** @var null|\Closure(ContextInput): void */
+    public ?\Closure $contextFactory;
+
     public function __construct(
         #[\SensitiveParameter]
         public string $appToken = '',
@@ -21,7 +24,9 @@ final readonly class Config
         public int $initialBackoffMilliseconds = 500,
         public int $maxBackoffMilliseconds = 30_000,
         public int $maxMessageBytes = 1_048_576,
+        ?callable $contextFactory = null,
     ) {
+        $this->contextFactory = $contextFactory === null ? null : \Closure::fromCallable($contextFactory);
         if (
             $this->appToken !== ''
             && (!preg_match('/^(?:xapp-|xoxe\.xapp-)/', $this->appToken) || preg_match('/\s/', $this->appToken) === 1)

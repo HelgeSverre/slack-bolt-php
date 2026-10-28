@@ -10,6 +10,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
 use Thunder\Bolt\App;
+use Thunder\Bolt\Invocation\Delivery;
 use Thunder\Bolt\SocketMode\Transport\Connection;
 use Thunder\Bolt\SocketMode\Transport\ConnectionClosed;
 use Thunder\Bolt\SocketMode\Transport\Connector;
@@ -233,7 +234,12 @@ final class Runner
 
         $startedAt = $this->now();
         try {
-            $acknowledgement = $this->app->dispatch($payload, $metadata);
+            $factory = $this->config->contextFactory;
+            $acknowledgement = $this->app->dispatch(
+                $payload,
+                $metadata,
+                $factory === null ? null : fn(Delivery $delivery) => $factory(new ContextInput($delivery, $message)),
+            );
         } catch (Throwable $exception) {
             // A failed handler is not a successful acknowledgement. Continue with
             // the next frame; Slack may choose to redeliver this envelope.

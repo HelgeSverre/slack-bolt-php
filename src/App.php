@@ -498,8 +498,9 @@ final class App
      *
      * @param  array<array-key, mixed>  $body
      * @param  array<array-key, mixed>  $metadata
+     * @param null|callable(Delivery): void $enrichContext Runs after authorization, before middleware.
      */
-    public function dispatch(array $body, array $metadata = []): ?Acknowledgement
+    public function dispatch(array $body, array $metadata = [], ?callable $enrichContext = null): ?Acknowledgement
     {
         if (is_string($body['event_id'] ?? null) && $body['event_id'] !== '') {
             $metadata['eventId'] = $body['event_id'];
@@ -578,6 +579,19 @@ final class App
                 context: $context,
             ),
         );
+        if ($enrichContext !== null) {
+            try {
+                $enrichContext($global);
+            } catch (Throwable $error) {
+                $this->reportFailures([$error], $payload, $metadata, [new FailureContext(
+                    $error,
+                    FailureStage::Context,
+                    delivery: $global,
+                    metadata: $metadata,
+                )]);
+                throw $error;
+            }
+        }
         $responses = [];
         $failures = [];
         $failureContexts = [];

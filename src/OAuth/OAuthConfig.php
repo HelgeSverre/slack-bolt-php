@@ -44,7 +44,8 @@ final readonly class OAuthConfig
         self::validateScopes($userScopes);
     }
 
-    private static function validateScopes(array $scopes): void
+    /** @internal */
+    public static function validateScopes(array $scopes): void
     {
         if (!array_is_list($scopes)) {
             throw new \InvalidArgumentException('OAuth scopes must be lists.');

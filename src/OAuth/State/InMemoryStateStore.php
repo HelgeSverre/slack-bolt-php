@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Thunder\Bolt\OAuth\State;
 
-final class InMemoryStateStore implements StateStore
+use Thunder\Bolt\OAuth\InstallRequest;
+
+final class InMemoryStateStore implements RequestStateStore
 {
-    /** @var array<string, array{cookieHash: string, expiresAt: int}> */
+    /** @var array<string, array{cookieHash: string, expiresAt: int, request: InstallRequest}> */
     private array $states = [];
 
     public function put(State $state): void
@@ -19,10 +21,16 @@ final class InMemoryStateStore implements StateStore
         $this->states[$key] = [
             'cookieHash' => hash('sha256', $state->cookieBinding),
             'expiresAt' => $state->expiresAt,
+            'request' => $state->request,
         ];
     }
 
     public function consume(string $value, string $cookieBinding, int $now): bool
+    {
+        return $this->consumeRequest($value, $cookieBinding, $now) !== null;
+    }
+
+    public function consumeRequest(string $value, string $cookieBinding, int $now): ?InstallRequest
     {
         $key = $this->key($value);
         $state = $this->states[$key] ?? null;
@@ -30,7 +38,9 @@ final class InMemoryStateStore implements StateStore
 
         return $state !== null
         && $state['expiresAt'] > $now
-        && hash_equals($state['cookieHash'], hash('sha256', $cookieBinding));
+        && hash_equals($state['cookieHash'], hash('sha256', $cookieBinding))
+            ? $state['request']
+            : null;
     }
 
     private function key(string $value): string

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thunder\Bolt\OAuth;
 
 use Psr\Clock\ClockInterface;
+use Thunder\Bolt\OAuth\State\RequestStateStore;
 use Thunder\Bolt\OAuth\State\State;
 use Thunder\Bolt\OAuth\State\StateStore;
 use Thunder\Bolt\WebApi\Client;
@@ -21,23 +22,37 @@ final readonly class Installer
         private ClockInterface $clock,
     ) {}
 
-    public function begin(): InstallRedirect
+    public function begin(?InstallRequest $request = null): InstallRedirect
     {
+        $request ??= InstallRequest::make();
+        if (!$this->states instanceof RequestStateStore && $request != InstallRequest::make()) {
+            throw new \LogicException('Per-install options require a RequestStateStore adapter.');
+        }
+        $request = new InstallRequest(
+            $request->scopes ?? $this->config->scopes,
+            $request->userScopes ?? $this->config->userScopes,
+            $request->team,
+            $request->metadata,
+        );
         $state = new State(
             value: $this->randomValue(),
             cookieBinding: $this->randomValue(),
             expiresAt: $this->now() + $this->config->stateTtlSeconds,
+            request: $request,
         );
         $this->states->put($state);
 
         $query = [
             'client_id' => $this->config->clientId,
             'redirect_uri' => $this->config->redirectUri,
-            'scope' => implode(',', $this->config->scopes),
+            'scope' => implode(',', $request->scopes ?? []),
             'state' => $state->value,
         ];
-        if ($this->config->userScopes !== []) {
-            $query['user_scope'] = implode(',', $this->config->userScopes);
+        if ($request->userScopes !== []) {
+            $query['user_scope'] = implode(',', $request->userScopes ?? []);
+        }
+        if ($request->team !== null) {
+            $query['team'] = $request->team;
         }
 
         return new InstallRedirect(
@@ -46,30 +61,35 @@ final readonly class Installer
             cookieValue: $state->cookieBinding,
             expiresAt: $state->expiresAt,
             maxAge: $this->config->stateTtlSeconds,
+            cookieName: self::cookieName($state->value),
         );
     }
 
     public function complete(?string $state, ?string $cookieBinding, ?string $code, ?string $error): InstallResult
     {
-        // Slack's normal cancellation callback has no useful authorization code
-        // or state to exchange. It is safe to end it immediately: no token is
-        // requested, no installation is persisted, and the controller clears
-        // the browser cookie.
-        if ($error === 'access_denied') {
+        // An unbound cancellation remains a safe display-only outcome. It must
+        // never expose metadata or represent a validated installation request.
+        if ($error === 'access_denied' && $state === null) {
             return InstallResult::denied();
         }
-        if (
-            $state === null
-            || !$this->isStateValue($state)
-            || !$this->states->consume($state, $cookieBinding ?? '', $this->now())
-        ) {
+        if ($state === null || !$this->isStateValue($state)) {
+            return InstallResult::invalidState();
+        }
+        $request = $this->states instanceof RequestStateStore
+            ? $this->states->consumeRequest($state, $cookieBinding ?? '', $this->now())
+            : (
+                $this->states->consume($state, $cookieBinding ?? '', $this->now())
+                    ? new InstallRequest($this->config->scopes, $this->config->userScopes)
+                    : null
+            );
+        if ($request === null) {
             return InstallResult::invalidState();
         }
         if ($error !== null) {
-            return InstallResult::denied();
+            return InstallResult::denied($request);
         }
         if (!is_string($code) || $code === '') {
-            return InstallResult::missingCode();
+            return InstallResult::missingCode($request);
         }
 
         $response = $this->client
@@ -94,7 +114,14 @@ final readonly class Installer
         $installation = Installation::fromOAuthResponse($oauthResponse, $this->now());
         $this->installations->save($installation);
 
-        return InstallResult::installed($installation);
+        return InstallResult::installed($installation, $request);
+    }
+
+    public static function cookieName(?string $state): string
+    {
+        return is_string($state) && preg_match('/\A[A-Za-z0-9_-]{43}\z/', $state) === 1
+            ? self::STATE_COOKIE . '-' . hash('sha256', $state)
+            : self::STATE_COOKIE;
     }
 
     private function now(): int

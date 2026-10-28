@@ -52,12 +52,83 @@ final class OAuthControllerTest extends TestCase
         $callback = new GenericRequest(
             Method::GET,
             'https://example.test/slack/oauth_redirect?state=' . rawurlencode($query['state']) . '&code=code',
-            headers: ['Cookie' => Installer::STATE_COOKIE . '=' . $cookie->value],
+            headers: ['Cookie' => $cookie->key . '=' . $cookie->value],
         );
         $response = $controller->callback($callback);
 
         self::assertSame(200, $response->status->value);
         self::assertSame('Thunder Bolt was installed.', $response->body);
+        self::assertStringContainsString('Max-Age=0', $response->headers['Set-Cookie']->values[0]);
+        self::assertStringStartsWith($cookie->key . '=', $response->headers['Set-Cookie']->values[0]);
+    }
+
+    public function test_two_browser_tabs_complete_independently_and_duplicate_cookies_are_rejected(): void
+    {
+        $container = new GenericContainer();
+        $config = new OAuthConfig('123', 'secret', 'https://example.test/slack/oauth_redirect');
+        $transport = new RecordingHttpClient();
+        $container->singleton(
+            Installer::class,
+            new Installer(
+                $config,
+                new Client($transport, ''),
+                new MemoryInstallationStore(),
+                new InMemoryStateStore(),
+                new OAuthControllerTestClock(),
+            ),
+        );
+        $controller = new OAuthController(new BoltConfig(oauth: $config), $container);
+        $tabs = [];
+        foreach ([1, 2, 3] as $_) {
+            $response = $controller->install();
+            parse_str((string) parse_url($response->headers['Location']->values[0], PHP_URL_QUERY), $query);
+            $tabs[] = [$query['state'], Cookie::createFromString($response->headers['Set-Cookie']->values[0])];
+        }
+        self::assertNotSame($tabs[0][1]->key, $tabs[1][1]->key);
+        $cookies = implode('; ', array_map(
+            static fn(array $tab): string => $tab[1]->key . '=' . $tab[1]->value,
+            $tabs,
+        ));
+        foreach (array_slice($tabs, 0, 2) as [$state, $cookie]) {
+            $result = $controller->callback(new GenericRequest(
+                Method::GET,
+                'https://example.test/slack/oauth_redirect?error=access_denied&state=' . $state,
+                headers: ['Cookie' => $cookies],
+            ));
+            self::assertSame('Slack authorization was denied.', $result->body);
+            self::assertStringStartsWith($cookie->key . '=', $result->headers['Set-Cookie']->values[0]);
+        }
+        [$state, $cookie] = $tabs[2];
+        $ambiguous = $controller->callback(new GenericRequest(
+            Method::GET,
+            'https://example.test/slack/oauth_redirect?error=access_denied&state=' . $state,
+            headers: ['Cookie' => $cookies . '; ' . $cookie->key . '=' . $cookie->value],
+        ));
+        self::assertSame('OAuth state could not be verified.', $ambiguous->body);
+        self::assertCount(0, $transport->requests);
+    }
+
+    public function test_a_pending_legacy_flow_clears_the_fixed_cookie_it_used(): void
+    {
+        $container = new GenericContainer();
+        $config = new OAuthConfig('123', 'secret', 'https://example.test/slack/oauth_redirect');
+        $installer = new Installer(
+            $config,
+            new Client(new RecordingHttpClient(), ''),
+            new MemoryInstallationStore(),
+            new InMemoryStateStore(),
+            new OAuthControllerTestClock(),
+        );
+        $container->singleton(Installer::class, $installer);
+        $redirect = $installer->begin();
+        parse_str((string) parse_url($redirect->authorizationUrl, PHP_URL_QUERY), $query);
+        $response = new OAuthController(new BoltConfig(oauth: $config), $container)->callback(new GenericRequest(
+            Method::GET,
+            'https://example.test/slack/oauth_redirect?error=access_denied&state=' . $query['state'],
+            headers: ['Cookie' => Installer::STATE_COOKIE . '=' . $redirect->cookieValue],
+        ));
+        self::assertSame('Slack authorization was denied.', $response->body);
+        self::assertStringStartsWith(Installer::STATE_COOKIE . '=', $response->headers['Set-Cookie']->values[0]);
         self::assertStringContainsString('Max-Age=0', $response->headers['Set-Cookie']->values[0]);
     }
 

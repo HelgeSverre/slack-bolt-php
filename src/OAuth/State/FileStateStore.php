@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Thunder\Bolt\OAuth\State;
 
 use RuntimeException;
+use Thunder\Bolt\OAuth\InstallRequest;
 
 /**
  * A file-backed state store for ordinary PHP worker deployments. Every
  * consumption holds one directory lock while it reads and deletes the record,
  * making successful state use one-time across workers sharing this directory.
  */
-final readonly class FileStateStore implements StateStore
+final readonly class FileStateStore implements RequestStateStore
 {
     public function __construct(
         private string $directory,
@@ -35,6 +36,7 @@ final readonly class FileStateStore implements StateStore
             $record = json_encode([
                 'cookie_hash' => hash('sha256', $state->cookieBinding),
                 'expires_at' => $state->expiresAt,
+                'request' => $state->request->toArray(),
             ], JSON_THROW_ON_ERROR);
             if (file_put_contents($path, $record, LOCK_EX) === false) {
                 throw new RuntimeException('Unable to persist OAuth state.');
@@ -47,13 +49,18 @@ final readonly class FileStateStore implements StateStore
 
     public function consume(string $value, string $cookieBinding, int $now): bool
     {
+        return $this->consumeRequest($value, $cookieBinding, $now) !== null;
+    }
+
+    public function consumeRequest(string $value, string $cookieBinding, int $now): ?InstallRequest
+    {
         $this->ensureDirectory();
         $lock = $this->lock();
 
         try {
             $path = $this->path($value);
             if (!is_file($path)) {
-                return false;
+                return null;
             }
 
             $encoded = file_get_contents($path);
@@ -64,7 +71,7 @@ final readonly class FileStateStore implements StateStore
             try {
                 $record = json_decode($encoded, true, flags: JSON_THROW_ON_ERROR);
             } catch (\JsonException) {
-                return false;
+                return null;
             }
 
             if (
@@ -72,10 +79,18 @@ final readonly class FileStateStore implements StateStore
                 || !is_string($record['cookie_hash'] ?? null)
                 || !is_int($record['expires_at'] ?? null)
             ) {
-                return false;
+                return null;
             }
 
-            return $record['expires_at'] > $now && hash_equals($record['cookie_hash'], hash('sha256', $cookieBinding));
+            if ($record['expires_at'] <= $now || !hash_equals($record['cookie_hash'], hash('sha256', $cookieBinding))) {
+                return null;
+            }
+            try {
+                $request = $record['request'] ?? [];
+                return is_array($request) ? InstallRequest::fromArray($request) : null;
+            } catch (\InvalidArgumentException|\JsonException) {
+                return null;
+            }
         } finally {
             $this->unlock($lock);
         }

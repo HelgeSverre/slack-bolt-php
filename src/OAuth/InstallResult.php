@@ -9,16 +9,17 @@ final readonly class InstallResult
     private function __construct(
         public InstallStatus $status,
         public ?Installation $installation = null,
+        public ?InstallRequest $request = null,
     ) {}
 
-    public static function installed(Installation $installation): self
+    public static function installed(Installation $installation, ?InstallRequest $request = null): self
     {
-        return new self(InstallStatus::Installed, $installation);
+        return new self(InstallStatus::Installed, $installation, $request);
     }
 
-    public static function denied(): self
+    public static function denied(?InstallRequest $request = null): self
     {
-        return new self(InstallStatus::Denied);
+        return new self(InstallStatus::Denied, request: $request);
     }
 
     public static function invalidState(): self
@@ -26,8 +27,8 @@ final readonly class InstallResult
         return new self(InstallStatus::InvalidState);
     }
 
-    public static function missingCode(): self
+    public static function missingCode(?InstallRequest $request = null): self
     {
-        return new self(InstallStatus::MissingCode);
+        return new self(InstallStatus::MissingCode, request: $request);
     }
 }

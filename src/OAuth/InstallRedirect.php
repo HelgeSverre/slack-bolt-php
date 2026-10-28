@@ -12,6 +12,7 @@ final readonly class InstallRedirect
         public string $cookieValue,
         public int $expiresAt,
         public int $maxAge,
+        public string $cookieName = Installer::STATE_COOKIE,
     ) {}
 
     public function __debugInfo(): array

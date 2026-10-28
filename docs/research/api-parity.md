@@ -6,12 +6,12 @@ The source-backed [26 October 2026 Bolt JS parity audit](bolt-js-parity-audit.md
 
 | Area | Assessment |
 | --- | --- |
-| Listener families, interactivity and matching | Implemented with behavioral evidence, including regex captures and legacy interaction classification. Reusable subtype/direct-mention filters are missing. |
+| Listener families, interactivity and matching | Implemented with behavioral evidence, including regex captures, legacy interaction classification and composable subtype/direct-mention filters. |
 | Middleware and delivery context | Ordered pipelines and shared request-local Context work. Stock-adapter context factories remain a gap. Persistent conversation state is a different concern. |
 | Authorization and OAuth | Scoped clients, basic OAuth v2, state, stores and rotation work. Static identity verification is explicit and cached per App; advanced installer controls remain narrower than Bolt. |
-| HTTP and Socket Mode | Verified ingress, acknowledgements and Socket Mode lifecycle work. Inline returned responses plus named jobs intentionally replace early-ack continuation. Receiver/error hooks and SSL probes are not fully equivalent. |
+| HTTP and Socket Mode | Verified ingress, acknowledgements, sanitized SSL probes and Socket Mode lifecycle work. Inline returned responses plus named jobs intentionally replace early-ack continuation. Host routing and asynchronous timeout behavior remain PHP adaptations. |
 | Error handling | Structured listener/delivery/stage/acknowledgement context, explicit handling policy and safe HTTP processing-error responses are implemented. Host route policy and verification rejection statuses remain separate; no asynchronous unhandled timer exists. |
-| Assistant and custom functions | Lifecycle/context/streaming and typed function inputs/complete/fail are implemented. Workflow-token opt-out is missing; paid-plan live validation remains limited. |
+| Assistant and custom functions | Lifecycle/context/streaming, typed function inputs/complete/fail and configurable workflow-token attachment are implemented; paid-plan live validation remains limited. |
 | Web API and Block Kit | 273 typed request/response pairs, generated resources, uploads, pagination/retries and reviewed transport policy exist. This is separate from inbound Bolt parity. Some nested/polymorphic model fields remain raw. |
 | Conversation/thread state | Implemented through memory/file/SQLite adapters with stronger tenant/thread scoping than the baseline. |
 | Durable jobs, modern agent sessions and Work Objects | Implemented PHP product capabilities; they do not count toward unrelated upstream gaps. |

@@ -22,6 +22,30 @@ use Thunder\Bolt\WebApi\Client;
 
 final class SocketCommandsTest extends TestCase
 {
+    public function test_function_token_opt_out_requires_installation_credentials_before_connecting(): void
+    {
+        $previous = GenericContainer::instance();
+        $container = new GenericContainer();
+        $config = new BoltConfig(attachFunctionToken: false);
+        $http = new RecordingHttpClient();
+        $app = new App($container, new Client($http, ''), $config);
+        $app->function('fixture', static fn() => null);
+        $container->singleton(App::class, $app);
+        $container->singleton(BoltConfig::class, $config);
+        $container->singleton(Config::class, new Config(appToken: 'xapp-fixture'));
+        // Resolving Runner would be a regression: preflight must return first.
+        $container->register(Runner::class, static function (): never {
+            self::fail('Unusable worker must not start.');
+        });
+        GenericContainer::setInstance($container);
+        try {
+            self::assertSame(ExitCode::INVALID, new SocketCommands($this->createStub(Console::class))->serve());
+            self::assertSame([], $http->requests);
+        } finally {
+            GenericContainer::setInstance($previous);
+        }
+    }
+
     public function test_sigterm_stops_the_worker_and_restores_the_previous_signal_configuration(): void
     {
         if (

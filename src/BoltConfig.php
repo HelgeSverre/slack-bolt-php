@@ -24,6 +24,7 @@ final readonly class BoltConfig
         public ?string $conversationStorePath = null,
         public ?SocketModeConfig $socketMode = null,
         public ?string $botId = null,
+        public bool $attachFunctionToken = true,
     ) {
         if ($maxBodyBytes < 1 || $maxTimestampSkewSeconds < 0) {
             throw new \InvalidArgumentException(

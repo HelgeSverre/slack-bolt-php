@@ -27,6 +27,8 @@ final readonly class GreetMention
 
 Put the class in your application's `app/` directory. Tempest discovers the handler and injects its dependencies. Payloads expose native properties such as `userId` and `channelId`, while `raw` preserves Slack's original data.
 
+Message middleware composes through `MessageFilter::subtype('file_share')` and `MessageFilter::directMention()` from `Thunder\Bolt\Middleware`. For example, `$app->message('', MessageFilter::directMention(), $handler)` selects messages beginning with a mention of the authorized bot. It preserves the message text and requires a known bot user ID.
+
 ## Get started
 
 You need PHP 8.5+ and Composer 2. Node is only required when maintaining the reference generators.
@@ -238,7 +240,7 @@ final readonly class FormatMessage
 
 `$app->function('format_message', FormatMessage::class)` provides fluent registration. Inputs may also be injected as `Functions\Inputs` for strict accessors such as `string()` and `integer()`, or mapped explicitly with `as(MyInputs::class)`. DTO mapping supports constructor defaults, nullable fields, nested DTOs, backed enums and `#[InputName('wire_name')]` aliases. It does not coerce strings into numbers or booleans. Missing and invalid inputs raise `InvalidInputs`; application error handling remains explicit.
 
-`Execution` supplies `complete()`, `fail()`, `inputs()`, `client()` and a typed execution context. Function-scoped actions and views receive the same capability alongside their normal acknowledgement responses. The workflow token overrides the delivery client after installation authorization; it never enters the global client pool. Make completion your last Slack call: the temporary credential expires when the function ends. A duplicate terminal call is rejected locally, and a failed completion request leaves the outcome `Uncertain` rather than automatically attempting the opposite result. This guard is per delivery, not distributed idempotency.
+`Execution` supplies `complete()`, `fail()`, `inputs()`, `client()` and a typed execution context. Function-scoped actions and views receive the same capability alongside their normal acknowledgement responses. By default, the workflow token overrides the delivery client after installation authorization; it never enters the global client pool. Set `BoltConfig::attachFunctionToken` or `SLACK_ATTACH_FUNCTION_TOKEN` to `false` to use authorized installation credentials instead. Client injection, replies and completion helpers follow the same selection; opting out requires an installation credential. When using a workflow token, make completion your last Slack call: that credential expires when the function ends. A duplicate terminal call is rejected locally, and a failed completion request leaves the outcome `Uncertain` rather than automatically attempting the opposite result. This guard is per delivery, not distributed idempotency.
 
 The transport acknowledgement confirms delivery; it does not complete the workflow. Inline event handlers need no response value, and the receiver acknowledges after they return. For slow work, the [Tempest async example](examples/hello-bolt/README.md#custom-functions-and-tempest-async) persists an encrypted, short-lived execution credential and queues only an opaque reference. It deduplicates executions before business work. Tempest's async bus is experimental; this example adds explicit claim/outcome handling without presenting it as a framework-wide queue.
 

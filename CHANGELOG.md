@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Composable `MessageFilter::subtype()` and `directMention()` middleware, explicit workflow-token attachment policy, and sanitized SSL-check receipt without application dispatch.
+
 - Explicit cached static-token verification through `App::verifyToken()`, `auth:verify` and `socket:serve --verify-token`, plus `SLACK_BOT_ID` for network-free self-message filtering.
 - Delivery-local `Context` shared by middleware and handlers, with isolated constructor scopes when needed and fresh job-attempt context.
 - Structured `App::onError()` policy with original errors, listener/delivery/stage identity and buffered acknowledgement state; safe HTTP processing-error responses. Legacy `error()` remains supported.

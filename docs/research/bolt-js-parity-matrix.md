@@ -2,7 +2,7 @@
 
 Generated from [the reviewed audit manifest](bolt-js-parity.json) by `node scripts/audit-bolt-parity.mjs`. The human verdict and priorities are in [the audit](bolt-js-parity-audit.md).
 
-Baseline: Bolt JS 5.1.0, commit `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. PHP revision: `28 October 2026 implementation, based on 4b03c1b`. Audited 2026-10-28.
+Baseline: Bolt JS 5.1.0, commit `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. PHP revision: `28 October 2026 implementation, based on a4c50d9`. Audited 2026-10-28.
 
 Mapping presence is a bookkeeping check, not proof of behavioral equality. No percentage is reported: features differ in importance, and excluded Node APIs/type aliases are not missing PHP capabilities.
 
@@ -89,11 +89,11 @@ Upstream: [src/middleware/builtin.ts](https://github.com/slackapi/bolt-js/blob/f
 
 ### subtype-mention
 
-**subtype and directMention helpers — missing.** No reusable subtype/direct-mention filters exist. Applications can inspect payload.raw with custom middleware; add idiomatic reusable filters if these common operations should be first-class. Do not confuse app_mention with directMention filtering of message events.
+**subtype and directMention helpers — covered.** MessageFilter.subtype() and MessageFilter.directMention() compose with ordinary middleware. Matching preserves raw text/captures, uses per-installation bot identity, follows leading-mention/whitespace behavior, and errors on missing bot identity without network lookups.
 
-PHP: [src/Middleware/Middleware.php](../../src/Middleware/Middleware.php), [src/Payloads/Events/Message.php](../../src/Payloads/Events/Message.php).
+PHP: [src/Middleware/MessageFilter.php](../../src/Middleware/MessageFilter.php), [src/Invocation/InvocationPipeline.php](../../src/Invocation/InvocationPipeline.php).
 
-No dedicated behavioral test is cited for the missing/excluded contract; the source establishes its absence or scope.
+Behavioral evidence: [tests/Middleware/MessageFilterTest.php](../../tests/Middleware/MessageFilterTest.php).
 
 Upstream: [src/middleware/builtin.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/middleware/builtin.ts).
 
@@ -269,11 +269,11 @@ Upstream: [src/CustomFunction.ts](https://github.com/slackapi/bolt-js/blob/ffbe0
 
 ### function-policy
 
-**Workflow-token attachment policy — partial.** Function workflow tokens take precedence when present. No attachFunctionToken=false option exists. Expose an explicit per-app policy if applications need ordinary installation credentials instead; this is independent of typed input/completion support.
+**Workflow-token attachment policy — covered.** BoltConfig.attachFunctionToken defaults true, with an explicit false opt-out and strict SLACK_ATTACH_FUNCTION_TOKEN environment parsing. The selected workflow/bot/user client is consistent across injection, Reply and complete/fail. Authorizers still run; opting out requires installation credentials and never reuses a workflow-only grant as fallback.
 
-PHP: [src/App.php](../../src/App.php), [src/BoltConfig.php](../../src/BoltConfig.php), [src/Functions/ExecutionContext.php](../../src/Functions/ExecutionContext.php).
+PHP: [src/BoltConfig.php](../../src/BoltConfig.php), [src/App.php](../../src/App.php), [src/Integration/bolt.config.php](../../src/Integration/bolt.config.php).
 
-Behavioral evidence: [tests/Functions/RuntimeTest.php](../../tests/Functions/RuntimeTest.php).
+Behavioral evidence: [tests/Functions/TokenAttachmentPolicyTest.php](../../tests/Functions/TokenAttachmentPolicyTest.php), [tests/Functions/RuntimeTest.php](../../tests/Functions/RuntimeTest.php), [tests/Console/SocketCommandsTest.php](../../tests/Console/SocketCommandsTest.php).
 
 Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts).
 
@@ -329,11 +329,11 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 
 ### legacy-ssl
 
-**Slash-command ssl_check probe — missing.** No dedicated ssl_check branch exists. Bolt returns an empty 200 for a sanitized probe; the PHP receiver rejects unsigned probes or reports an unsupported signed payload. Add this narrow compatibility path without allowing it to dispatch listener payloads or bypass verification for real deliveries. This is a Slack protocol gap, not a Node-only non-goal.
+**Slash-command ssl_check probe — adapted.** The HTTP receiver returns empty 200 for an unambiguous top-level form ssl_check=1, discarding other fields without dispatch. Probes may be unsigned; normal delivery verification and body-size limits remain. Duplicate/array/lookalike probes are rejected and unsigned form inspection is bounded to 1,000 fields; PHP ends receipt directly rather than forwarding sanitized input.
 
 PHP: [src/Http/Receiver.php](../../src/Http/Receiver.php).
 
-No dedicated behavioral test is cited for the missing/excluded contract; the source establishes its absence or scope.
+Behavioral evidence: [tests/Http/SslCheckTest.php](../../tests/Http/SslCheckTest.php), [tests/Http/ReceiverTest.php](../../tests/Http/ReceiverTest.php).
 
 Upstream: [src/receivers/HTTPModuleFunctions.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPModuleFunctions.ts), [src/receivers/ExpressReceiver.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/ExpressReceiver.ts).
 
@@ -380,7 +380,7 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 | `tokenVerificationEnabled` | adapted | [static-identity](#static-identity) | Explicit App.verifyToken, auth:verify and socket:serve --verify-token replace eager initialization. |
 | `deferInitialization` | adapted | [routing-lifecycle](#routing-lifecycle) | No equivalent async startup lifecycle to defer. Help/discovery need no token verification. |
 | `extendedErrorHandler` | adapted | [errors](#errors) | Typed App.onError(FailureContext):ErrorHandling plus safe HTTP processing-error response hook; legacy error callback retained. |
-| `attachFunctionToken` | partial | [function-policy](#function-policy) | Workflow token attachment is automatic with no opt-out. |
+| `attachFunctionToken` | covered | [function-policy](#function-policy) | Default-on BoltConfig.attachFunctionToken and SLACK_ATTACH_FUNCTION_TOKEN; false selects authorized installation credentials. |
 
 ## All public App member names (overloads grouped)
 
@@ -395,7 +395,7 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 | `webClientOptions` | adapted | [client](#client) | Configure the PSR-18 transport and explicit retry policy. |
 | `use` | covered | [scratch-context](#scratch-context) | Ordered pipeline with shared delivery-local Context. |
 | `assistant` | covered | [assistant](#assistant) | Assistant builder and scoped runtime. |
-| `function` | partial | [function-policy](#function-policy) | Function routing/completion exist; attachment policy and explicit auto-ack control differ. |
+| `function` | adapted | [functions](#functions) | Function routing, typed inputs, completion and token-attachment policy are implemented. PHP returned acknowledgements/named jobs replace explicit auto-ack callback/timing options. |
 | `event` | covered | [listeners](#listeners) | Typed/fluent registration; unfiltered messages use an empty selector or event(message). |
 | `message` | covered | [listeners](#listeners) | Typed/fluent registration; unfiltered messages use an empty selector or event(message). |
 | `command` | covered | [listeners](#listeners) | Typed/fluent registration; unfiltered messages use an empty selector or event(message). |

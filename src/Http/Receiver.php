@@ -42,6 +42,10 @@ final readonly class Receiver
         if (strlen($rawBody) > $this->config->maxBodyBytes) {
             return new Response(413, 'Request body exceeds the configured limit.');
         }
+        if ($this->isSslCheck($rawBody, $contentType)) {
+            // Probe receipt only: discard every field without dispatching or contacting Slack.
+            return new Response(200);
+        }
         if ($this->config->signingSecret === '') {
             return new Response(503, 'Configure SLACK_SIGNING_SECRET before accepting Slack requests.');
         }
@@ -121,6 +125,33 @@ final readonly class Receiver
         }
 
         return $ack === null || $ack->toArray() === [] ? new Response(200) : Response::json($ack->toArray());
+    }
+
+    private function isSslCheck(string $rawBody, string $contentType): bool
+    {
+        if (strtolower(trim(explode(';', $contentType, 2)[0])) !== 'application/x-www-form-urlencoded') {
+            return false;
+        }
+        $value = null;
+        $fields = explode('&', $rawBody, 1001);
+        if (count($fields) > 1000) {
+            return false;
+        }
+        foreach ($fields as $field) {
+            [$key, $candidate] = array_pad(explode('=', $field, 2), 2, '');
+            $key = urldecode($key);
+            if (str_starts_with($key, 'ssl_check[')) {
+                return false;
+            }
+            if ($key !== 'ssl_check') {
+                continue;
+            }
+            if ($value !== null) {
+                return false;
+            }
+            $value = urldecode($candidate);
+        }
+        return $value === '1';
     }
 
     private function decode(string $rawBody, string $contentType): array

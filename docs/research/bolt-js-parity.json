@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "auditedAt": "2026-10-28",
-  "phpRevision": "28 October 2026 implementation, based on 4b03c1b",
+  "phpRevision": "28 October 2026 implementation, based on a4c50d9",
   "baseline": {
     "package": "@slack/bolt",
     "version": "5.1.0",
@@ -159,13 +159,15 @@
     {
       "id": "subtype-mention",
       "area": "subtype and directMention helpers",
-      "status": "missing",
-      "assessment": "No reusable subtype/direct-mention filters exist. Applications can inspect payload.raw with custom middleware; add idiomatic reusable filters if these common operations should be first-class. Do not confuse app_mention with directMention filtering of message events.",
+      "status": "covered",
+      "assessment": "MessageFilter.subtype() and MessageFilter.directMention() compose with ordinary middleware. Matching preserves raw text/captures, uses per-installation bot identity, follows leading-mention/whitespace behavior, and errors on missing bot identity without network lookups.",
       "php": [
-        "src/Middleware/Middleware.php",
-        "src/Payloads/Events/Message.php"
+        "src/Middleware/MessageFilter.php",
+        "src/Invocation/InvocationPipeline.php"
       ],
-      "tests": [],
+      "tests": [
+        "tests/Middleware/MessageFilterTest.php"
+      ],
       "upstream": [
         "src/middleware/builtin.ts"
       ]
@@ -513,15 +515,17 @@
     {
       "id": "function-policy",
       "area": "Workflow-token attachment policy",
-      "status": "partial",
-      "assessment": "Function workflow tokens take precedence when present. No attachFunctionToken=false option exists. Expose an explicit per-app policy if applications need ordinary installation credentials instead; this is independent of typed input/completion support.",
+      "status": "covered",
+      "assessment": "BoltConfig.attachFunctionToken defaults true, with an explicit false opt-out and strict SLACK_ATTACH_FUNCTION_TOKEN environment parsing. The selected workflow/bot/user client is consistent across injection, Reply and complete/fail. Authorizers still run; opting out requires installation credentials and never reuses a workflow-only grant as fallback.",
       "php": [
-        "src/App.php",
         "src/BoltConfig.php",
-        "src/Functions/ExecutionContext.php"
+        "src/App.php",
+        "src/Integration/bolt.config.php"
       ],
       "tests": [
-        "tests/Functions/RuntimeTest.php"
+        "tests/Functions/TokenAttachmentPolicyTest.php",
+        "tests/Functions/RuntimeTest.php",
+        "tests/Console/SocketCommandsTest.php"
       ],
       "upstream": [
         "src/App.ts"
@@ -621,12 +625,15 @@
     {
       "id": "legacy-ssl",
       "area": "Slash-command ssl_check probe",
-      "status": "missing",
-      "assessment": "No dedicated ssl_check branch exists. Bolt returns an empty 200 for a sanitized probe; the PHP receiver rejects unsigned probes or reports an unsupported signed payload. Add this narrow compatibility path without allowing it to dispatch listener payloads or bypass verification for real deliveries. This is a Slack protocol gap, not a Node-only non-goal.",
+      "status": "adapted",
+      "assessment": "The HTTP receiver returns empty 200 for an unambiguous top-level form ssl_check=1, discarding other fields without dispatch. Probes may be unsigned; normal delivery verification and body-size limits remain. Duplicate/array/lookalike probes are rejected and unsigned form inspection is bounded to 1,000 fields; PHP ends receipt directly rather than forwarding sanitized input.",
       "php": [
         "src/Http/Receiver.php"
       ],
-      "tests": [],
+      "tests": [
+        "tests/Http/SslCheckTest.php",
+        "tests/Http/ReceiverTest.php"
+      ],
       "upstream": [
         "src/receivers/HTTPModuleFunctions.ts",
         "src/receivers/ExpressReceiver.ts"
@@ -801,9 +808,9 @@
       "assessment": "Typed App.onError(FailureContext):ErrorHandling plus safe HTTP processing-error response hook; legacy error callback retained."
     },
     "attachFunctionToken": {
-      "status": "partial",
+      "status": "covered",
       "feature": "function-policy",
-      "assessment": "Workflow token attachment is automatic with no opt-out."
+      "assessment": "Default-on BoltConfig.attachFunctionToken and SLACK_ATTACH_FUNCTION_TOKEN; false selects authorized installation credentials."
     }
   },
   "appMembers": {
@@ -853,9 +860,9 @@
       "assessment": "Assistant builder and scoped runtime."
     },
     "function": {
-      "status": "partial",
-      "feature": "function-policy",
-      "assessment": "Function routing/completion exist; attachment policy and explicit auto-ack control differ."
+      "status": "adapted",
+      "feature": "functions",
+      "assessment": "Function routing, typed inputs, completion and token-attachment policy are implemented. PHP returned acknowledgements/named jobs replace explicit auto-ack callback/timing options."
     },
     "event": {
       "status": "covered",

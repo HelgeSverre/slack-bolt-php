@@ -25,6 +25,11 @@ return new BoltConfig(
     token: (string) env('SLACK_BOT_TOKEN', ''),
     signingSecret: (string) env('SLACK_SIGNING_SECRET', ''),
     ignoreSelf: filter_var(env('SLACK_IGNORE_SELF', 'true'), FILTER_VALIDATE_BOOL),
+    attachFunctionToken: filter_var(
+        env('SLACK_ATTACH_FUNCTION_TOKEN', 'true'),
+        FILTER_VALIDATE_BOOL,
+        FILTER_NULL_ON_FAILURE,
+    ) ?? throw new \InvalidArgumentException('SLACK_ATTACH_FUNCTION_TOKEN must be a boolean.'),
     botUserId: is_string($botUserId) && $botUserId !== '' ? $botUserId : null,
     botId: is_string($botId) && $botId !== '' ? $botId : null,
     oauth: $clientId !== '' && $clientSecret !== '' && $redirectUri !== ''

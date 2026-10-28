@@ -240,6 +240,7 @@ final class App
             $this->authorizer !== null
             || $this->config->token !== ''
             || $body !== null
+            && $this->config->attachFunctionToken
             && ExecutionContext::fromArray($body)?->workflowToken() !== null
         );
     }
@@ -532,7 +533,11 @@ final class App
                 )
                 : $this->authorizeSource($source);
             $client = $this->client->withToken(
-                $lifecycle ? '' : $functionContext?->workflowToken() ?? $authorization->token(),
+                $lifecycle
+                    ? ''
+                    : (
+                        $this->config->attachFunctionToken ? $functionContext?->workflowToken() : null
+                    ) ?? $authorization->token(),
             );
         } catch (Throwable $error) {
             $this->reportFailures([$error], $payload, $metadata, [new FailureContext(

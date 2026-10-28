@@ -9,6 +9,7 @@ use Tempest\Console\ConsoleArgument;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Console\ExitCode;
 use Thunder\Bolt\App;
+use Thunder\Bolt\BoltConfig;
 use Thunder\Bolt\SocketMode\AuthenticationException;
 use Thunder\Bolt\SocketMode\Config;
 use Thunder\Bolt\SocketMode\Runner;
@@ -41,7 +42,10 @@ final readonly class SocketCommands
 
             return ExitCode::INVALID;
         }
-        if (!$app->hasAuthorization() && !$app->hasFunctionListeners()) {
+        if (
+            !$app->hasAuthorization()
+            && (!$app->hasFunctionListeners() || !\Tempest\Container\get(BoltConfig::class)->attachFunctionToken)
+        ) {
             $this->error('socket:serve requires SLACK_BOT_TOKEN or configured OAuth installation authorization.');
 
             return ExitCode::INVALID;

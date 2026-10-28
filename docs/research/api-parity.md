@@ -1,14 +1,14 @@
 # API parity map
 
-The source-backed [26 October 2026 Bolt JS parity audit](bolt-js-parity-audit.md) compares v0.1.0 with **Bolt JS 5.1.0** at `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. Its first three gaps were addressed on 28 October: [identity, request context and failures](delivery-context-identity-errors.md). Use the refreshed [matrix](bolt-js-parity-matrix.md) and [JSON manifest](bolt-js-parity.json) for the current capability assessment.
+The source-backed [26 October 2026 Bolt JS parity audit](bolt-js-parity-audit.md) compares v0.1.0 with **Bolt JS 5.1.0** at `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. Its first three gaps were addressed on 28 October: [identity, request context and failures](delivery-context-identity-errors.md). The v0.2 preview adds [installation requests/hooks](oauth-install-requests.md), [transport factories](transport-context-factories.md), [typed form readers](typed-interaction-values.md) and a [fresh-project integration fixture](v0.2-validation.md). Use the refreshed [matrix](bolt-js-parity-matrix.md) and [JSON manifest](bolt-js-parity.json) for the current capability assessment.
 
 **Broad capability coverage is implemented; full Bolt JS parity has not been established.** PHP-native replacements and deliberate exclusions are assessed separately from gaps. No overall parity percentage is claimed.
 
 | Area | Assessment |
 | --- | --- |
 | Listener families, interactivity and matching | Implemented with behavioral evidence, including regex captures, legacy interaction classification and composable subtype/direct-mention filters. |
-| Middleware and delivery context | Ordered pipelines and shared request-local Context work. Stock-adapter context factories remain a gap. Persistent conversation state is a different concern. |
-| Authorization and OAuth | Scoped clients, basic OAuth v2, state, stores and rotation work. Static identity verification is explicit and cached per App; advanced installer controls remain narrower than Bolt. |
+| Middleware and delivery context | Ordered pipelines and shared request-local Context work. Both stock transports now offer typed, authorized context factories. Persistent conversation state is a different concern. |
+| Authorization and OAuth | Scoped clients, modern OAuth v2, atomic browser-bound request/state, per-install options, hooks, host routes, stores and rotation work. Static identity verification is explicit and cached per App. Classic v1 and state-free flows remain deliberate exclusions. |
 | HTTP and Socket Mode | Verified ingress, acknowledgements, sanitized SSL probes and Socket Mode lifecycle work. Inline returned responses plus named jobs intentionally replace early-ack continuation. Host routing and asynchronous timeout behavior remain PHP adaptations. |
 | Error handling | Structured listener/delivery/stage/acknowledgement context, explicit handling policy and safe HTTP processing-error responses are implemented. Host route policy and verification rejection statuses remain separate; no asynchronous unhandled timer exists. |
 | Assistant and custom functions | Lifecycle/context/streaming, typed function inputs/complete/fail and configurable workflow-token attachment are implemented; paid-plan live validation remains limited. |

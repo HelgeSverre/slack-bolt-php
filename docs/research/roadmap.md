@@ -5,8 +5,9 @@ Current ordering refreshed 28 October 2026; earlier milestone sections below ret
 ## Next compatibility slices
 
 1. Completed 28 October: delivery-local Context, structured failure context/policy and explicit static-token identity verification/hydration. [Implementation and evidence](delivery-context-identity-errors.md). Help and discovery stay network-free.
-2. Completed 28 October: workflow-token opt-out, composable subtype/direct-mention filters and sanitized SSL probes. [Implementation and evidence](message-filters-function-policy-ssl.md). Stock-adapter context extraction remains separate.
-3. Next: typed OAuth installation request options and hooks, plus stock-adapter context factories. Expand inbound DTOs and live verification where real use cases justify them.
+2. Completed 28 October: workflow-token opt-out, composable subtype/direct-mention filters and sanitized SSL probes. [Implementation and evidence](message-filters-function-policy-ssl.md). Transport context factories were completed in the v0.2 work below.
+3. Completed in v0.2 preview preparation: [per-install OAuth options, atomic request/state and hooks](oauth-install-requests.md), [typed transport context factories](transport-context-factories.md), [shared typed interaction readers](typed-interaction-values.md) and [fresh-project OAuth-to-job recovery coverage](v0.2-validation.md).
+4. Release gate: independent review, refreshed parity evidence, full Linux/macOS CI and v0.2.0 GitHub prerelease. Deeper event DTOs, additional adapters and a documentation site remain demand-led follow-ups.
 
 Keep existing `App::dispatch`, capture/retry metadata and function terminal guards. Do not add Node start/stop/Express/AWS interfaces for naming parity. Preserve typed returned acknowledgements, explicit named jobs, tenant/thread scoping, PSR logging and PSR-18 transport. The audit matrix records constraints; inventory counts alone are not implementation progress.
 
@@ -84,6 +85,6 @@ The first opt-in live transport slice is complete: five conversation read method
 1. **Compatibility and release validation.** Maintain a behavior matrix, targeted live-workspace checks and package installation/release verification. Linux/macOS CI already passes; paid-plan custom-function validation still needs an eligible workspace. Triage Mago advisories explicitly. Fresh named-job project installation is verified, but publishing/release automation and CLI startup optimization remain open.
 2. **Demand-led adapters and operational growth.** Add deployment/shared-store adapters when needed. SQLite retention, schema migrations and operator history are implemented in the [operations milestone](job-operations.md). Deduplication receipts deliberately remain indefinite; any future key-expiry policy needs an explicit replay horizon.
 
-Each milestone updates the [parity map](api-parity.md) with implemented behavior and its evidence. Full parity requires behavior coverage for every retained feature family; generated symbol counts alone cannot close a milestone. Remote Linux/macOS CI is verified in the current inventory. A release/publish operation remains outstanding.
+Each milestone updates the [parity map](api-parity.md) with implemented behavior and its evidence. Full parity requires behavior coverage for every retained feature family; generated symbol counts alone cannot close a milestone. Remote Linux/macOS CI is verified in the current inventory. v0.1.0 is already published as a GitHub prerelease; the v0.2.0 preview follows the explicit release gate above. Packagist publication remains separate.
 
 The [application and async investigation](durable-execution-explained.md) led to the user's explicit-jobs/SQLite choice and the current implementation. Execution storage remains separate from conversation storage, and Tempest owns composition. A broad application superclass is not implemented. Earlier per-system interface sketches remain research; the README documents shipped methods.

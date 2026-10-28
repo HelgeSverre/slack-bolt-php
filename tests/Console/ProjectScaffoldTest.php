@@ -228,7 +228,7 @@ final class ProjectScaffoldTest extends TestCase
         self::assertFileExists($project . '/bolt');
         self::assertFileExists($project . '/public/index.php');
         self::assertFileExists($project . '/app/Listeners/GreetOnMention.php');
-        self::assertStringContainsString('0.1.x-dev', (string) file_get_contents($project . '/composer.json'));
+        self::assertStringContainsString('0.2.x-dev', (string) file_get_contents($project . '/composer.json'));
         self::assertStringContainsString(
             'vendor/thunder/bolt/bin/bolt',
             (string) file_get_contents($project . '/bolt'),

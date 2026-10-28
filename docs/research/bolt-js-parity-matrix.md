@@ -2,7 +2,7 @@
 
 Generated from [the reviewed audit manifest](bolt-js-parity.json) by `node scripts/audit-bolt-parity.mjs`. The human verdict and priorities are in [the audit](bolt-js-parity-audit.md).
 
-Baseline: Bolt JS 5.1.0, commit `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. PHP revision: `28 October 2026 implementation, based on a4c50d9`. Audited 2026-10-28.
+Baseline: Bolt JS 5.1.0, commit `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. PHP revision: `v0.2.0 preview preparation, 28 October 2026`. Audited 2026-10-28.
 
 Mapping presence is a bookkeeping check, not proof of behavioral equality. No percentage is reported: features differ in importance, and excluded Node APIs/type aliases are not missing PHP capabilities.
 
@@ -69,11 +69,11 @@ Upstream: [src/types/middleware.ts](https://github.com/slackapi/bolt-js/blob/ffb
 
 ### host-context
 
-**Adapter-supplied custom properties — partial.** dispatch(body, metadata) accepts host data in metadata, but the stock HTTP and Socket Mode adapters provide no context-extractor hook. Missing host enrichment is distinct from existing retry/capture support.
+**Adapter-supplied custom properties — adapted.** Both stock transports expose typed input to a configured context factory after verification/authorization and before middleware. Factories enrich the existing fresh Context, cannot replace delivery authorization, and fail dispatch without an acknowledgement. HTTP headers/body and Socket Mode envelopes remain available; jobs retain only explicit inputs.
 
-PHP: [src/App.php](../../src/App.php), [src/Http/Receiver.php](../../src/Http/Receiver.php), [src/SocketMode/Runner.php](../../src/SocketMode/Runner.php).
+PHP: [src/App.php](../../src/App.php), [src/Http/Receiver.php](../../src/Http/Receiver.php), [src/SocketMode/Runner.php](../../src/SocketMode/Runner.php), [src/Http/ContextInput.php](../../src/Http/ContextInput.php), [src/SocketMode/ContextInput.php](../../src/SocketMode/ContextInput.php), [src/BoltConfig.php](../../src/BoltConfig.php), [src/SocketMode/Config.php](../../src/SocketMode/Config.php).
 
-Behavioral evidence: [tests/Http/ReceiverTest.php](../../tests/Http/ReceiverTest.php).
+Behavioral evidence: [tests/Http/ReceiverTest.php](../../tests/Http/ReceiverTest.php), [tests/Runtime/ContextFactoryTest.php](../../tests/Runtime/ContextFactoryTest.php), [tests/Jobs/JobRequestContextTest.php](../../tests/Jobs/JobRequestContextTest.php).
 
 Upstream: [src/types/receiver.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/receiver.ts), [src/receivers/HTTPReceiver.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPReceiver.ts), [src/receivers/SocketModeReceiver.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeReceiver.ts).
 
@@ -129,11 +129,11 @@ Upstream: [src/receivers/HTTPReceiver.ts](https://github.com/slackapi/bolt-js/bl
 
 ### oauth-options
 
-**Advanced installation options and hooks — partial.** Installer.begin() has no per-install request options: no metadata round trip, target-team hint, per-request scopes, install/callback hooks or built-in configurable paths/pages. Applications can own controllers, but that is not packaged installer-option parity. Prioritize metadata and success/failure hooks over visual install pages.
+**Advanced installation options and hooks — adapted.** Immutable InstallRequest supports per-flow bot/user scopes, workspace hints and server-side metadata. Atomic request/state consumption and per-flow cookies support concurrent tabs. Typed success/failure hooks run after the determined outcome, with persistence before success. Reusable OAuthHttpHandler supports host-owned paths and safe responses/redirects. Rendered installation pages remain host-owned; classic v1 and state-free installation flows remain deliberate exclusions.
 
-PHP: [src/OAuth/OAuthConfig.php](../../src/OAuth/OAuthConfig.php), [src/OAuth/Installer.php](../../src/OAuth/Installer.php), [src/OAuth/State/State.php](../../src/OAuth/State/State.php), [src/Integration/OAuthController.php](../../src/Integration/OAuthController.php).
+PHP: [src/OAuth/OAuthConfig.php](../../src/OAuth/OAuthConfig.php), [src/OAuth/Installer.php](../../src/OAuth/Installer.php), [src/OAuth/State/State.php](../../src/OAuth/State/State.php), [src/Integration/OAuthController.php](../../src/Integration/OAuthController.php), [src/OAuth/InstallRequest.php](../../src/OAuth/InstallRequest.php), [src/OAuth/InstallHooks.php](../../src/OAuth/InstallHooks.php), [src/OAuth/InstallResult.php](../../src/OAuth/InstallResult.php), [src/OAuth/InstallResponse.php](../../src/OAuth/InstallResponse.php), [src/OAuth/State/RequestStateStore.php](../../src/OAuth/State/RequestStateStore.php), [src/OAuth/State/FileStateStore.php](../../src/OAuth/State/FileStateStore.php), [src/Integration/OAuthHttpHandler.php](../../src/Integration/OAuthHttpHandler.php).
 
-Behavioral evidence: [tests/OAuth/InstallerTest.php](../../tests/OAuth/InstallerTest.php).
+Behavioral evidence: [tests/OAuth/InstallerTest.php](../../tests/OAuth/InstallerTest.php), [tests/OAuth/InstallationFlowTest.php](../../tests/OAuth/InstallationFlowTest.php), [tests/OAuth/StateStoreTest.php](../../tests/OAuth/StateStoreTest.php), [tests/OAuth/InstallHooksTest.php](../../tests/OAuth/InstallHooksTest.php), [tests/Integration/OAuthHttpHandlerTest.php](../../tests/Integration/OAuthHttpHandlerTest.php), [tests/Integration/OAuthControllerTest.php](../../tests/Integration/OAuthControllerTest.php).
 
 Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts), [src/receivers/HTTPReceiver.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPReceiver.ts).
 
@@ -279,11 +279,11 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 
 ### payload-types
 
-**Inbound native payload and state typing — partial.** Common events have dedicated classes and unknown events preserve raw data. Many JS action unions, view-state value variants and the @slack/types event universe remain generic/raw, not native PHP DTO equivalents. Routing those payloads is supported; claiming complete typed inbound coverage would be inaccurate.
+**Inbound native payload and state typing — partial.** Common event classes and native InputValue/FormState readers cover text, select and ID variants, radio/checkbox, date/time, files and rich text across actions and views. Raw access and existing value()/state() remain compatible. The complete @slack/types event universe and nested polymorphic data still have generic/raw fields; this is narrower native typing, not an unsupported routing family or a promise of one PHP DTO per TypeScript union.
 
-PHP: [src/Payloads/Event.php](../../src/Payloads/Event.php), [src/Payloads/Action.php](../../src/Payloads/Action.php), [src/Payloads/View.php](../../src/Payloads/View.php), [src/App.php](../../src/App.php).
+PHP: [src/Payloads/Event.php](../../src/Payloads/Event.php), [src/Payloads/Action.php](../../src/Payloads/Action.php), [src/Payloads/View.php](../../src/Payloads/View.php), [src/App.php](../../src/App.php), [src/Payloads/Values/InputValue.php](../../src/Payloads/Values/InputValue.php), [src/Payloads/Values/FormState.php](../../src/Payloads/Values/FormState.php), [src/Payloads/Values/UploadedFile.php](../../src/Payloads/Values/UploadedFile.php).
 
-Behavioral evidence: [tests/Payloads/InteractionPayloadTest.php](../../tests/Payloads/InteractionPayloadTest.php), [tests/Runtime/TypedEventDispatchTest.php](../../tests/Runtime/TypedEventDispatchTest.php).
+Behavioral evidence: [tests/Payloads/InteractionPayloadTest.php](../../tests/Payloads/InteractionPayloadTest.php), [tests/Runtime/TypedEventDispatchTest.php](../../tests/Runtime/TypedEventDispatchTest.php), [tests/Payloads/FormStateTest.php](../../tests/Payloads/FormStateTest.php).
 
 Upstream: [src/types/actions/block-action.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/actions/block-action.ts), [src/types/view/index.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/view/index.ts), [src/types/events/index.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/types/events/index.ts).
 
@@ -363,7 +363,7 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 | `scopes` | covered | [oauth-core](#oauth-core) | OAuthConfig and InstallationStore with installation-scoped grants. |
 | `installationStore` | covered | [oauth-core](#oauth-core) | OAuthConfig and InstallationStore with installation-scoped grants. |
 | `stateSecret` | adapted | [oauth-core](#oauth-core) | Opaque one-time state and browser binding replace signed state-secret encoding. |
-| `installerOptions` | partial | [oauth-options](#oauth-options) | Basic v2 flow exists; advanced per-install metadata, hooks and install controls do not. |
+| `installerOptions` | adapted | [oauth-options](#oauth-options) | InstallRequest, atomic browser-bound state, typed hooks and reusable host-route handling cover the practical modern installation controls. Host pages, classic OAuth v1 and state-free direct installs are deliberate exclusions. |
 | `convoStore` | adapted | [conversation](#conversation) | ConversationStore adapter or false, with stronger key scoping. |
 | `token` | covered | [authorization](#authorization) | BoltConfig token and Socket Mode Config appToken. |
 | `appToken` | covered | [authorization](#authorization) | BoltConfig token and Socket Mode Config appToken. |
@@ -389,9 +389,9 @@ Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e1
 | `client` | adapted | [client](#client) | Inject WebApi.Client or Delivery.client instead of reading App.client. |
 | `logger` | adapted | [logging](#logging) | Inject PSR-3 logger. |
 | `(call signature)` | adapted | [authorization](#authorization) | Constructor/container setup with typed BoltConfig. |
-| `init` | adapted | [routing-lifecycle](#routing-lifecycle) | Host and runners own lifecycle; no Node server lifecycle clone. Token verification remains a separate gap. |
-| `start` | adapted | [routing-lifecycle](#routing-lifecycle) | Host and runners own lifecycle; no Node server lifecycle clone. Token verification remains a separate gap. |
-| `stop` | adapted | [routing-lifecycle](#routing-lifecycle) | Host and runners own lifecycle; no Node server lifecycle clone. Token verification remains a separate gap. |
+| `init` | adapted | [routing-lifecycle](#routing-lifecycle) | Host and runners own lifecycle; no Node server lifecycle clone. Explicit App::verifyToken() and socket:serve --verify-token provide identity verification without implicit discovery-time network calls. |
+| `start` | adapted | [routing-lifecycle](#routing-lifecycle) | Host and runners own lifecycle; no Node server lifecycle clone. Explicit App::verifyToken() and socket:serve --verify-token provide identity verification without implicit discovery-time network calls. |
+| `stop` | adapted | [routing-lifecycle](#routing-lifecycle) | Host and runners own lifecycle; no Node server lifecycle clone. Explicit App::verifyToken() and socket:serve --verify-token provide identity verification without implicit discovery-time network calls. |
 | `webClientOptions` | adapted | [client](#client) | Configure the PSR-18 transport and explicit retry policy. |
 | `use` | covered | [scratch-context](#scratch-context) | Ordered pipeline with shared delivery-local Context. |
 | `assistant` | covered | [assistant](#assistant) | Assistant builder and scoped runtime. |

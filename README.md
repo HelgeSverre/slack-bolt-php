@@ -4,7 +4,7 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 
 Thunder Bolt is built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style. The `Thunder\Bolt` namespace and package name are provisional.
 
-**Experimental preview.** The latest tag is `v0.1.0`; this README follows `main`, including newer context, identity and error APIs. HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet. [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md). The package is not yet registered on Packagist.
+**Experimental v0.2.0 preview.** This README follows `main`; the v0.2.0 tag captures the reviewed compatibility milestone. HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet. [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md). The package is not yet registered on Packagist.
 
 The [Bolt JS parity audit](docs/research/bolt-js-parity-audit.md) distinguishes implemented capabilities, PHP adaptations, useful gaps and Node-specific exclusions. Endpoint/model counts do not establish full framework parity.
 
@@ -26,6 +26,8 @@ final readonly class GreetMention
 ```
 
 Put the class in your application's `app/` directory. Tempest discovers the handler and injects its dependencies. Payloads expose native properties such as `userId` and `channelId`, while `raw` preserves Slack's original data.
+
+Views and actions share typed form readers: `$view->form()->require('title', 'input')->text()` and `$action->input()->selectedValue()`. Original payloads and existing value/state readers stay available.
 
 Message middleware composes through `MessageFilter::subtype('file_share')` and `MessageFilter::directMention()` from `Thunder\Bolt\Middleware`. For example, `$app->message('', MessageFilter::directMention(), $handler)` selects messages beginning with a mention of the authorized bot. It preserves the message text and requires a known bot user ID.
 
@@ -96,6 +98,10 @@ Dedicated builders cover the pinned Block Kit families, including selectors, ric
 ## Delivery context and errors
 
 Middleware can attach ephemeral values through `Delivery::context`; handlers inject `Thunder\Bolt\Context` and read them with `get()` or `require()`. Context is shared within one delivery and isolated from subsequent deliveries and job attempts. Use conversation/thread stores for persistent state and named job DTOs for durable work.
+
+Configure the `httpContextFactory` option on `BoltConfig` or `contextFactory` on Socket Mode `Config` to enrich that Context from typed transport input after authorization, before middleware. [Factory examples](docs/research/transport-context-factories.md).
+
+OAuth supports per-install scopes, workspace hints and server-side metadata through immutable `InstallRequest` values. Configure `OAuthConfig` with installation hooks for post-save onboarding and failure handling; reuse `OAuthHttpHandler` when your app owns the installation routes. [Installation interface](docs/research/oauth-install-requests.md).
 
 For structured errors, register `$app->onError(function (FailureContext $failure): ErrorHandling { ... })` using types from `Thunder\Bolt\Errors`. The context exposes the original error, listener, processing stage, available delivery and buffered response state. Return `ErrorHandling::Handled` or `ErrorHandling::Rethrow`; log `$failure->summary()` for metadata without payloads or credentials. The existing `error()` callback remains supported. [Interface details and examples](docs/research/delivery-context-identity-errors.md).
 
@@ -398,9 +404,9 @@ To regenerate from the pinned upstream archives, run `npm run sync:references`, 
 
 ## What's next
 
-The preview includes a transport contract inventory for all 273 catalogued endpoints, a fresh-project integration check, and upgrade guidance. Next comes adopter feedback, broader opt-in live coverage and filling remaining Bolt JS parity gaps. Larger deployments may need additional durable-store adapters and an explicit deduplication-key expiry policy.
+The preview includes a transport contract inventory for all 273 catalogued endpoints, a fresh-project integration check, and upgrade guidance. Next comes adopter feedback, broader opt-in live coverage and demand-led native typing of additional Slack events. Larger deployments may need additional durable-store adapters and an explicit deduplication-key expiry policy.
 
-Extended guides and API documentation will live on a separate docs site. Existing design notes and coverage inventories remain under `docs/` for maintainers. Controlled live-workspace tests and Linux/macOS CI are release gates; generated coverage alone does not establish full Bolt JS conformance.
+Extended guides and API documentation will live on a separate docs site. Existing design notes and coverage inventories remain under `docs/` for maintainers. Recorded integration checks and Linux/macOS CI are release gates. Opt-in live checks provide narrower real-workspace evidence; generated coverage alone does not establish full Bolt JS conformance.
 
 ## License
 

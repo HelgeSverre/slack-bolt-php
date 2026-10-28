@@ -1,4 +1,19 @@
-# Upgrading to v0.1.0
+# Upgrading
+
+## v0.2.0 preview
+
+PHP 8.5+ and Tempest 3 remain the baseline. For local path installations, stop intake/workers, preserve private configuration and durable stores, check out `v0.2.0`, and run `composer install` in the framework checkout. Change existing app constraints and path-repository version overrides from `0.1.x-dev` to `0.2.x-dev`, then run `composer update thunder/bolt --with-dependencies` in each app. Newly scaffolded apps already use the new development alias. Restart all processes on the same version. This release adds no job database schema migration beyond v0.1.0.
+
+- Existing `Installer::begin()` calls keep their configured defaults. Per-install options require the new `RequestStateStore` extension; old custom `StateStore` adapters remain valid for default flows. Built-in stores support it automatically. Persist `State::$request` and return it atomically with state consumption.
+- Custom install routes must set the cookie named by `InstallRedirect::$cookieName`. The built-in/reusable handler handles per-flow cookies and legacy fixed-name pending flows. Old file records remain readable, but only a newly started flow can carry new account metadata. Do not mix old and new HTTP workers during an install flow.
+- `Installer::complete()` now returns `InstallStatus::Failed` with an error for storage/exchange failures. Update exhaustive status matches and code that previously relied on these errors throwing. Hook exceptions still throw `InstallHookFailed`, retaining the determined result and original exception. Success hooks run after storage; callback replay cannot rerun exchange or onboarding.
+- Failure-stage matches must account for `FailureStage::Context`. HTTP and Socket Mode factories enrich fresh Context after authorization and before middleware; factory failure cannot become a successful acknowledgement.
+- Existing action/view raw properties and `View::value()`/`state()` are unchanged. New `input()`/`form()` readers are additive; rich-text trees and unfamiliar controls retain raw access.
+- `MessageFilter::directMention()` needs a known bot user ID. Static-token apps can verify explicitly with `auth:verify` or `socket:serve --verify-token`. `SLACK_ATTACH_FUNCTION_TOKEN=false` selects installation authorization and requires a configured bot/user grant, including for function-only Socket Mode apps.
+
+See [installation requests and host routes](docs/research/oauth-install-requests.md), [transport factories](docs/research/transport-context-factories.md), [typed values](docs/research/typed-interaction-values.md), and [release validation scope](docs/research/v0.2-validation.md).
+
+## v0.1.0 foundation
 
 Requires PHP 8.5+ and Composer 2. SQLite jobs and SQLite context storage require `pdo_sqlite`. Gzipped enterprise analytics additionally requires `zlib` and is limited to 32 MiB of decompressed data per response.
 

@@ -2,9 +2,9 @@
 
 **28 October follow-up:** the first three gaps below now have PHP implementations: explicit static-token identity verification/hydration, delivery-local Context and structured failure context/policy. See the [implementation and evidence](delivery-context-identity-errors.md) and refreshed [matrix](bolt-js-parity-matrix.md). The dated findings and counts below describe the v0.1.0 baseline; the current matrix records the changes. Identity and receiver policies deliberately retain explicit PHP execution boundaries.
 
-**Second 28 October follow-up:** composable message filters, configurable workflow-token attachment and sanitized SSL probes are also implemented. [Behavior and evidence](message-filters-function-policy-ssl.md). OAuth installation options, stock-adapter context factories and broader inbound typing remain relevant next work.
+**Second 28 October follow-up:** composable message filters, configurable workflow-token attachment and sanitized SSL probes are also implemented. [Behavior and evidence](message-filters-function-policy-ssl.md). Those were the next priorities at that checkpoint. The v0.2 follow-up below records their implementation.
 
-**Verdict: the main Slack application capabilities work, but meaningful framework gaps remain. Literal API parity is neither achieved nor the right PHP target.** We should close the practical gaps below, retain the documented PHP adaptations, and exclude Node-only interfaces. No percentage is claimed.
+**Current v0.2 verdict:** the planned practical compatibility slices are implemented with behavioral evidence. Complete native typing of the Slack event universe remains narrower, and deliberate PHP adaptations/exclusions remain. Literal API parity is neither achieved nor the right PHP target. No percentage is claimed. The dated baseline findings below are preserved for traceability; see the v0.2 follow-up and current matrix for their disposition.
 
 This audit compares PHP revision [`21192af`](https://github.com/HelgeSverre/slack-bolt-php/tree/21192afee5efbbd35f90bbcf3e6b07858f5227b2) (the v0.1.0 preview) with `@slack/bolt` **5.1.0**, pinned at [`ffbe0b6…`](https://github.com/slackapi/bolt-js/tree/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d). It does not claim parity with a moving upstream release or every Slack API. The [upstream research](bolt-js-parity-upstream.md) cites the primary source contract; the [detailed matrix](bolt-js-parity-matrix.md) links PHP implementation and behavioral tests. The [machine-readable manifest](bolt-js-parity.json) is the reviewed assessment.
 
@@ -16,9 +16,9 @@ This audit compares PHP revision [`21192af`](https://github.com/HelgeSverre/slac
 - Ran offline probes for static-token identity, custom middleware context and error-handler arguments. Existing tests establish captures, retry metadata, per-installation clients, function terminal guards and the supported response families.
 - This is a static/source-and-fixture audit with narrow probes, not a differential run of every upstream test. Enterprise and paid-plan fixtures do not become live verification by being listed. The 273-method Web API audit is separate from inbound Bolt behavior.
 
-## Meaningful gaps to close
+## Historical v0.1.0 gaps (subsequently addressed by the follow-ups)
 
-| Priority | Gap | Current limitation | PHP acceptance criterion |
+| Priority | Gap | Baseline limitation | PHP acceptance criterion |
 | --- | --- | --- | --- |
 | P1 | Static-token identity and verification | `ignoreSelf` needs known bot identity. Token-only configuration neither verifies the token nor hydrates `botUserId`/`botId`; static `BoltConfig` has no `botId`. | An explicit startup/health-check identity resolver, cached per configured credential, supplies both bot identifiers and reports invalid credentials. No network work during help/discovery. Cover bot messages lacking a `user` field as well as normal self messages. |
 | P1 | Delivery-local middleware context | `Delivery` is readonly and `next()` cannot forward a replacement. There is no request-local place for middleware to attach fetched records, tracing or claims. | A typed context capability shared by one delivery's middleware/handlers and isolated from subsequent deliveries/tenants. Do not use persistent conversation state to carry live services. |
@@ -80,3 +80,9 @@ Implement **delivery context and failure context**, plus **explicit static-token
 Re-audit the manifest when each gap closes. A row moves to covered only with source plus behavioral evidence; an adaptation needs an explicit replacement and documented constraint. Use `npm run verify:parity` to detect missing AppOptions/member/built-in/module mappings and stale evidence paths. The command checks bookkeeping and generated-document consistency, not semantic correctness.
 
 Audit validation passed **840 tests / 5,254 assertions**, seven reference-tooling tests, generated/transport verification and the new parity inventory check. These remain useful validation, not a certificate of complete parity. No runtime fixes or new Slack messages were part of this audit.
+
+## v0.2 preview follow-up — 28 October 2026
+
+The next practical slices are implemented: [typed installation requests, atomic state, hooks and reusable host routes](oauth-install-requests.md), [HTTP/Socket context factories](transport-context-factories.md), and [typed action/form value readers](typed-interaction-values.md). The [release validation record](v0.2-validation.md) traces them through a freshly generated application to durable recovery in a new worker process. Current status is in the generated matrix; the numbered findings below preserve the historical audit baseline.
+
+This closes the planned practical slices without claiming complete native typing of every Slack event or every nested object. The payload typing row remains partial for that breadth. Rendered install pages, state-free direct installation, classic OAuth v1 and Node host adapters remain deliberate omissions/adaptations, not release prerequisites. The updated matrix records source and behavioral evidence rather than counting reference declarations as runtime coverage.

@@ -27,11 +27,11 @@ final readonly class ProjectScaffold
             'description' => 'A Slack application built with Thunder Bolt.',
             'type' => 'project',
             'license' => 'proprietary',
-            'require' => ['php' => '^8.5', 'thunder/bolt' => '0.1.x-dev'],
+            'require' => ['php' => '^8.5', 'thunder/bolt' => '0.2.x-dev'],
             'repositories' => [[
                 'type' => 'path',
                 'url' => $this->packageRoot,
-                'options' => ['symlink' => true, 'versions' => ['thunder/bolt' => '0.1.x-dev']],
+                'options' => ['symlink' => true, 'versions' => ['thunder/bolt' => '0.2.x-dev']],
             ]],
             'autoload' => ['psr-4' => ['App\\' => 'app/']],
             'minimum-stability' => 'dev',

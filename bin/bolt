@@ -24,7 +24,7 @@ if (PHP_VERSION_ID < 80500) {
 
 $arguments = array_slice($_SERVER['argv'] ?? [], 1);
 if (in_array('--version', $arguments, true) || in_array('-V', $arguments, true)) {
-    $version = '0.1.x-dev';
+    $version = '0.2.x-dev';
     if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('thunder/bolt')) {
         $version = InstalledVersions::getPrettyVersion('thunder/bolt') ?? $version;
     }

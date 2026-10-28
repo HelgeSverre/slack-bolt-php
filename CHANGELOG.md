@@ -1,6 +1,14 @@
 # Changelog
 
-## Unreleased
+## v0.2.0 — 2026-10-28
+
+Experimental compatibility preview; not full Bolt JS conformance.
+
+- Immutable installation requests with per-flow scopes, workspace hints and server-side metadata; atomic request/state consumption and independent browser-tab cookies.
+- Typed installation success/failure hooks, persisted installations before onboarding, reusable host-route handling and safe custom responses/redirects.
+- Authorized HTTP and Socket Mode context factories, fresh delivery context and critical factory-failure reporting.
+- Shared typed action/form readers for selections, identifiers, dates/times, files and rich text, preserving existing payload readers and raw fields.
+- Fresh-project recorded coverage from OAuth/account association through both transports and typed forms to durable job recovery in a new process. Development aliases now use 0.2.x-dev.
 
 - Composable `MessageFilter::subtype()` and `directMention()` middleware, explicit workflow-token attachment policy, and sanitized SSL-check receipt without application dispatch.
 

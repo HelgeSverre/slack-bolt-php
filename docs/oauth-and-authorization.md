@@ -26,7 +26,7 @@ The two routes are:
 | `GET /slack/install` | Create state, set its browser cookie, redirect to Slack |
 | `GET /slack/oauth_redirect` | Verify and consume state, exchange the code, identify the bot, persist the installation |
 
-Both routes return `503` when OAuth is disabled. The built-in callback renders a small success/failure response without tokens or authorization codes. For a custom onboarding experience, call the `Installer` module from your own routes and use its typed redirect/result values.
+Both routes return `503` when OAuth is disabled. The built-in callback renders a small success/failure response without tokens or authorization codes. For custom routes, reuse `Integration\OAuthHttpHandler` with per-install `InstallRequest` values and a typed `InstallResponse` responder. `OAuthConfig::hooks` supplies success/failure callbacks; successful installation is saved before the success hook runs. See [request options, hooks and host-route examples](research/oauth-install-requests.md).
 
 You can also configure OAuth in PHP through `BoltConfig`, returned from a discovered `config/bolt.config.php` file. CLI and generated HTTP bootstraps both discover the project's `config/` directory:
 
@@ -50,7 +50,7 @@ return new BoltConfig(
 
 Each install attempt creates independent random state and cookie values. The server stores a hash of the cookie binding with a ten-minute expiry. The callback must present both values and atomically consumes the state before any code exchange. Missing, mismatched, expired, or replayed state fails without exchanging a code. The cookie is `Secure`, `HttpOnly`, and `SameSite=Lax`; use HTTPS for the browser flow.
 
-An `access_denied` cancellation returns a denial outcome without exchanging or storing credentials. Callback responses clear the browser's state cookie. State is server-backed, so no separate `stateSecret` or signed JWT configuration is needed. Parallel browser install attempts share a cookie name; starting a newer attempt replaces the browser binding for the earlier one.
+An `access_denied` cancellation returns a denial outcome without exchanging or storing credentials. Callback responses clear the browser's state cookie. State is server-backed, so no separate `stateSecret` or signed JWT configuration is needed. Each attempt has a distinct cookie name, so parallel tabs can finish independently. Custom routes must use `InstallRedirect::$cookieName`; the reusable handler also recognizes and clears legacy fixed-name cookies for pending flows. Valid denied callbacks consume their state; unbound cancellation carries no trusted metadata.
 
 ## Delivery-scoped clients
 

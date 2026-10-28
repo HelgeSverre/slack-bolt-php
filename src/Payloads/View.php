@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Thunder\Bolt\Payloads;
 
+use Thunder\Bolt\Payloads\Values\FormState;
+
 final readonly class View
 {
     public function __construct(
@@ -61,6 +63,11 @@ final readonly class View
         $cell = $block[$actionId] ?? null;
 
         return is_array($cell) ? $cell : null;
+    }
+
+    public function form(): FormState
+    {
+        return FormState::fromArray($this->values);
     }
 
     private static function nestedString(array $body, string $container, string $key): ?string

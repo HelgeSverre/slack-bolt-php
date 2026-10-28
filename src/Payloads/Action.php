@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Thunder\Bolt\Payloads;
 
+use Thunder\Bolt\Payloads\Values\FormState;
+use Thunder\Bolt\Payloads\Values\InputValue;
+
 final readonly class Action
 {
     public function __construct(
@@ -46,6 +49,19 @@ final readonly class Action
             action: $action,
             raw: $body,
         );
+    }
+
+    public function input(): InputValue
+    {
+        return InputValue::fromArray($this->action);
+    }
+
+    public function form(): FormState
+    {
+        $view = is_array($this->raw['view'] ?? null) ? $this->raw['view'] : [];
+        $state = array_key_exists('state', $this->raw) ? $this->raw['state'] : $view['state'] ?? null;
+        $values = is_array($state) ? $state['values'] ?? null : null;
+        return FormState::fromArray(is_array($values) ? $values : []);
     }
 
     private static function nestedString(array $body, string $container, string $key): ?string

@@ -97,6 +97,9 @@ final class AppInitializer implements Initializer
                 Installer::class,
                 new Installer($config->oauth, $client->withToken(''), $store, $states, $clock),
             );
+            if (!$container->has(OAuthHttpHandler::class)) {
+                $container->singleton(OAuthHttpHandler::class, new OAuthHttpHandler($container->get(Installer::class)));
+            }
             $authorizer ??= new InstallationAuthorizer($store, $rotator);
         }
 

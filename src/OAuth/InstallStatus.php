@@ -10,4 +10,5 @@ enum InstallStatus
     case Denied;
     case InvalidState;
     case MissingCode;
+    case Failed;
 }

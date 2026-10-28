@@ -20,6 +20,7 @@ final readonly class OAuthConfig
         public array $scopes = [],
         public array $userScopes = [],
         public int $stateTtlSeconds = 600,
+        public InstallHooks $hooks = new InstallHooks(),
     ) {
         if ($clientId === '' || $clientSecret === '' || $stateTtlSeconds < 1) {
             throw new \InvalidArgumentException(

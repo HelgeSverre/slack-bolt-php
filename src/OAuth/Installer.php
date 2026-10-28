@@ -70,28 +70,49 @@ final readonly class Installer
         // An unbound cancellation remains a safe display-only outcome. It must
         // never expose metadata or represent a validated installation request.
         if ($error === 'access_denied' && $state === null) {
-            return InstallResult::denied();
+            return $this->finish(InstallResult::denied());
         }
         if ($state === null || !$this->isStateValue($state)) {
-            return InstallResult::invalidState();
+            return $this->finish(InstallResult::invalidState());
         }
-        $request = $this->states instanceof RequestStateStore
-            ? $this->states->consumeRequest($state, $cookieBinding ?? '', $this->now())
-            : (
-                $this->states->consume($state, $cookieBinding ?? '', $this->now())
-                    ? new InstallRequest($this->config->scopes, $this->config->userScopes)
-                    : null
-            );
+        try {
+            $request = $this->states instanceof RequestStateStore
+                ? $this->states->consumeRequest($state, $cookieBinding ?? '', $this->now())
+                : (
+                    $this->states->consume($state, $cookieBinding ?? '', $this->now())
+                        ? new InstallRequest($this->config->scopes, $this->config->userScopes)
+                        : null
+                );
+        } catch (\Throwable $error) {
+            return $this->finish(InstallResult::failed($error));
+        }
         if ($request === null) {
-            return InstallResult::invalidState();
+            return $this->finish(InstallResult::invalidState());
         }
         if ($error !== null) {
-            return InstallResult::denied($request);
+            return $this->finish(InstallResult::denied($request));
         }
         if (!is_string($code) || $code === '') {
-            return InstallResult::missingCode($request);
+            return $this->finish(InstallResult::missingCode($request));
         }
 
+        try {
+            $installation = $this->exchange($code);
+        } catch (\Throwable $error) {
+            return $this->finish(InstallResult::failed($error, $request));
+        }
+
+        return $this->finish(InstallResult::installed($installation, $request));
+    }
+
+    private function finish(InstallResult $result): InstallResult
+    {
+        $this->config->hooks->notify($result);
+        return $result;
+    }
+
+    private function exchange(string $code): Installation
+    {
         $response = $this->client
             ->withToken('')
             ->oauth()
@@ -114,7 +135,7 @@ final readonly class Installer
         $installation = Installation::fromOAuthResponse($oauthResponse, $this->now());
         $this->installations->save($installation);
 
-        return InstallResult::installed($installation, $request);
+        return $installation;
     }
 
     public static function cookieName(?string $state): string

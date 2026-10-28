@@ -5,18 +5,26 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use Tempest\CommandBus\CommandHandler;
+use Thunder\Bolt\Context;
 use Thunder\Bolt\Jobs\JobExecution;
+use Thunder\Bolt\WebApi\Client;
 
 final readonly class SmokeJobHandler
 {
     public function __construct(
         private JobExecution $execution,
+        private Context $context,
+        private Client $client,
     ) {}
 
     #[CommandHandler]
     public function handle(SmokeJob $job): void
     {
         $this->execution->checkpoint();
+        if ($this->context->has('account') || $this->context->has('transport')) {
+            throw new \RuntimeException('The worker inherited ambient delivery context.');
+        }
+        $this->client->auth()->test();
         // Replacing the same value is safe if a recovered attempt repeats.
         file_put_contents(getcwd() . '/receipt.txt', $job->text);
     }

@@ -15,8 +15,32 @@ final class SmokeHttp implements ClientInterface
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         $this->requests[] = $request;
+        if (
+            is_file(getcwd() . '/account.json')
+            && in_array(basename($request->getUri()->getPath()), ['auth.test', 'chat.postMessage'], true)
+            && $request->getHeaderLine('Authorization') !== 'Bearer smoke-installed-token'
+        ) {
+            throw new \RuntimeException('Delivery or restarted worker used the wrong installation credential.');
+        }
+        if (str_ends_with($request->getUri()->getPath(), '/apps.connections.open')) {
+            if ($request->getHeaderLine('Authorization') !== 'Bearer xapp-smoke') {
+                throw new \RuntimeException('Socket Mode used the wrong app credential.');
+            }
+            return new \GuzzleHttp\Psr7\Response(200, [], '{"ok":true,"url":"wss://socket.slack.test/fixture"}');
+        }
         if (str_ends_with($request->getUri()->getPath(), '/auth.test')) {
-            return new \GuzzleHttp\Psr7\Response(200, [], '{"ok":true,"user_id":"U-smoke-bot","bot_id":"B-smoke","team_id":"T-smoke"}');
+            return new \GuzzleHttp\Psr7\Response(
+                200,
+                [],
+                '{"ok":true,"user_id":"U-smoke-bot","bot_id":"B-smoke","team_id":"T-smoke"}',
+            );
+        }
+        if (str_ends_with($request->getUri()->getPath(), '/oauth.v2.access')) {
+            return new \GuzzleHttp\Psr7\Response(
+                200,
+                [],
+                '{"ok":true,"access_token":"smoke-installed-token","bot_user_id":"U-smoke-bot","team":{"id":"T-smoke"},"scope":"commands,chat:write"}',
+            );
         }
         return new \GuzzleHttp\Psr7\Response(200, [], '{"ok":true,"channel":"C-smoke","ts":"1.000001"}');
     }

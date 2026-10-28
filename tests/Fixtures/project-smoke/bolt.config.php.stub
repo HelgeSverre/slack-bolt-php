@@ -1,0 +1,44 @@
+<?php
+
+declare(strict_types=1);
+
+use Thunder\Bolt\BoltConfig;
+use Thunder\Bolt\Http\ContextInput as HttpInput;
+use Thunder\Bolt\Invocation\Delivery;
+use Thunder\Bolt\OAuth\InstallHooks;
+use Thunder\Bolt\OAuth\InstallResult;
+use Thunder\Bolt\OAuth\OAuthConfig;
+use Thunder\Bolt\SocketMode\Config;
+use Thunder\Bolt\SocketMode\ContextInput as SocketInput;
+
+$enrich = static function (Delivery $delivery, string $transport): void {
+    $account = json_decode(file_get_contents(getcwd() . '/account.json'), flags: JSON_THROW_ON_ERROR);
+    if ($account->team_id !== $delivery->authorization?->teamId || $delivery->context->has('account')) {
+        throw new RuntimeException('Enrichment did not receive fresh authorized delivery state.');
+    }
+    $delivery->context->set('account', $account)->set('transport', $transport);
+};
+return new BoltConfig(
+    signingSecret: 'smoke-secret',
+    oauth: new OAuthConfig(
+        'smoke-client',
+        'smoke-client-secret',
+        'https://example.test/integrations/slack/callback',
+        scopes: ['commands', 'chat:write'],
+        hooks: InstallHooks::make()->onSuccess(static function (InstallResult $result): void {
+            if ($result->request?->metadata['account_id'] !== 42 || $result->installation?->teamId !== 'T-smoke') {
+                throw new RuntimeException('Installation metadata did not survive OAuth.');
+            }
+            file_put_contents(getcwd() . '/account.json', json_encode([
+                'id' => $result->request->metadata['account_id'],
+                'team_id' => $result->installation->teamId,
+            ], JSON_THROW_ON_ERROR));
+        }),
+    ),
+    conversationStoreDriver: 'memory',
+    httpContextFactory: static fn(HttpInput $input) => $enrich($input->delivery, 'http'),
+    socketMode: new Config(appToken: 'xapp-smoke', contextFactory: static fn(SocketInput $input) => $enrich(
+        $input->delivery,
+        'socket_mode',
+    )),
+);

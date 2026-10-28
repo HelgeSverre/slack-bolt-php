@@ -3,10 +3,20 @@
 declare(strict_types=1);
 
 use Psr\Http\Client\ClientInterface;
+use Tempest\Http\Cookie\Cookie;
+use Tempest\Http\GenericRequest;
+use Tempest\Http\Method;
 use Thunder\Bolt\App;
 use Thunder\Bolt\BoltConfig;
 use Thunder\Bolt\Http\Receiver;
+use Thunder\Bolt\Integration\OAuthHttpHandler;
 use Thunder\Bolt\Jobs\SqliteJobStore;
+use Thunder\Bolt\OAuth\Installer;
+use Thunder\Bolt\OAuth\InstallRequest;
+use Thunder\Bolt\SocketMode\Config as SocketConfig;
+use Thunder\Bolt\SocketMode\Runner;
+use Thunder\Bolt\SocketMode\Transport\Connection;
+use Thunder\Bolt\SocketMode\Transport\Connector;
 
 require getcwd() . '/vendor/autoload.php';
 $container = Tempest\Core\Tempest::boot(
@@ -16,9 +26,27 @@ $container = Tempest\Core\Tempest::boot(
 );
 $http = $container->get(ClientInterface::class);
 $app = $container->get(App::class);
+$install = new OAuthHttpHandler($container->get(Installer::class));
+$redirect = $install->install(InstallRequest::make()->scopes('commands', 'chat:write')->metadata(['account_id' => 42]));
+if ($redirect->status->value !== 302) {
+    throw new RuntimeException('Fresh application could not start OAuth.');
+}
+parse_str((string) parse_url($redirect->headers['Location']->values[0], PHP_URL_QUERY), $query);
+$cookie = Cookie::createFromString($redirect->headers['Set-Cookie']->values[0]);
+$callback = new GenericRequest(
+    Method::GET,
+    'https://example.test/integrations/slack/callback?state=' . $query['state'] . '&code=smoke-code',
+    headers: ['Cookie' => $cookie->key . '=' . $cookie->value],
+);
+if ($install->callback($callback)->status->value !== 200 || !is_file(getcwd() . '/account.json')) {
+    throw new RuntimeException('Fresh application did not persist the installation/account association.');
+}
+if ($install->callback($callback)->status->value !== 400 || count($http->requests) !== 2) {
+    throw new RuntimeException('OAuth callback replay was not rejected before another exchange.');
+}
+$http->requests = [];
 $receiver = new Receiver($app, $container->get(BoltConfig::class));
-$post = static function (array $body, bool $form = false) use ($receiver, $app): void {
-    $payload = $body;
+$post = static function (array $body, bool $form = false) use ($receiver): void {
     $body = json_encode($body, JSON_THROW_ON_ERROR);
     $body = $form ? http_build_query(['payload' => $body]) : $body;
     $timestamp = (string) time();
@@ -31,7 +59,6 @@ $post = static function (array $body, bool $form = false) use ($receiver, $app):
         $form ? 'application/x-www-form-urlencoded' : 'application/json',
     );
     if ($result->status !== 200) {
-        $app->dispatch($payload);
         throw new RuntimeException('Fresh application rejected a signed fixture: ' . $result->status);
     }
 };
@@ -57,9 +84,71 @@ $action = [
     'channel' => ['id' => 'C-smoke'],
     'message' => ['ts' => '1.000001'],
     'actions' => [['type' => 'button', 'action_id' => 'smoke', 'value' => 'smoke']],
+    'state' => [
+        'values' => [
+            'title' => ['input' => ['type' => 'plain_text_input', 'value' => 'durable hello']],
+            'labels' => ['select' => ['type' => 'checkboxes', 'selected_options' => [['value' => 'urgent']]]],
+        ],
+    ],
 ];
 $post($action, true);
 $post($action, true);
+$connection = new class([
+    json_encode(['type' => 'hello'], JSON_THROW_ON_ERROR),
+    json_encode([
+        'type' => 'interactive',
+        'envelope_id' => 'smoke-envelope',
+        'accepts_response_payload' => true,
+        'payload' => $action,
+    ], JSON_THROW_ON_ERROR),
+]) implements Connection {
+    public array $sent = [];
+
+    public function __construct(
+        public array $frames,
+    ) {}
+
+    public function receive(float $timeoutSeconds): ?string
+    {
+        return array_shift($this->frames);
+    }
+
+    public function send(string $payload): void
+    {
+        $this->sent[] = json_decode($payload, true, flags: JSON_THROW_ON_ERROR);
+    }
+
+    public function close(): void {}
+};
+$connector = new class($connection) implements Connector {
+    public function __construct(
+        private Connection $connection,
+    ) {}
+
+    public function connect(string $url): Connection
+    {
+        return $this->connection;
+    }
+};
+new Runner(
+    $app,
+    $container->get(\Thunder\Bolt\WebApi\Client::class),
+    $container->get(SocketConfig::class),
+    $connector,
+)->run(static fn(): bool => $connection->frames === []);
+if (($connection->sent[0]['envelope_id'] ?? null) !== 'smoke-envelope') {
+    throw new RuntimeException('Socket interaction was not acknowledged.');
+}
+$deliveries = array_map(
+    static fn(string $line): array => json_decode($line, true, flags: JSON_THROW_ON_ERROR),
+    file(getcwd() . '/deliveries.jsonl', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES),
+);
+if (
+    array_column($deliveries, 'transport') !== ['http', 'http', 'socket_mode']
+    || array_unique(array_column($deliveries, 'text')) !== ['42:durable hello:smoke:urgent']
+) {
+    throw new RuntimeException('HTTP and Socket Mode did not share installation context and typed form semantics.');
+}
 $store = $container->get(SqliteJobStore::class);
 if (count($store->recent()) !== 1) {
     throw new RuntimeException('Interaction retry was not deduplicated.');
@@ -75,4 +164,4 @@ $pdo->prepare('UPDATE thunder_bolt_jobs SET lease_expires_at = :expired WHERE id
     'expired' => time() - 1,
     'id' => $claim->id,
 ]);
-echo "Signed mention and repeated button accepted; abandoned lease persisted.\n";
+echo "OAuth metadata and equivalent HTTP/Socket typed interactions accepted; abandoned lease persisted.\n";

@@ -6,16 +6,33 @@ namespace App\Listeners;
 
 use App\Jobs\SmokeJob;
 use Thunder\Bolt\Attributes\Action;
+use Thunder\Bolt\Context;
 use Thunder\Bolt\Jobs;
 use Thunder\Bolt\Jobs\RetryPolicy;
+use Thunder\Bolt\Payloads\Action as ActionPayload;
 use Thunder\Bolt\Responses\ActionResponse;
 
 final readonly class SmokeAction
 {
     #[Action('smoke')]
-    public function __invoke(Jobs $jobs): ActionResponse
+    public function __invoke(Jobs $jobs, ActionPayload $action, Context $context): ActionResponse
     {
-        $jobs->dispatch(new SmokeJob('durable hello'), key: 'smoke-button', retry: RetryPolicy::idempotent(3, 0, 0));
+        $text = implode(':', [
+            $context->require('account')->id,
+            $action->form()->require('title', 'input')->text(),
+            $action->input()->text(),
+            implode(',', $action->form()->require('labels', 'select')->selectedValues()),
+        ]);
+        file_put_contents(
+            getcwd() . '/deliveries.jsonl',
+            json_encode([
+                'text' => $text,
+                'transport' => $context->require('transport'),
+            ], JSON_THROW_ON_ERROR)
+                . "\n",
+            FILE_APPEND,
+        );
+        $jobs->dispatch(new SmokeJob($text), key: 'smoke-button', retry: RetryPolicy::idempotent(3, 0, 0));
         return ActionResponse::empty();
     }
 }

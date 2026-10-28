@@ -10,8 +10,32 @@ $root = dirname(__DIR__);
 $workspace = sys_get_temp_dir() . '/bolt-project-smoke-' . bin2hex(random_bytes(6));
 mkdir($workspace, 0700);
 $project = $workspace . '/app';
-$environment = [
-    ...getenv(),
+$environment = [];
+// Keep executable/runtime paths, not ambient application keys or tokens.
+foreach ([
+    'PATH',
+    'HOME',
+    'TMPDIR',
+    'TMP',
+    'TEMP',
+    'LANG',
+    'LC_ALL',
+    'PHPRC',
+    'PHP_INI_SCAN_DIR',
+    'SystemRoot',
+    'COMSPEC',
+    'PATHEXT',
+    'APPDATA',
+    'LOCALAPPDATA',
+    'USERPROFILE',
+    'COMPOSER_CACHE_DIR',
+] as $name) {
+    $value = getenv($name);
+    if (is_string($value)) {
+        $environment[$name] = $value;
+    }
+}
+$environment += [
     'SLACK_BOT_TOKEN' => 'smoke-token',
     'SLACK_SIGNING_SECRET' => 'smoke-secret',
     'SLACK_BOT_USER_ID' => 'U-smoke-bot',
@@ -68,6 +92,7 @@ try {
     if (($identity['bot_id'] ?? null) !== 'B-smoke' || ($identity['user_id'] ?? null) !== 'U-smoke-bot') {
         throw new RuntimeException('Static token verification did not return the fixture identity.');
     }
+    copy($root . '/tests/Fixtures/project-smoke/bolt.config.php.stub', $project . '/config/bolt.config.php');
     echo $command([PHP_BINARY, $root . '/tests/Fixtures/project-smoke/dispatch.php.stub'], $project);
     $outcome = json_decode(
         $command([PHP_BINARY, 'bolt', 'jobs:work', '--once'], $project),
@@ -77,7 +102,7 @@ try {
     if (
         ($outcome['status'] ?? '') !== 'succeeded'
         || ($outcome['attempts'] ?? 0) !== 2
-        || file_get_contents($project . '/receipt.txt') !== 'durable hello'
+        || file_get_contents($project . '/receipt.txt') !== '42:durable hello:smoke:urgent'
     ) {
         throw new RuntimeException('Fresh worker did not recover and complete the abandoned job.');
     }
@@ -93,7 +118,7 @@ try {
         throw new RuntimeException('Completed fixture was executed again.');
     }
     echo
-        "Fresh project passed: production install, discovery, signed mention/button, deduplication, process restart and recovery.\n";
+        "Fresh project passed: production install, discovery, OAuth metadata, HTTP/Socket context and typed forms, deduplication, worker restart and recovery.\n";
 } catch (Throwable $exception) {
     fwrite(STDERR, $exception::class . ': ' . $exception->getMessage() . "\n");
     $failed = true;

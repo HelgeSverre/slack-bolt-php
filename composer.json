@@ -1,8 +1,11 @@
 {
-    "name": "thunder/bolt",
+    "name": "helgesverre/slack-bolt",
     "description": "A PHP-native Slack application framework built on Tempest.",
+    "keywords": ["slack","bolt","framework","block-kit","socket-mode","oauth","tempest"],
+    "homepage": "https://github.com/HelgeSverre/slack-bolt-php",
     "type": "library",
     "license": "MIT",
+    "support": {"issues":"https://github.com/HelgeSverre/slack-bolt-php/issues","source":"https://github.com/HelgeSverre/slack-bolt-php","docs":"https://github.com/HelgeSverre/slack-bolt-php/blob/main/docs/README.md"},
     "require": {
         "php": "^8.5",
         "amphp/amp": "^3.1",

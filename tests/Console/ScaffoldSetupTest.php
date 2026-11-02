@@ -76,7 +76,7 @@ final class ScaffoldSetupTest extends TestCase
                 flags: JSON_THROW_ON_ERROR,
             );
 
-            self::assertSame('dev-main', $composer['require']['thunder/bolt']);
+            self::assertSame('dev-main', $composer['require']['helgesverre/slack-bolt']);
             self::assertSame(['type' => 'vcs', 'url' => realpath(dirname(__DIR__, 2))], $composer['repositories'][0]);
             self::assertStringContainsString(
                 'VCS `dev-main` branch',

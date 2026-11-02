@@ -1,10 +1,17 @@
 # Thunder Bolt
 
+![Thunder Bolt — Slack apps. Modern PHP.](docs/images/readme-header.png)
+
+[![Checks](https://github.com/HelgeSverre/slack-bolt-php/actions/workflows/checks.yml/badge.svg)](https://github.com/HelgeSverre/slack-bolt-php/actions/workflows/checks.yml)
+[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-A4AF71?style=flat-square)](https://www.php.net/releases/)
+[![Packagist](https://img.shields.io/packagist/v/helgesverre/slack-bolt?include_prereleases&style=flat-square&color=A4AF71)](https://packagist.org/packages/helgesverre/slack-bolt)
+[![License: MIT](https://img.shields.io/badge/license-MIT-A4AF71?style=flat-square)](LICENSE)
+
 Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, and a Slack client that feels at home in your editor.
 
-Thunder Bolt is built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style. The `Thunder\Bolt` namespace and package name are provisional.
+Thunder Bolt is built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style. The PHP namespace is `Thunder\Bolt`; the Composer package is `helgesverre/slack-bolt`.
 
-**Experimental v0.2.0 preview.** This README follows `main`; the v0.2.0 tag captures the reviewed compatibility milestone. HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet. [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md). The package is not yet registered on Packagist.
+**Experimental v0.2.0 preview.** This README follows `main`; the v0.2.0 tag captures the reviewed compatibility milestone. HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet. [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
 
 The [Bolt JS parity audit](docs/research/bolt-js-parity-audit.md) distinguishes implemented capabilities, PHP adaptations, useful gaps and Node-specific exclusions. Endpoint/model counts do not establish full framework parity.
 
@@ -33,22 +40,35 @@ Views and actions share typed form readers: `$view->form()->require('title', 'in
 
 Message middleware composes through `MessageFilter::subtype('file_share')` and `MessageFilter::directMention()` from `Thunder\Bolt\Middleware`. For example, `$app->message('', MessageFilter::directMention(), $handler)` selects messages beginning with a mention of the authorized bot. It preserves the message text and requires a known bot user ID.
 
-## Get started
+## Install
+
+Install the current development preview into an existing Composer application:
+
+```sh
+composer require helgesverre/slack-bolt:dev-main
+```
+
+The public package uses `dev-main` while these unreleased APIs settle. Earlier tags predate the package rename and current project setup; use the explicit development constraint for this guide. PHP 8.5+ and Composer 2 are required.
+
+## Create an app
 
 You need PHP 8.5+ and Composer 2. Node is only required for maintainer tooling, including reference generation and documentation checks.
 
 ```sh
-git clone --branch main https://github.com/HelgeSverre/slack-bolt-php.git
-cd slack-bolt-php
-composer install
+composer global require helgesverre/slack-bolt:dev-main
 
-php bin/bolt new work/my-bot --no-interaction
-cd work/my-bot
+bolt new my-bot \
+  --source=vcs \
+  --repository=https://github.com/HelgeSverre/slack-bolt-php.git \
+  --no-interaction
+cd my-bot
 composer install
 cp .env.example .env
 php bolt doctor
 php bolt serve
 ```
+
+Make sure Composer’s global vendor bin directory is on `PATH` (`composer global config bin-dir --absolute`). For contributor development, the [getting started guide](docs/guides/getting-started.md) also covers scaffolding from a checkout.
 
 Set `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` in `.env`. Configure your Slack app's Events API and interactivity request URL as a publicly reachable HTTPS `/slack/events` endpoint, install the app with the scopes in the generated manifest, and invite it to a channel. Use an HTTPS tunnel for local HTTP development.
 
@@ -57,13 +77,14 @@ Run `php bolt auth:verify` to check a static token and print its identity. For H
 Choose the transport and installation style when scaffolding:
 
 ```sh
+# From a framework checkout; add the same profile flags to a global bolt new.
 php bin/bolt new work/socket-app --transport=socket --auth=token --no-interaction
 php bin/bolt new work/oauth-app --transport=http --auth=oauth --no-interaction
 ```
 
 HTTP/token remains the default. Socket Mode needs an app-level token with `connections:write`; OAuth needs client credentials and a registered HTTPS callback. OAuth still uses HTTP install/callback routes when events arrive through Socket Mode. Generated manifests, environment examples and start commands follow the selected profile. `config/setup.config.php` records onboarding defaults; runtime settings remain in `BoltConfig`.
 
-Until the package is published, generated apps default to a local Composer path repository pointing at this checkout; keep it available. `bolt new --source=vcs --repository=… --version=dev-main` is the explicit Git alternative. `serve` starts a development server; production serves `public/index.php` through your PHP host.
+Generated apps default to a local Composer path repository pointing at the scaffolder’s installation; keep it available when using that default. The global CLI example above explicitly selects Git so the application does not depend on that local installation. `bolt new --source=vcs --repository=… --version=dev-main` is the explicit Git alternative. `serve` starts a development server; production serves `public/index.php` through your PHP host.
 
 The [hello-bolt example](examples/hello-bolt/) connects mentions, buttons, shortcuts, external options, modal validation, and stored conversation state.
 

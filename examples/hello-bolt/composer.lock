@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dc7f689618a3fe64731740a0c262ca58",
+    "content-hash": "49779a73e78be12c861eab4481c10cee",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2108,6 +2108,107 @@
                 }
             ],
             "time": "2026-10-17T23:49:46+00:00"
+        },
+        {
+            "name": "helgesverre/slack-bolt",
+            "version": "0.2.x-dev",
+            "dist": {
+                "type": "path",
+                "url": "../..",
+                "reference": "80a4d031dcebc11779dc2b02321aa5a444f00ef5"
+            },
+            "require": {
+                "amphp/amp": "^3.1",
+                "amphp/http-client": "^5.3",
+                "amphp/websocket-client": "^2.0",
+                "guzzlehttp/guzzle": "^7.8.2",
+                "guzzlehttp/psr7": "^2.6",
+                "php": "^8.5",
+                "psr/clock": "^1.0",
+                "psr/http-client": "^1.0",
+                "psr/http-factory": "^1.1",
+                "psr/log": "^3.0",
+                "revolt/event-loop": "^1.0",
+                "tempest/framework": "^3.20.0"
+            },
+            "require-dev": {
+                "carthage-software/mago": "1.50.0",
+                "phpunit/phpunit": "^12.5"
+            },
+            "bin": [
+                "bin/bolt",
+                "bin/bolt-complete"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "0.2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Thunder\\Bolt\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Thunder\\Bolt\\Tests\\": "tests/",
+                    "App\\": "examples/hello-bolt/app/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "@php vendor/bin/phpunit --exclude-group live"
+                ],
+                "test:live": [
+                    "@php vendor/bin/phpunit tests/Live"
+                ],
+                "test:project": [
+                    "@php scripts/smoke-project.php"
+                ],
+                "test:vcs-project": [
+                    "@php scripts/smoke-vcs-project.php"
+                ],
+                "test:soak": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "@php -d memory_limit=128M scripts/soak-runtime.php"
+                ],
+                "analyse": [
+                    "@php vendor/bin/mago analyze"
+                ],
+                "lint": [
+                    "@php vendor/bin/mago lint"
+                ],
+                "format": [
+                    "@php vendor/bin/mago format"
+                ],
+                "format:check": [
+                    "@php vendor/bin/mago format --check"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "A PHP-native Slack application framework built on Tempest.",
+            "homepage": "https://github.com/HelgeSverre/slack-bolt-php",
+            "keywords": [
+                "block-kit",
+                "bolt",
+                "framework",
+                "oauth",
+                "slack",
+                "socket-mode",
+                "tempest"
+            ],
+            "support": {
+                "issues": "https://github.com/HelgeSverre/slack-bolt-php/issues",
+                "source": "https://github.com/HelgeSverre/slack-bolt-php",
+                "docs": "https://github.com/HelgeSverre/slack-bolt-php/blob/main/docs/README.md"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "kelunik/certificate",
@@ -4874,16 +4975,16 @@
         },
         {
             "name": "symfony/mime",
-            "version": "v8.1.7",
+            "version": "v8.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mime.git",
-                "reference": "773ac57f20e2795bdadb65b5b1b5f4850d498283"
+                "reference": "8d1232052c9cdef170ed9608b3147bca4f61ff69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/mime/zipball/773ac57f20e2795bdadb65b5b1b5f4850d498283",
-                "reference": "773ac57f20e2795bdadb65b5b1b5f4850d498283",
+                "url": "https://api.github.com/repos/symfony/mime/zipball/8d1232052c9cdef170ed9608b3147bca4f61ff69",
+                "reference": "8d1232052c9cdef170ed9608b3147bca4f61ff69",
                 "shasum": ""
             },
             "require": {
@@ -4936,7 +5037,7 @@
                 "mime-type"
             ],
             "support": {
-                "source": "https://github.com/symfony/mime/tree/v8.1.7"
+                "source": "https://github.com/symfony/mime/tree/v8.1.10"
             },
             "funding": [
                 {
@@ -4956,7 +5057,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-04T11:02:17+00:00"
+            "time": "2026-10-28T17:58:38+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -6331,85 +6432,6 @@
             "time": "2026-10-20T08:16:58+00:00"
         },
         {
-            "name": "thunder/bolt",
-            "version": "0.2.x-dev",
-            "dist": {
-                "type": "path",
-                "url": "../..",
-                "reference": "f91ace07b936b02cf20354a6d968a331026c9b18"
-            },
-            "require": {
-                "amphp/amp": "^3.1",
-                "amphp/http-client": "^5.3",
-                "amphp/websocket-client": "^2.0",
-                "guzzlehttp/guzzle": "^7.8.2",
-                "guzzlehttp/psr7": "^2.6",
-                "php": "^8.5",
-                "psr/clock": "^1.0",
-                "psr/http-client": "^1.0",
-                "psr/http-factory": "^1.1",
-                "psr/log": "^3.0",
-                "revolt/event-loop": "^1.0",
-                "tempest/framework": "^3.20.0"
-            },
-            "require-dev": {
-                "carthage-software/mago": "1.50.0",
-                "phpunit/phpunit": "^12.5"
-            },
-            "bin": [
-                "bin/bolt",
-                "bin/bolt-complete"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "0.2.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Thunder\\Bolt\\": "src/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Thunder\\Bolt\\Tests\\": "tests/",
-                    "App\\": "examples/hello-bolt/app/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "@php vendor/bin/phpunit --exclude-group live"
-                ],
-                "test:live": [
-                    "@php vendor/bin/phpunit tests/Live"
-                ],
-                "test:project": [
-                    "@php scripts/smoke-project.php"
-                ],
-                "analyse": [
-                    "@php vendor/bin/mago analyze"
-                ],
-                "lint": [
-                    "@php vendor/bin/mago lint"
-                ],
-                "format": [
-                    "@php vendor/bin/mago format"
-                ],
-                "format:check": [
-                    "@php vendor/bin/mago format --check"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "A PHP-native Slack application framework built on Tempest.",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
             "name": "vlucas/phpdotenv",
             "version": "v5.7.0",
             "source": {
@@ -6572,7 +6594,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "thunder/bolt": 20
+        "helgesverre/slack-bolt": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

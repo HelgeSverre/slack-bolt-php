@@ -61,7 +61,7 @@ final readonly class ProjectSource
         return [
             'type' => 'path',
             'url' => $this->repository,
-            'options' => ['symlink' => true, 'versions' => ['thunder/bolt' => $this->version]],
+            'options' => ['symlink' => true, 'versions' => ['helgesverre/slack-bolt' => $this->version]],
         ];
     }
 

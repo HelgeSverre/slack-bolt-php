@@ -1,5 +1,7 @@
 # Distribution, package naming, and docs-site options
 
+> Update — 2 November 2026: the repository is public. The logged-in Packagist submission found `thunder` owned by another account; Helge selected `helgesverre/slack-bolt`, retaining `Thunder\Bolt` imports. The observations and recommendation below are historical; use the root README for current installation instructions.
+
 Researched 30 October 2026. This is a decision memo, not a registration or
 publication plan. It records what the public registries returned on that date;
 it does **not** establish ownership, trademark rights, or legal clearance.

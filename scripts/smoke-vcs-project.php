@@ -204,7 +204,7 @@ try {
         $project,
         $environment,
     );
-    if (is_link($project . '/vendor/thunder/bolt')) {
+    if (is_link($project . '/vendor/helgesverre/slack-bolt')) {
         throw new RuntimeException('VCS installation must not be a path repository symlink.');
     }
     rename($source, $workspace . '/source-detached');

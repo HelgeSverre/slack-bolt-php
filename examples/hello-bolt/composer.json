@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.5",
-        "thunder/bolt": "0.2.x-dev"
+        "helgesverre/slack-bolt": "0.2.x-dev"
     },
     "repositories": [
         {
@@ -14,7 +14,7 @@
             "options": {
                 "symlink": true,
                 "versions": {
-                    "thunder/bolt": "0.2.x-dev"
+                    "helgesverre/slack-bolt": "0.2.x-dev"
                 }
             }
         }

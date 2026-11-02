@@ -1,6 +1,6 @@
 # Thunder Bolt documentation
 
-Thunder Bolt is an experimental PHP 8.5+ Slack framework built on Tempest 3. It is private and not published on Packagist. Start with the guides below; the older research material is deliberately kept separate so an adopter does not need to treat a dated audit as current operating guidance.
+Thunder Bolt is an experimental PHP 8.5+ Slack framework built on Tempest 3. The public Composer package is [`helgesverre/slack-bolt`](https://packagist.org/packages/helgesverre/slack-bolt), with the PHP namespace `Thunder\Bolt`. Use `dev-main` for the current development preview. Start with the guides below; the older research material is deliberately kept separate so an adopter does not need to treat a dated audit as current operating guidance.
 
 ## Start here
 

@@ -62,7 +62,7 @@ final class OnboardingBootstrapTest extends TestCase
             true,
             flags: JSON_THROW_ON_ERROR,
         );
-        self::assertSame('dev-main', $composer['require']['thunder/bolt']);
+        self::assertSame('dev-main', $composer['require']['helgesverre/slack-bolt']);
         self::assertSame('vcs', $composer['repositories'][0]['type']);
     }
 

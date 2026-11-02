@@ -230,7 +230,7 @@ final class ProjectScaffoldTest extends TestCase
         self::assertFileExists($project . '/app/Listeners/GreetOnMention.php');
         self::assertStringContainsString('0.2.x-dev', (string) file_get_contents($project . '/composer.json'));
         self::assertStringContainsString(
-            'vendor/thunder/bolt/bin/bolt',
+            'vendor/helgesverre/slack-bolt/bin/bolt',
             (string) file_get_contents($project . '/bolt'),
         );
         self::assertStringContainsString('SLACK_APP_TOKEN=', (string) file_get_contents($project . '/.env.example'));

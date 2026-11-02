@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Public Composer identity `helgesverre/slack-bolt`, preserving `Thunder\Bolt` imports; aligned generated applications, example lockfile and launchers.
+- Public installation instructions, status badges and a minimal generated README header.
+- Updated the locked Symfony Mime dependency to its patched release.
+
 - Observed runtime status for Socket Mode and durable workers, with heartbeat freshness, queue backlog and uncertain/expired outcome visibility. Diagnostics are read-only and redact sensitive execution data. Optional queue failures preserve independent Socket Mode observations.
 - Non-root Docker Compose deployment example with persistent state, separate intake/workers, health checks and graceful restart guidance.
 - Graceful SIGTERM handling for one-shot job workers, real process crash/drain/concurrency tests and an opt-in sustained reliability harness.

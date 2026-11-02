@@ -85,8 +85,8 @@ final class BoltCli
     private static function writeVersion(): void
     {
         $version = '0.2.x-dev';
-        if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('thunder/bolt')) {
-            $version = InstalledVersions::getPrettyVersion('thunder/bolt') ?? $version;
+        if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('helgesverre/slack-bolt')) {
+            $version = InstalledVersions::getPrettyVersion('helgesverre/slack-bolt') ?? $version;
         }
         fwrite(STDOUT, "Thunder Bolt {$version}\n");
     }

@@ -33,7 +33,7 @@ The guide uses current sidebar labels and warns that Slack mixes old and new set
 - Custom functions need remote-runtime configuration and `function_executed`, plus workspace eligibility. The broad demo manifest alone does not complete that setup.
 - Function-only Socket Mode can use delivery-scoped workflow tokens; ordinary bot traffic still needs installation authorization.
 - Sending message metadata does not configure inbound metadata subscriptions. Work Object unfurl domains and authorization remain application configuration.
-- The package is private and not published on Packagist. Path scaffolding uses the checkout; VCS scaffolding requires an explicit repository and currently `dev-main`. Old tags lack the generated application's setup API.
+- At the initial audit snapshot the repository was private and unpublished. The subsequent public package is `helgesverre/slack-bolt`, retaining `Thunder\Bolt` imports; use the root README for installation. Path scaffolding uses the checkout; VCS scaffolding requires an explicit repository and currently `dev-main`. Old tags lack the generated application's setup API.
 
 ## Ongoing verification
 

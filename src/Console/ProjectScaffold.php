@@ -29,7 +29,7 @@ final readonly class ProjectScaffold
             'description' => 'A Slack application built with Thunder Bolt.',
             'type' => 'project',
             'license' => 'proprietary',
-            'require' => ['php' => '^8.5', 'thunder/bolt' => $source->version],
+            'require' => ['php' => '^8.5', 'helgesverre/slack-bolt' => $source->version],
             'repositories' => [$source->composerRepository()],
             'autoload' => ['psr-4' => ['App\\' => 'app/']],
             'minimum-stability' => 'dev',
@@ -75,7 +75,7 @@ final readonly class ProjectScaffold
         $this->copyStub('mention-listener.php.stub', "{$project}/app/Listeners/GreetOnMention.php");
         $this->write(
             "{$project}/bolt",
-            "#!/usr/bin/env php\n<?php\n\ndeclare(strict_types=1);\n\nrequire __DIR__ . '/vendor/autoload.php';\nrequire __DIR__ . '/vendor/thunder/bolt/bin/bolt';\n",
+            "#!/usr/bin/env php\n<?php\n\ndeclare(strict_types=1);\n\nrequire __DIR__ . '/vendor/autoload.php';\nrequire __DIR__ . '/vendor/helgesverre/slack-bolt/bin/bolt';\n",
         );
         chmod("{$project}/bolt", 0755);
 

@@ -50,10 +50,10 @@ all matching listener promises. The HTTP receiver holds an acknowledgement
 timeout (normally 3001 ms; 5001 ms for `function_executed` in this release),
 while the Socket Mode response ACK currently has no comparable timer. Neither
 receiver persists listeners as jobs or supplies a worker/retry abstraction.
-[`App.ts`](../../work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts),
-[`HTTPReceiver.ts`](../../work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPReceiver.ts),
-[`HTTPResponseAck.ts`](../../work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPResponseAck.ts),
-[`SocketModeReceiver.ts`](../../work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeReceiver.ts).
+[`App.ts`](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts),
+[`HTTPReceiver.ts`](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPReceiver.ts),
+[`HTTPResponseAck.ts`](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/HTTPResponseAck.ts),
+[`SocketModeReceiver.ts`](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/receivers/SocketModeReceiver.ts).
 
 `async` in this JavaScript design is event-loop concurrency and completion
 ordering within the live process; it is **not durable execution**. A Promise

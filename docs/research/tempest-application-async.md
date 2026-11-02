@@ -51,22 +51,22 @@ once”* merely because an attribute was applied.
 ### Boot, configuration, container, and lifecycle
 
 `Tempest::boot()` delegates to `FrameworkKernel::boot()` and returns the
-container ([`Tempest.php:12-26`](../../vendor/tempest/framework/packages/core/src/Tempest.php#L12-L26)). The kernel creates or accepts a container, registers
+container ([`Tempest.php:12-26`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/core/src/Tempest.php#L12-L26)). The kernel creates or accepts a container, registers
 itself, validates the root, loads `.env`, establishes internal storage, loads
 Composer/discovery/configuration, boots discovery, installs error handling, and
-emits `BOOTED` ([`FrameworkKernel.php:50-80`](../../vendor/tempest/framework/packages/core/src/FrameworkKernel.php#L50-L80)). It loads every discoverable
+emits `BOOTED` ([`FrameworkKernel.php:50-80`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/core/src/FrameworkKernel.php#L50-L80)). It loads every discoverable
 `*.config.php` and registers each configuration object into the container
-([`LoadConfig.php:28-42`](../../vendor/tempest/framework/packages/core/src/Kernel/LoadConfig.php#L28-L42)); discovery locations include explicit locations plus Composer-derived locations
-([`FrameworkKernel.php:175-191`](../../vendor/tempest/framework/packages/core/src/FrameworkKernel.php#L175-L191)).
+([`LoadConfig.php:28-42`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/core/src/Kernel/LoadConfig.php#L28-L42)); discovery locations include explicit locations plus Composer-derived locations
+([`FrameworkKernel.php:175-191`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/core/src/FrameworkKernel.php#L175-L191)).
 
 The container already supports typed registrations, singletons, configuration,
 auto-resolution, invocation, initializers, decorators, and resettable services
-([`Container.php:13-49`](../../vendor/tempest/framework/packages/container/src/Container.php#L13-L49)). For a `longRunning` kernel, shutdown finishes deferred tasks and resets the container before emitting the final shutdown event
-([`FrameworkKernel.php:104-120`](../../vendor/tempest/framework/packages/core/src/FrameworkKernel.php#L104-L120)).
+([`Container.php:13-49`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/container/src/Container.php#L13-L49)). For a `longRunning` kernel, shutdown finishes deferred tasks and resets the container before emitting the final shutdown event
+([`FrameworkKernel.php:104-120`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/core/src/FrameworkKernel.php#L104-L120)).
 
 Tempest's `Application` interface is deliberately only `run(): void`
-([`Application.php:7-10`](../../vendor/tempest/framework/packages/core/src/Application.php#L7-L10)). Its framework initializer chooses a console application for CLI and an HTTP application otherwise
-([`ApplicationInitializer.php:15-30`](../../vendor/tempest/framework/src/Tempest/Framework/Application/ApplicationInitializer.php#L15-L30)). A generic Thunder subclass/base class would therefore duplicate the host's
+([`Application.php:7-10`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/core/src/Application.php#L7-L10)). Its framework initializer chooses a console application for CLI and an HTTP application otherwise
+([`ApplicationInitializer.php:15-30`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/src/Tempest/Framework/Application/ApplicationInitializer.php#L15-L30)). A generic Thunder subclass/base class would therefore duplicate the host's
 SAPI/lifecycle decision while still being unable to express Slack's request
 acknowledgement and delivery semantics.
 
@@ -84,17 +84,17 @@ published config, not a second application kernel.
 ### Console and command discovery
 
 Public methods carrying `#[ConsoleCommand]` are discovered and registered
-([`ConsoleCommandDiscovery.php:22-44`](../../vendor/tempest/framework/packages/console/src/Discovery/ConsoleCommandDiscovery.php#L22-L44)). `ConsoleApplication::boot()` uses the same Tempest boot/configuration
+([`ConsoleCommandDiscovery.php:22-44`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/console/src/Discovery/ConsoleCommandDiscovery.php#L22-L44)). `ConsoleApplication::boot()` uses the same Tempest boot/configuration
 path; `run()` resolves a command and shuts down the kernel
-([`ConsoleApplication.php:31-62`](../../vendor/tempest/framework/packages/console/src/ConsoleApplication.php#L31-L62)). Thus a worker/diagnostic command is
+([`ConsoleApplication.php:31-62`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/console/src/ConsoleApplication.php#L31-L62)). Thus a worker/diagnostic command is
 already a normal Tempest console command; Thunder should not implement a
 parallel command registry.
 
 Likewise, the command bus discovers public `#[CommandHandler]` methods whose
 sole parameter is a class and indexes them by that command class
-([`CommandBusDiscovery.php:20-54`](../../vendor/tempest/framework/packages/command-bus/src/CommandBusDiscovery.php#L20-L54)). Dispatch resolves the
+([`CommandBusDiscovery.php:20-54`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/CommandBusDiscovery.php#L20-L54)). Dispatch resolves the
 handler through the container and invokes it through the middleware stack
-([`GenericCommandBus.php:19-57`](../../vendor/tempest/framework/packages/command-bus/src/GenericCommandBus.php#L19-L57)).
+([`GenericCommandBus.php:19-57`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/GenericCommandBus.php#L19-L57)).
 
 ## Locked async implementation
 
@@ -125,20 +125,20 @@ sequenceDiagram
 ```
 
 `#[Async]` itself has no fields or behavior
-([`Async.php:7-10`](../../vendor/tempest/framework/packages/command-bus/src/Async.php#L7-L10)). Framework-priority middleware detects it on either a command or its
+([`Async.php:7-10`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/Async.php#L7-L10)). Framework-priority middleware detects it on either a command or its
 handler, stores the command under a random UUID, and deliberately returns
-without invoking the next handler ([`AsyncCommandMiddleware.php:11-30`](../../vendor/tempest/framework/packages/command-bus/src/AsyncCommandMiddleware.php#L11-L30)). That is the precise completion point of an
+without invoking the next handler ([`AsyncCommandMiddleware.php:11-30`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/AsyncCommandMiddleware.php#L11-L30)). That is the precise completion point of an
 async `dispatch()` call.
 
 `command:monitor` is an infinite polling daemon. It polls every 0.5 seconds,
 keeps no more than five child `command:handle` processes in *that monitor*, and
-chooses the first pending UUID ([`MonitorAsyncCommands.php:29-107`](../../vendor/tempest/framework/packages/command-bus/src/MonitorAsyncCommands.php#L29-L107)). Each child loads the still-pending command,
+chooses the first pending UUID ([`MonitorAsyncCommands.php:29-107`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/MonitorAsyncCommands.php#L29-L107)). Each child loads the still-pending command,
 directly invokes its handler, then marks it done; it catches `Throwable` and
-marks the command failed ([`HandleAsyncCommand.php:27-85`](../../vendor/tempest/framework/packages/command-bus/src/HandleAsyncCommand.php#L27-L85)).
+marks the command failed ([`HandleAsyncCommand.php:27-85`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/HandleAsyncCommand.php#L27-L85)).
 
 There is no `claim`, `reserve`, `heartbeat`, `release`, `retry`, `cancel`, or
 attempt method in the entire repository contract
-([`CommandRepository.php:7-19`](../../vendor/tempest/framework/packages/command-bus/src/CommandRepository.php#L7-L19)). Therefore the following are source-based
+([`CommandRepository.php:7-19`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/CommandRepository.php#L7-L19)). Therefore the following are source-based
 inferences, not a claim from Tempest documentation:
 
 1. Multiple monitors can select the same pending UUID before either child marks
@@ -164,14 +164,14 @@ token that can expire or leak at rest.
 
 | Adapter | What locked code does | Appropriate reading |
 | --- | --- | --- |
-| File (default) | Writes a serialized `.pending.txt` under the installed `command-bus` package; scans with `glob`; deletes on success and renames to `.failed.txt` on failure ([source](../../vendor/tempest/framework/packages/command-bus/src/AsyncCommandRepositories/FileCommandRepository.php#L13-L66)). | Persists only as well as that shared writable filesystem; unsuitable as a multi-host queue and has no claim. |
-| Memory | Holds commands in an array, removing them for both done and failed ([source](../../vendor/tempest/framework/packages/command-bus/src/AsyncCommandRepositories/MemoryRepository.php#L9-L36)). | Test/local-only; process exit loses every pending command. |
-| Database | Inserts `id` + serialized `payload`; pending means `failed_at IS NULL`; success deletes, failure timestamps the row ([source](../../vendor/tempest/framework/packages/command-bus/src/AsyncCommandRepositories/DatabaseCommandRepository.php#L20-L96)). | A shared, durable enqueue store if the database commits, but no transactionally acquired work item, lease, or retry metadata. |
-| Redis | Writes serialized payloads in a pending hash; scans with `HSCAN`; success `HDEL`s; a Lua script atomically moves an existing pending entry to the failed hash ([source](../../vendor/tempest/framework/packages/command-bus/src/AsyncCommandRepositories/RedisCommandRepository.php#L69-L110)). | Shared persistence/atomic terminal failure move, but no pop/claim/visibility timeout/retry. |
+| File (default) | Writes a serialized `.pending.txt` under the installed `command-bus` package; scans with `glob`; deletes on success and renames to `.failed.txt` on failure ([source](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/AsyncCommandRepositories/FileCommandRepository.php#L13-L66)). | Persists only as well as that shared writable filesystem; unsuitable as a multi-host queue and has no claim. |
+| Memory | Holds commands in an array, removing them for both done and failed ([source](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/AsyncCommandRepositories/MemoryRepository.php#L9-L36)). | Test/local-only; process exit loses every pending command. |
+| Database | Inserts `id` + serialized `payload`; pending means `failed_at IS NULL`; success deletes, failure timestamps the row ([source](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/AsyncCommandRepositories/DatabaseCommandRepository.php#L20-L96)). | A shared, durable enqueue store if the database commits, but no transactionally acquired work item, lease, or retry metadata. |
+| Redis | Writes serialized payloads in a pending hash; scans with `HSCAN`; success `HDEL`s; a Lua script atomically moves an existing pending entry to the failed hash ([source](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/AsyncCommandRepositories/RedisCommandRepository.php#L69-L110)). | Shared persistence/atomic terminal failure move, but no pop/claim/visibility timeout/retry. |
 
 `CommandBusConfig` defaults to the file repository
-([`CommandBusConfig.php:11-22`](../../vendor/tempest/framework/packages/command-bus/src/CommandBusConfig.php#L11-L22)); the configured repository is resolved once as a
-singleton ([`CommandRepositoryInitializer.php:11-19`](../../vendor/tempest/framework/packages/command-bus/src/CommandRepositoryInitializer.php#L11-L19)). The
+([`CommandBusConfig.php:11-22`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/CommandBusConfig.php#L11-L22)); the configured repository is resolved once as a
+singleton ([`CommandRepositoryInitializer.php:11-19`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/CommandRepositoryInitializer.php#L11-L19)). The
 database and Redis backends are therefore better deployment choices *only if*
 the application accepts the worker semantics above and provides idempotency at
 the side-effect boundary. They do not, by themselves, make Slack execution
@@ -266,7 +266,7 @@ flowchart LR
 ### Evidence
 
 - [Tempest 3.x command bus (official)](https://tempestphp.com/3.x/features/command-bus)
-- [Tempest 3.20 source documentation pinned in this checkout](../../vendor/tempest/framework/docs/2-features/10-command-bus.md#L80-L133)
+- [Tempest 3.20 source documentation pinned in this checkout](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/docs/2-features/10-command-bus.md#L80-L133)
 - [Locked framework version and source revision](../../composer.lock#L6032)
-- [Tempest kernel boot source](../../vendor/tempest/framework/packages/core/src/FrameworkKernel.php#L50-L120)
-- [Async middleware / worker / repository contract](../../vendor/tempest/framework/packages/command-bus/src/AsyncCommandMiddleware.php#L19-L30), [monitor](../../vendor/tempest/framework/packages/command-bus/src/MonitorAsyncCommands.php#L29-L107), [handler](../../vendor/tempest/framework/packages/command-bus/src/HandleAsyncCommand.php#L27-L85), [repository](../../vendor/tempest/framework/packages/command-bus/src/CommandRepository.php#L7-L19)
+- [Tempest kernel boot source](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/core/src/FrameworkKernel.php#L50-L120)
+- [Async middleware / worker / repository contract](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/AsyncCommandMiddleware.php#L19-L30), [monitor](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/MonitorAsyncCommands.php#L29-L107), [handler](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/HandleAsyncCommand.php#L27-L85), [repository](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/CommandRepository.php#L7-L19)

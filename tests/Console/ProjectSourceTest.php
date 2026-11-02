@@ -93,6 +93,8 @@ final class ProjectSourceTest extends TestCase
             return;
         }
         if (file_exists($path) || is_link($path)) {
+            // Git objects are read-only on Windows; change only this disposable fixture.
+            chmod($path, 0600);
             unlink($path);
         }
     }

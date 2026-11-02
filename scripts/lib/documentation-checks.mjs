@@ -86,6 +86,8 @@ export function checkDocumentation(root, files = documentationFiles(root), { php
       result.links++;
       if (!inside(target)) {
         report(file, line, `Use a repository-relative link: ${destination}`);
+      } else if (['work', 'vendor', 'node_modules', '.git', '.thunder-bolt', '.tempest'].includes(path.relative(root, target).split(path.sep)[0])) {
+        report(file, line, `Link depends on private or generated local state: ${destination}`);
       } else if (!fs.existsSync(target)) {
         report(file, line, `Missing link target: ${destination}`);
       } else if (fragment && fs.statSync(target).isFile()) {

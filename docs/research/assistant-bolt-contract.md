@@ -16,7 +16,7 @@ Slack's current documentation steers new agent experiences toward `agents.sessio
 
 `threadStarted` and `userMessage` are required. Each may be one callback or an ordered middleware list. The context-changed handler is optional; its default is to persist the event's context. Malformed assistant configuration fails before registration. Missing a channel or root timestamp at execution time throws a dedicated error.
 
-Sources: pinned [`Assistant.ts`](../../work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts), [`App.ts`](../../work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts), and unit tests. Confidence: high.
+Sources: pinned [`Assistant.ts`](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts), [`App.ts`](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts), and unit tests. Confidence: high.
 
 ## Utility behavior
 
@@ -29,13 +29,13 @@ Every handler receives helpers scoped to the resolved `(channel_id, thread_ts)`:
 - `setSuggestedPrompts({ prompts, title? })` supplies the channel/thread for `assistant.threads.setSuggestedPrompts`; each prompt is `{title, message}`.
 - `getThreadContext()` and `saveThreadContext()` delegate to the configured store.
 
-Sources: [`Assistant.ts` utilities](../../work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts), [`create-set-status.ts`](../../work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-set-status.ts), and generated PHP request models. Confidence: high.
+Sources: [`Assistant.ts` utilities](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts), [`create-set-status.ts`](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-set-status.ts), and generated PHP request models. Confidence: high.
 
 ## Context-store parity and limits
 
 Bolt's `AssistantThreadContextStore` has only `get(args)` and `save(args)`. Its default implementation asks `conversations.replies` for thread messages with metadata, finds the first bot-authored message, and writes `assistant_thread_context` metadata back with `chat.update`. It also caches the most recently saved context **on the store instance**, which is not tenant or thread keyed. That cache is convenient in a single worker but unsafe as a model for concurrent or long-lived multi-thread PHP workers.
 
-Source: [`AssistantThreadContextStore.ts`](../../work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/AssistantThreadContextStore.ts) and its unit tests. Confidence: high.
+Source: [`AssistantThreadContextStore.ts`](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/AssistantThreadContextStore.ts) and its unit tests. Confidence: high.
 
 ## Recommended Thunder Bolt seam
 

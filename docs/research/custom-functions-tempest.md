@@ -55,7 +55,7 @@ Slack's public example event contains all of the useful durable identifiers:
 
 Sources: [Slack custom steps](https://docs.slack.dev/tools/bolt-js/concepts/custom-steps/),
 [function_executed event](https://docs.slack.dev/reference/events/function_executed/),
-and pinned Bolt JS [`CustomFunction.ts`](../../work/reference-sources/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/bolt-js-ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/CustomFunction.ts).
+and pinned Bolt JS [`CustomFunction.ts`](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/CustomFunction.ts).
 
 ## Recommended small PHP surface
 
@@ -175,9 +175,9 @@ command feature:
 
 Reference: [Tempest command bus — async commands](https://tempestphp.com/3.x/features/command-bus#async-commands);
 the pinned implementation is
-[`AsyncCommandMiddleware.php`](../../vendor/tempest/framework/packages/command-bus/src/AsyncCommandMiddleware.php),
-[`MonitorAsyncCommands.php`](../../vendor/tempest/framework/packages/command-bus/src/MonitorAsyncCommands.php),
-and [`HandleAsyncCommand.php`](../../vendor/tempest/framework/packages/command-bus/src/HandleAsyncCommand.php).
+[`AsyncCommandMiddleware.php`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/AsyncCommandMiddleware.php),
+[`MonitorAsyncCommands.php`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/MonitorAsyncCommands.php),
+and [`HandleAsyncCommand.php`](https://github.com/tempestphp/tempest-framework/blob/e114a7f8ebf9f8653e51039cd0b83ff4c298e18a/packages/command-bus/src/HandleAsyncCommand.php).
 
 It is persistence plus a polling worker, not yet a full durable-work guarantee:
 

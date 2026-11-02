@@ -56,3 +56,12 @@ test('expands grouped framework imports and aliases', () => fixture(root => {
   assert.equal(report.imports, 2);
   assert.deepEqual(report.errors, []);
 }));
+
+test('rejects links to ignored local state even when files exist', () => fixture(root => {
+  fs.mkdirSync(path.join(root, 'work'));
+  fs.writeFileSync(path.join(root, 'work', 'upstream.php'), '<?php');
+  fs.writeFileSync(path.join(root, 'README.md'), '[local capture](work/upstream.php)\n');
+  const report = checkDocumentation(root, undefined, { syntax: false });
+  assert.equal(report.errors.length, 1);
+  assert.match(report.errors[0], /private or generated local state/);
+}));

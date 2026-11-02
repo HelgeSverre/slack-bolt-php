@@ -64,7 +64,7 @@ final class ProcessRecoveryTest extends TestCase
             key: 'safe',
             retry: RetryPolicy::idempotent(backoffSeconds: 0),
         );
-        $child = $this->start();
+        $child = $this->start(lease: 2);
         $this->awaitReady($job->id);
         self::assertSame(JobStatus::Running, $store->find($job->id)->status);
         self::assertSame('running', new RuntimeMonitor($this->directory . '/runtime')->snapshot()[0]['state']);
@@ -82,7 +82,7 @@ final class ProcessRecoveryTest extends TestCase
     {
         [$store, $jobs] = \ThunderBoltReliability\setup($this->directory);
         $job = $jobs->dispatch(new ProbeJob($this->directory, 'crash-after', 2), key: 'unsafe');
-        $child = $this->start();
+        $child = $this->start(lease: 2);
         $this->awaitReady($job->id);
         proc_terminate($child[0], 9);
         self::assertNotSame(0, $this->finish($child));
@@ -160,7 +160,7 @@ final class ProcessRecoveryTest extends TestCase
         self::assertSame([], new RuntimeMonitor($this->directory . '/runtime')->snapshot());
     }
 
-    private function start(int $maxJobs = 1, string $mode = ''): array
+    private function start(int $maxJobs = 1, string $mode = '', int $lease = 10): array
     {
         $process = proc_open(
             [
@@ -169,6 +169,7 @@ final class ProcessRecoveryTest extends TestCase
                 $this->directory,
                 (string) $maxJobs,
                 $mode,
+                (string) $lease,
             ],
             [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
             $pipes,

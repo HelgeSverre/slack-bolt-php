@@ -98,11 +98,12 @@ if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) {
         exit(runSocket($argv[1]));
     }
     [, , $worker] = setup($argv[1]);
+    $lease = (int) ($argv[4] ?? 10);
     if (($argv[3] ?? '') === 'console-once') {
         $container = new GenericContainer();
         $container->singleton(Worker::class, $worker);
         GenericContainer::setInstance($container);
-        exit(new \Thunder\Bolt\Console\JobCommands()->work(once: true, lease: 2)->value);
+        exit(new \Thunder\Bolt\Console\JobCommands()->work(once: true, lease: $lease)->value);
     }
     $stop = false;
     if (function_exists('pcntl_async_signals')) {
@@ -116,7 +117,7 @@ if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) {
         static function () use (&$stop, $deadline): bool {
             return $stop || hrtime(true) >= $deadline;
         },
-        2,
+        $lease,
         (int) ($argv[2] ?? 1),
     );
 }

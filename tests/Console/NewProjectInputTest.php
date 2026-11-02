@@ -45,10 +45,10 @@ final class NewProjectInputTest extends TestCase
     {
         $registry = NewProjectInput::fromArguments(['app']);
         self::assertNull($registry->source->composerRepository());
-        self::assertSame('^0.3', $registry->source->version);
+        self::assertSame('^0.4', $registry->source->version);
         $local = NewProjectInput::fromArguments(['app', '--source=path']);
         self::assertSame('path', $local->source->composerRepository()['type']);
-        self::assertSame('0.3.x-dev', $local->source->version);
+        self::assertSame('0.4.x-dev', $local->source->version);
     }
 
     public function test_registry_and_git_sources_accept_compatible_composer_constraints(): void

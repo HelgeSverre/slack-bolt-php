@@ -14,6 +14,8 @@ use Thunder\Bolt\Invocation\HandlerInvoker;
 use Thunder\Bolt\Invocation\InvocationFailure;
 use Thunder\Bolt\Invocation\InvocationPipeline;
 use Thunder\Bolt\Invocation\InvocationScope;
+use Thunder\Bolt\Payloads\Events\AppContextChanged;
+use Thunder\Bolt\Payloads\Events\AppHomeOpened;
 use Thunder\Bolt\Payloads\Events\AssistantThreadContextChanged;
 use Thunder\Bolt\Payloads\Events\AssistantThreadEvent;
 use Thunder\Bolt\Payloads\Events\AssistantThreadStarted;
@@ -32,6 +34,9 @@ final readonly class Runtime
 
     public function handle(Delivery $delivery, Closure $next, bool $scoped): mixed
     {
+        if ($this->assistant->agentView) {
+            return $this->handleAgentView($delivery, $next);
+        }
         $payload = $delivery->payload;
         if (!$payload instanceof AssistantThreadEvent && !$this->isUserMessage($payload)) {
             return $next();
@@ -84,7 +89,68 @@ final readonly class Runtime
             return null;
         }
         $scope = $scoped ? InvocationScope::create($this->container, $client, $authorization) : null;
-        $scope?->singleton(Context::class, $delivery->context);
+        return $this->invoke($handler, $prepared, $scope);
+    }
+
+    private function handleAgentView(Delivery $delivery, Closure $next): mixed
+    {
+        $payload = $delivery->payload;
+        if ($payload instanceof AppHomeOpened && $payload->tab === 'messages') {
+            $handler = $this->assistant->opened;
+            $context = $payload->appContext;
+        } elseif ($payload instanceof AppContextChanged) {
+            $handler = $this->assistant->appContextChanged;
+            $context = $payload->context;
+        } elseif ($this->isUserMessage($payload) && $payload instanceof Message) {
+            $handler = $this->assistant->message;
+            $context = $payload->appContext ?? AppContext::fromArray([]);
+        } else {
+            return $next();
+        }
+        if ($handler === null) {
+            return $next();
+        }
+        $client = $delivery->client ?? throw new \LogicException('Agent delivery has no authorized client.');
+        $authorization = $delivery->authorization ?? throw new \LogicException('Agent delivery has no authorization.');
+        $thread = null;
+        if ($payload instanceof Message) {
+            $key = $delivery->thread?->key ?? throw new \LogicException('Agent message has no thread identity.');
+            $thread = new Thread(
+                $client,
+                new ThreadIdentity($key, $payload->userId, $authorization->botUserId),
+                $this->defaultStore,
+                agentContext: $context,
+            );
+        }
+        $prepared = new Delivery(
+            $payload,
+            $delivery->reply,
+            $delivery->metadata,
+            ListenerDescriptor::event(
+                $payload instanceof Message ? 'message' : $payload->type,
+                $handler->target,
+                $handler->middleware,
+                source: 'Assistant configuration',
+            ),
+            $delivery->matches,
+            $delivery->constraintMatches,
+            $client,
+            $authorization,
+            $delivery->authorizationSource,
+            $delivery->conversation,
+            $delivery->thread,
+            $thread,
+            jobs: $delivery->jobs,
+            context: $delivery->context,
+        );
+        $scope = InvocationScope::create($this->container, $client, $authorization);
+        $scope->singleton(AppContext::class, $context);
+        return $this->invoke($handler, $prepared, $scope);
+    }
+
+    private function invoke(Handler $handler, Delivery $prepared, ?Container $scope): mixed
+    {
+        $scope?->singleton(Context::class, $prepared->context);
         if ($scope !== null && $prepared->jobs !== null) {
             $scope->singleton(\Thunder\Bolt\Jobs::class, $prepared->jobs);
         }
@@ -121,8 +187,12 @@ final readonly class Runtime
             && ($payload->raw['channel_type'] ?? null) === 'im'
             && $payload->channelId !== ''
             && $payload->userId !== ''
-            && $payload->threadTs !== null
-            && $payload->threadTs !== ''
+            && (
+                $this->assistant->agentView
+                    ? $payload->ts !== ''
+                    : $payload->threadTs !== null
+                    && $payload->threadTs !== ''
+            )
             && !isset($payload->raw['bot_id'])
             && in_array($payload->raw['subtype'] ?? null, [null, 'file_share'], true)
         );

@@ -29,6 +29,7 @@ final class EventPayloads
             'agent_session_stopped' => Events\AgentSessionStopped::class,
             'agent_session_title_changed' => Events\AgentSessionTitleChanged::class,
             'app_home_opened' => Events\AppHomeOpened::class,
+            'app_context_changed' => Events\AppContextChanged::class,
             'channel_created' => Events\ChannelCreated::class,
             'channel_rename' => Events\ChannelRenamed::class,
             'channel_archive' => Events\ChannelArchived::class,

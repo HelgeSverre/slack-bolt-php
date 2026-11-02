@@ -9,7 +9,7 @@
 
 Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, and explicit durable jobs. Built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style.
 
-**Experimental v0.3.0.** Install `helgesverre/slack-bolt:^0.3` for the code shown here. The PHP namespace remains `Thunder\Bolt`. Tags before v0.3.0 predate the public package rename and current scaffolder. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
+**Experimental v0.4.0.** Install `helgesverre/slack-bolt:^0.4` for the code shown here. The PHP namespace remains `Thunder\Bolt`. Tags before v0.3.0 predate the public package rename and current scaffolder. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
 
 ## Explore the framework
 
@@ -46,7 +46,7 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 ### Add the package
 
 ```sh
-composer require helgesverre/slack-bolt:^0.3
+composer require helgesverre/slack-bolt:^0.4
 ```
 
 ### Create a new application
@@ -54,7 +54,7 @@ composer require helgesverre/slack-bolt:^0.3
 Install the CLI, then generate an application backed by Packagist:
 
 ```sh
-composer global require helgesverre/slack-bolt:^0.3
+composer global require helgesverre/slack-bolt:^0.4
 
 bolt new my-bot --no-interaction
 
@@ -71,7 +71,7 @@ Put Composer's global vendor bin directory on `PATH` if needed: `composer global
 | `--auth` | `token`, `oauth` | `token` |
 | `--source` | `packagist`, `path`, `vcs` | `packagist` |
 | `--repository` | HTTPS/SSH URL or absolute local Git repository | Required for `vcs` |
-| `--version` | Composer constraint for 0.3.0+, or `dev-main` | `^0.3` for Packagist; `dev-main` for Git |
+| `--version` | Composer constraint for 0.3.0+, or `dev-main` | `^0.4` for Packagist; `dev-main` for Git |
 
 Generated apps use Packagist without a custom Composer repository and run independently of your CLI installation. Use `--source=path` for framework development, or `--source=vcs --repository=…` for an explicit Git source. Existing directories are never overwritten. [Full getting-started guide](docs/guides/getting-started.md).
 
@@ -670,13 +670,27 @@ The stream needs at least one nonempty fragment before finishing. `chunks()` als
 | Thread helper | Use |
 | --- | --- |
 | `say()` / `sayStream()` | Replies and streamed output pinned to the thread |
-| `saveContext()` / `context()` | Assistant focus context, separate from chat history |
+| `saveContext()` / `context()` | Legacy assistant focus context, separate from chat history |
 | `setSuggestedPrompts()` | Starter prompts |
 | `session()->processing()` / `active()` | Modern session status |
 | `session()->rename()` | Modern session title |
 | `setStatus()` / `setTitle()` | Retained legacy assistant-thread APIs |
 
-Modern session APIs require the current Slack Agents capability; subscribing to legacy `assistant_thread_*` events alone does not enable them. Agent View and `app_context_changed` integration must be validated for the target workspace. A Stop event does not cancel arbitrary PHP code: the app must cancel its jobs and check cancellation during work.
+Modern session APIs require the current Slack Agents capability; subscribing to legacy `assistant_thread_*` events alone does not enable them. Use `Assistant::forAgentView()` for typed current focus, Messages-tab opening and root DM routing. Enable Agent View in the target workspace first; see the [Agent View guide](docs/guides/agent-view.md). A Stop event does not cancel arbitrary PHP code: the app must cancel its jobs and check cancellation during work.
+
+Modern configuration uses the same application config seam:
+
+```php
+use App\Listeners\WorkspaceAgent;
+use Thunder\Bolt\Assistant;
+
+return Assistant::forAgentView()
+    ->opened([WorkspaceAgent::class, 'opened'])
+    ->appContextChanged([WorkspaceAgent::class, 'focusChanged'])
+    ->userMessage([WorkspaceAgent::class, 'message']);
+```
+
+`AppContext` is injectable per delivery. Missing focus becomes empty context; it is never restored from an older selection. Only messages have a rooted `Thread`. Legacy `Assistant::make()` remains available.
 
 Model execution belongs in application code. The demo uses OpenAI Responses; a configured Laravel application can integrate Laravel AI through the same thread/worker boundary. Neither provider is a core dependency. [Advanced Slack features](docs/guides/advanced-slack-features.md) · [AI playground](examples/hello-bolt/README.md#native-slack-assistant).
 

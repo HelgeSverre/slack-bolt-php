@@ -29,7 +29,7 @@ final readonly class WorkspaceHome
 }
 ```
 
-An App Home event has no published `view` until a view exists. Channel, tab, timestamp, view, and current app `context` are optional; `raw` retains the original event. Receiving app context here does not implement the separate modern agent-context lifecycle.
+An App Home event has no published `view` until a view exists. Channel, tab, timestamp, view, and current app `context` are optional; `raw` retains the original event. Use the opt-in [Agent View runtime](agent-view.md) for typed current focus and root-DM routing.
 
 ## Added event families
 

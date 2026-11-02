@@ -14,8 +14,8 @@ final readonly class ProjectSource
     public const string PACKAGIST = 'packagist';
     public const string PATH = 'path';
     public const string VCS = 'vcs';
-    public const string DEFAULT_VERSION = '^0.3';
-    public const string DEVELOPMENT_VERSION = '0.3.x-dev';
+    public const string DEFAULT_VERSION = '^0.4';
+    public const string DEVELOPMENT_VERSION = '0.4.x-dev';
 
     private function __construct(
         public string $type,

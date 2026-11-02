@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## v0.4.0 — 2026-11-02
+
+- Opt-in `Assistant::forAgentView()` with Messages-tab opening, focus changes, human root DMs and thread replies, preserving legacy assistant behavior.
+- Typed ordered app-context entities on messages, App Home and `app_context_changed`, with per-delivery injection and forward-compatible raw fields.
+- Fresh focus semantics: no stale cache fallback, invented thread anchors, automatic content fetching or public legacy metadata.
+- Agent View configuration, migration and testing guidance; default generated project constraint updated to `^0.4`.
+
 ## v0.3.0 — 2026-11-02
 
 - Packagist-first project scaffolding, with explicit path/Git sources retained.

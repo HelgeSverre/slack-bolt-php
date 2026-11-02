@@ -6,6 +6,12 @@ The Composer package is now `helgesverre/slack-bolt`; the PHP namespace remains 
 
 Use `^0.3` for the first release under the public package name. Tags before v0.3.0 predate the rename and current scaffolding API; `dev-main` remains available explicitly.
 
+## v0.4.0
+
+Use `^0.4` for this release. Existing `Assistant::make()` applications keep their lifecycle and stores. Adopting `Assistant::forAgentView()` is explicit: replace legacy lifecycle callbacks with optional `opened`/`appContextChanged` and required `userMessage`, enable Slack Agent View and its event subscriptions, and use injected `AppContext`. Focus is delivery-local, never legacy thread metadata. See the [migration and setup guide](docs/guides/agent-view.md). No queue/store schema changes are required.
+
+Contributor path installs now use `0.4.x-dev`; update both the dependency and path version override, then update Composer. New Packagist scaffolds default to `^0.4`; explicit compatible older constraints remain supported.
+
 ## v0.3.0
 
 `bolt new` and `ProjectScaffold::create()` now default to Packagist and `^0.3`, without a custom repository or dependency on the CLI checkout. Contributor scripts that must exercise the current working tree should pass `--source=path` or provide `ProjectSource::local()` explicitly. Its checkout alias is now `0.3.x-dev`; update existing path-repository version overrides and requirements together. Git sources remain available with `--source=vcs --repository=…`. No network request is made until the separate Composer installation step.

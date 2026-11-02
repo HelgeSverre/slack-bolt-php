@@ -15,15 +15,29 @@ final class Thread
         public readonly ThreadIdentity $identity,
         private readonly ThreadContextStore $store,
         private ?ThreadContext $eventContext = null,
+        private readonly ?AppContext $agentContext = null,
     ) {}
 
     public function context(): ?ThreadContext
     {
+        if ($this->agentContext !== null) {
+            return null;
+        }
         return $this->eventContext ?? $this->store->get($this->identity, $this->client);
+    }
+
+    public function appContext(): ?AppContext
+    {
+        return $this->agentContext;
     }
 
     public function saveContext(?ThreadContext $context = null): void
     {
+        if ($this->agentContext !== null) {
+            throw new \LogicException(
+                'Agent View focus belongs to this delivery. Persist application state explicitly.',
+            );
+        }
         $context ??= $this->eventContext;
         if ($context === null) {
             throw new \LogicException('No assistant context was supplied by Slack or the caller.');

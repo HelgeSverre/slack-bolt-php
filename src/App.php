@@ -154,6 +154,8 @@ final class App
             'assistant_thread_started' => $assistant->started,
             'assistant_thread_context_changed' => $assistant->contextChanged,
             'message' => $assistant->message,
+            'app_home_opened' => $assistant->opened,
+            'app_context_changed' => $assistant->appContextChanged,
         ] as $event => $handler) {
             if ($handler !== null) {
                 $this->validatePayloadCompatibility(ListenerDescriptor::event($event, $handler->target));
@@ -477,11 +479,20 @@ final class App
             $this->registeredListeners,
         );
         if ($this->registeredAssistant !== null) {
-            foreach ([
-                'assistant_thread_started' => $this->registeredAssistant->started,
-                'assistant_thread_context_changed' => $this->registeredAssistant->contextChanged,
-                'message.im (thread replies)' => $this->registeredAssistant->message,
-            ] as $selector => $handler) {
+            $handlers = $this->registeredAssistant->agentView
+                ? [
+                    'app_home_opened (messages)' => $this->registeredAssistant->opened,
+                    'app_context_changed' => $this->registeredAssistant->appContextChanged,
+                    'message.im (roots and thread replies)' => $this->registeredAssistant->message,
+                ] : [
+                    'assistant_thread_started' => $this->registeredAssistant->started,
+                    'assistant_thread_context_changed' => $this->registeredAssistant->contextChanged,
+                    'message.im (thread replies)' => $this->registeredAssistant->message,
+                ];
+            foreach ($handlers as $selector => $handler) {
+                if ($handler === null && $this->registeredAssistant->agentView) {
+                    continue;
+                }
                 $listeners[] = [
                     'kind' => 'assistant',
                     'selector' => $selector,

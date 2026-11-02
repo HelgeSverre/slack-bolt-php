@@ -1,6 +1,6 @@
 # Thunder Bolt documentation
 
-Thunder Bolt is an experimental PHP 8.5+ Slack framework built on Tempest 3. The public Composer package is [`helgesverre/slack-bolt`](https://packagist.org/packages/helgesverre/slack-bolt), with the PHP namespace `Thunder\Bolt`. Use `^0.3` for the current experimental release, or `dev-main` explicitly for development. Start with the guides below; the older research material is deliberately kept separate so an adopter does not need to treat a dated audit as current operating guidance.
+Thunder Bolt is an experimental PHP 8.5+ Slack framework built on Tempest 3. The public Composer package is [`helgesverre/slack-bolt`](https://packagist.org/packages/helgesverre/slack-bolt), with the PHP namespace `Thunder\Bolt`. Use `^0.4` for the current experimental release, or `dev-main` explicitly for development. Start with the guides below; the older research material is deliberately kept separate so an adopter does not need to treat a dated audit as current operating guidance.
 
 ## Start here
 
@@ -17,6 +17,7 @@ Thunder Bolt is an experimental PHP 8.5+ Slack framework built on Tempest 3. The
 | Buttons, shortcuts, external selects, and modals | [HTTP interactivity](http-interactivity.md) |
 | Durable channel and thread state | [Conversation and thread storage](conversation-and-thread-storage.md) |
 | Typed methods, builders, uploads, pagination, and retries | [Web API client](web-api-client.md) and [Block Kit](sdk-and-block-kit.md) |
+| Modern agent focus and root DMs | [Agent View](guides/agent-view.md) |
 | Assistants, agent sessions, custom functions, or Work Objects | [Advanced Slack features](guides/advanced-slack-features.md) |
 | Testing application handlers with fake Slack and durable-intake assertions | [Public testing toolkit](guides/testing-toolkit.md) |
 | App Home, channel lifecycle, and message-metadata payloads | [Typed events](guides/typed-events.md) |

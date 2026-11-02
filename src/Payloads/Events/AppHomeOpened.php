@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thunder\Bolt\Payloads\Events;
 
+use Thunder\Bolt\Assistant\AppContext;
 use Thunder\Bolt\Payloads\Event;
 use Thunder\Bolt\Payloads\Values\EventFields;
 
@@ -13,6 +14,7 @@ final readonly class AppHomeOpened extends Event
     public ?string $eventTs;
     public ?array $view;
     public ?array $context;
+    public AppContext $appContext;
 
     public function __construct(array $body)
     {
@@ -21,6 +23,7 @@ final readonly class AppHomeOpened extends Event
         $this->eventTs = EventFields::optionalText($body, 'event_ts');
         $this->view = isset($body['view']) ? EventFields::object($body, 'view') : null;
         $this->context = isset($body['context']) ? EventFields::object($body, 'context') : null;
+        $this->appContext = AppContext::fromArray($this->context ?? []);
         parent::__construct(
             'app_home_opened',
             EventFields::text($body, 'user'),

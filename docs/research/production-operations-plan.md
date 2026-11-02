@@ -7,7 +7,7 @@ Scope: observed process health and queue visibility, a runnable supervised deplo
 - [x] Deployment example with private persistent state, non-root processes, health checks, graceful stop/restart and backup/recovery instructions.
 - [x] Actual subprocess concurrency, forced crash, restart/recovery, cancellation and SIGTERM drain checks.
 - [x] Two-hour local reliability run, including native WebSocket polling and repeated isolated job/reconnect/OAuth rotation checks. Separate this evidence from live Slack verification.
-- [ ] Fresh-project integration, CLI help/completion/bootstrap, Linux/macOS and Windows CLI checks, Mago, self-review, commit/push and CI.
+- [x] Fresh-project integration, CLI help/completion/bootstrap, Linux/macOS and Windows CLI checks, Mago, self-review, commit/push and CI.
 
 Health is an observation of shared local state. A fresh connected socket or idle/running job worker satisfies that role; stale records never do. Queue failures and uncertain jobs are reported for operator attention, and do not trigger destructive recovery or automatic restarts from this diagnostic command. `doctor` remains a configuration check. HTTP host health belongs to its host.
 
@@ -15,4 +15,6 @@ Local evidence: 1,023 tests / 6,170 assertions; fresh production-dependency proj
 
 The Docker production example built successfully, completed an offline local receipt, deduplicated enqueue, retained it across restart, and reported the stopped worker unhealthy. Private status observations remain in ignored work/live-acceptance/. Review fixed the heartbeat lock-contention race and added actual Socket Mode CLI SIGTERM coverage. A failed developmental soak was discarded. The clean run completed with exit 0 after 7,200 seconds: 107 rounds, 1,162,086 native WebSocket polls, 1,061,800 bytes maximum retained growth and 8,388,608 bytes peak PHP heap under a 128M limit. [Recorded result and scope](production-operations-soak.json). OAuth/reconnect responses are recorded fixtures; this is not a two-hour live Slack conformance claim.
 
-Implementation CI passed on Linux, macOS, Windows CLI, reference generation and the offline Docker deployment check at b420bcc: [run 41452465305](https://github.com/HelgeSverre/slack-bolt-php/actions/runs/41452465305). Final self-review also isolated optional queue read failures from required socket health; its focused regression, full local suite and Mago passed. CI for that final diagnostic fix is pending.
+Implementation CI passed on Linux, macOS, Windows CLI, reference generation and the offline Docker deployment check at b420bcc: [run 41452465305](https://github.com/HelgeSverre/slack-bolt-php/actions/runs/41452465305). Final self-review also isolated optional queue read failures from required socket health; its focused regression, full local suite and Mago passed. Final diagnostic-fix CI passed on all five jobs at d4c0502: [run 41469810900](https://github.com/HelgeSverre/slack-bolt-php/actions/runs/41469810900).
+
+Warm CLI fast-path benchmark on the development host (five runs): version median 65.3 ms versus 62.8 ms for bare PHP startup, about 2.5 ms package overhead. Status includes application configuration/bootstrap; the fast-path measurement is not a status latency promise. Disposable local containers/volumes and the offline dummy environment were removed; live acceptance workers stopped cleanly.

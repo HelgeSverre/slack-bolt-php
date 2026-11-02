@@ -9,7 +9,7 @@ Current ordering refreshed 28 October 2026; earlier milestone sections below ret
 3. Completed in v0.2 preview preparation: [per-install OAuth options, atomic request/state and hooks](oauth-install-requests.md), [typed transport context factories](transport-context-factories.md), [shared typed interaction readers](typed-interaction-values.md) and [fresh-project OAuth-to-job recovery coverage](v0.2-validation.md).
 4. Completed: independent review, refreshed parity evidence, full Linux/macOS CI and the [v0.2.0 GitHub prerelease](https://github.com/HelgeSverre/slack-bolt-php/releases/tag/v0.2.0). [Completion evidence](v0.2-release-verification.md). Deeper event DTOs, additional adapters and a documentation site remain demand-led follow-ups.
 
-Production operation (2 November): runtime observations, read-only status, supervised deployment and real process failure coverage are implemented; the two-hour local reliability run passed; final diagnostic-fix CI is pending. See [the operations plan](production-operations-plan.md) for current evidence.
+Production operation (2 November): runtime observations, read-only status, supervised deployment and real process failure coverage are implemented; the two-hour local reliability run and all five CI jobs passed. See [the operations plan](production-operations-plan.md) for current evidence.
 
 Keep existing `App::dispatch`, capture/retry metadata and function terminal guards. Do not add Node start/stop/Express/AWS interfaces for naming parity. Preserve typed returned acknowledgements, explicit named jobs, tenant/thread scoping, PSR logging and PSR-18 transport. The audit matrix records constraints; inventory counts alone are not implementation progress.
 

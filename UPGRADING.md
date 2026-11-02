@@ -4,9 +4,13 @@
 
 The Composer package is now `helgesverre/slack-bolt`; the PHP namespace remains `Thunder\Bolt`. Existing applications using `thunder/bolt` must update their Composer requirement and any path-repository `options.versions` key, then run `composer update helgesverre/slack-bolt thunder/bolt`. Update a hand-written launcher from `vendor/thunder/bolt/bin/bolt` to `vendor/helgesverre/slack-bolt/bin/bolt`. Newly generated apps already use the new path. Do not change application imports.
 
-Use `dev-main` for the public development preview; older tags predate the rename and current scaffolding API.
+Use `^0.3` for the first release under the public package name. Tags before v0.3.0 predate the rename and current scaffolding API; `dev-main` remains available explicitly.
 
-## Unreleased
+## v0.3.0
+
+`bolt new` and `ProjectScaffold::create()` now default to Packagist and `^0.3`, without a custom repository or dependency on the CLI checkout. Contributor scripts that must exercise the current working tree should pass `--source=path` or provide `ProjectSource::local()` explicitly. Its checkout alias is now `0.3.x-dev`; update existing path-repository version overrides and requirements together. Git sources remain available with `--source=vcs --repository=…`. No network request is made until the separate Composer installation step.
+
+Additional known events now decode into subclasses of `Payloads\Event`. Generic listeners and `raw` access remain compatible. Malformed required fields on these known events now fail validation before dispatch; update incomplete synthetic fixtures accordingly.
 
 Restart workers/intake after updating to enable runtime observations. `status` cannot verify processes started with an older version, and is scoped to processes sharing its local state directory. New heartbeat files live under `.thunder-bolt/runtime`; they are separate from job ownership and do not require a queue schema migration. Custom library hosts opt in by passing a `RuntimeMonitor` to `Worker` or `SocketMode\Runner`.
 

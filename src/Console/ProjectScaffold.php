@@ -15,7 +15,7 @@ final readonly class ProjectScaffold
     public function create(string $directory, ?ProjectSetup $setup = null, ?ProjectSource $source = null): string
     {
         $setup ??= new ProjectSetup();
-        $source ??= ProjectSource::local($this->packageRoot);
+        $source ??= ProjectSource::fromOptions(null, null, null, $this->packageRoot);
         $project = $this->resolveNewProjectPath($directory);
         $projectName = basename($project);
         if (!mkdir($project, 0775, true) && !is_dir($project)) {
@@ -30,7 +30,7 @@ final readonly class ProjectScaffold
             'type' => 'project',
             'license' => 'proprietary',
             'require' => ['php' => '^8.5', 'helgesverre/slack-bolt' => $source->version],
-            'repositories' => [$source->composerRepository()],
+            ...($source->composerRepository() === null ? [] : ['repositories' => [$source->composerRepository()]]),
             'autoload' => ['psr-4' => ['App\\' => 'app/']],
             'minimum-stability' => 'dev',
             'prefer-stable' => true,
@@ -90,9 +90,17 @@ final readonly class ProjectScaffold
         $transport = $setup->transport === 'socket'
             ? 'Set SLACK_APP_TOKEN to an app-level token with connections:write. The generated manifest enables Socket Mode. OAuth still needs an HTTPS installation/callback route.'
             : "Set SLACK_SIGNING_SECRET. Expose your local HTTP server through trusted HTTPS, then configure Slack's Events API URL as /slack/events.";
-        $sourceNote = $source->type === ProjectSource::VCS
-            ? 'This project installs Thunder Bolt from its VCS `dev-main` branch. Keep access to that repository available.'
-            : 'This project uses a local Composer path repository. Keep the framework checkout available while developing.';
+        $sourceNote = $source->type === ProjectSource::PACKAGIST
+            ? 'This project installs helgesverre/slack-bolt from Packagist using '
+            . $source->version
+            . '. Commit composer.lock to pin the installed revision.'
+            : (
+                $source->type === ProjectSource::VCS
+                    ? 'This project installs Thunder Bolt from VCS using `'
+                    . $source->version
+                    . '`. Keep access to that repository available.'
+                    : 'This project uses a local Composer path repository. Keep the framework checkout available while developing.'
+            );
         return "# Your Slack app\n\nThis app uses {$setup->transport} delivery and {$setup->authorization} authorization.\n\n1. Run composer install.\n2. Copy .env.example to .env and fill in your app credentials.\n3. {$authorization}\n4. {$transport}\n5. Run php bolt doctor, then {$setup->startCommand()}.\n\nNever commit .env. {$sourceNote}\n\n## Background work\n\nUse php bolt make:job MyJob to scaffold an explicit named job. Run php bolt jobs:work in a separate process when dispatching durable jobs; SQLite requires pdo_sqlite. Configuration readiness does not prove a worker is running.\n\n## Useful commands\n\n- php bolt doctor --format=json\n- php bolt status --format=json --require=jobs\n- php bolt listener:list\n- php bolt make:listener MyListener --event=app_mention\n- php bolt make:job MyJob\n\nThe onboarding defaults live in config/setup.config.php. For an HTTP readiness check alongside Socket Mode, use php bolt doctor --transport=http.\n";
     }
 
@@ -199,29 +207,14 @@ final readonly class ProjectScaffold
     /** @return array{0: string, 1: string, 2: string} */
     private function eventPayload(string $selector): array
     {
-        $typedEvents = [
-            'app_mention' => ['Events\\AppMention', 'AppMention'],
-            'message' => ['Events\\Message as SlackMessage', 'SlackMessage'],
-            'function_executed' => ['Events\\FunctionExecuted', 'FunctionExecuted'],
-            'assistant_thread_started' => ['Events\\AssistantThreadStarted', 'AssistantThreadStarted'],
-            'assistant_thread_context_changed' => [
-                'Events\\AssistantThreadContextChanged',
-                'AssistantThreadContextChanged',
-            ],
-            'entity_details_requested' => ['Events\\EntityDetailsRequested', 'EntityDetailsRequested'],
-            'entity_comments_requested' => ['Events\\EntityCommentsRequested', 'EntityCommentsRequested'],
-            'reaction_added' => ['Events\\ReactionAdded', 'ReactionAdded'],
-            'reaction_removed' => ['Events\\ReactionRemoved', 'ReactionRemoved'],
-            'member_joined_channel' => ['Events\\MemberJoinedChannel', 'MemberJoinedChannel'],
-            'member_left_channel' => ['Events\\MemberLeftChannel', 'MemberLeftChannel'],
-            'link_shared' => ['Events\\LinkShared', 'LinkShared'],
-            'file_shared' => ['Events\\FileShared', 'FileShared'],
-            'app_uninstalled' => ['Events\\AppUninstalled', 'AppUninstalled'],
-            'tokens_revoked' => ['Events\\TokensRevoked', 'TokensRevoked'],
-            'agent_session_stopped' => ['Events\\AgentSessionStopped', 'AgentSessionStopped'],
-            'agent_session_title_changed' => ['Events\\AgentSessionTitleChanged', 'AgentSessionTitleChanged'],
-        ];
-        [$payloadUse, $payloadClass] = $typedEvents[$selector] ?? ['Event as SlackEvent', 'SlackEvent'];
+        $class = \Thunder\Bolt\Payloads\EventPayloads::classFor($selector);
+        $payloadClass = substr($class, strrpos($class, '\\') + 1);
+        $payloadUse = substr($class, strlen('Thunder\\Bolt\\Payloads\\'));
+        if ($payloadClass === 'Event' || $payloadClass === 'Message') {
+            $alias = $payloadClass === 'Event' ? 'SlackEvent' : 'SlackMessage';
+            $payloadUse .= ' as ' . $alias;
+            $payloadClass = $alias;
+        }
 
         return ['Event', $payloadUse, $payloadClass];
     }

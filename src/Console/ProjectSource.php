@@ -4,30 +4,41 @@ declare(strict_types=1);
 
 namespace Thunder\Bolt\Console;
 
+use Composer\Semver\Intervals;
+use Composer\Semver\VersionParser;
 use InvalidArgumentException;
 
-/** The one supported dependency source for a generated project's Composer repository. */
+/** A generated project's dependency requirement and optional Composer repository. */
 final readonly class ProjectSource
 {
+    public const string PACKAGIST = 'packagist';
     public const string PATH = 'path';
     public const string VCS = 'vcs';
+    public const string DEFAULT_VERSION = '^0.3';
+    public const string DEVELOPMENT_VERSION = '0.3.x-dev';
 
     private function __construct(
         public string $type,
-        public string $repository,
+        public ?string $repository,
         public string $version,
     ) {}
 
     public static function local(string $packageRoot): self
     {
-        return new self(self::PATH, $packageRoot, '0.2.x-dev');
+        return new self(self::PATH, $packageRoot, self::DEVELOPMENT_VERSION);
     }
 
     public static function fromOptions(?string $type, ?string $repository, ?string $version, string $packageRoot): self
     {
-        $type ??= self::PATH;
-        if (!in_array($type, [self::PATH, self::VCS], true)) {
-            throw new InvalidArgumentException('Source must be path or vcs.');
+        $type ??= self::PACKAGIST;
+        if (!in_array($type, [self::PACKAGIST, self::PATH, self::VCS], true)) {
+            throw new InvalidArgumentException('Source must be packagist, path or vcs.');
+        }
+        if ($type === self::PACKAGIST) {
+            if ($repository !== null) {
+                throw new InvalidArgumentException('--repository requires --source=vcs.');
+            }
+            return new self(self::PACKAGIST, null, self::validateVersion($version ?? self::DEFAULT_VERSION));
         }
         if ($type === self::PATH) {
             if ($repository !== null || $version !== null) {
@@ -40,27 +51,45 @@ final readonly class ProjectSource
             throw new InvalidArgumentException('--source=vcs requires --repository.');
         }
         $repository = self::validateRepository($repository);
-        $version ??= 'dev-main';
-        if ($version !== 'dev-main') {
-            throw new InvalidArgumentException(
-                'VCS projects currently require --version=dev-main because generated projects use unreleased APIs. '
-                . 'A compatible release will permit tagged versions.',
-            );
-        }
+        $version = self::validateVersion($version ?? 'dev-main');
 
         return new self(self::VCS, $repository, $version);
     }
 
-    /** @return array{type: 'path'|'vcs', url: string, options?: array{symlink: true, versions: array<string, string>}} */
-    public function composerRepository(): array
+    private static function validateVersion(string $version): string
     {
+        if ($version === 'dev-main') {
+            return $version;
+        }
+        try {
+            $parser = new VersionParser();
+            if (Intervals::isSubsetOf($parser->parseConstraints($version), $parser->parseConstraints('>=0.3.0'))) {
+                return $version;
+            }
+        } catch (\UnexpectedValueException) {
+            // Keep input errors actionable without echoing arbitrary command-line data.
+        }
+        throw new InvalidArgumentException(
+            'Use a valid Composer constraint requiring version 0.3.0 or newer, or dev-main.',
+        );
+    }
+
+    /** @return null|array{type: 'path'|'vcs', url: string, options?: array{symlink: true, versions: array<string, string>}} */
+    public function composerRepository(): ?array
+    {
+        if ($this->type === self::PACKAGIST) {
+            return null;
+        }
         if ($this->type === self::VCS) {
-            return ['type' => 'vcs', 'url' => $this->repository];
+            return [
+                'type' => 'vcs',
+                'url' => $this->repository ?? throw new \LogicException('A local or VCS source requires a repository.'),
+            ];
         }
 
         return [
             'type' => 'path',
-            'url' => $this->repository,
+            'url' => $this->repository ?? throw new \LogicException('A path source requires a repository.'),
             'options' => ['symlink' => true, 'versions' => ['helgesverre/slack-bolt' => $this->version]],
         ];
     }

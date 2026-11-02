@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## v0.3.0 — 2026-11-02
+
+- Packagist-first project scaffolding, with explicit path/Git sources retained.
+- Typed App Home, channel lifecycle and message-metadata events from one shared dispatch/scaffolding catalog.
+- Public application testing toolkit with signed fixtures, an in-memory Slack transport, reply/acknowledgement assertions, and real isolated SQLite job intake.
+
 - Public Composer identity `helgesverre/slack-bolt`, preserving `Thunder\Bolt` imports; aligned generated applications, example lockfile and launchers.
 - Public installation instructions, status badges and a minimal generated README header.
 - Updated the locked Symfony Mime dependency to its patched release.

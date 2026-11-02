@@ -79,7 +79,7 @@ final class ScaffoldSetupTest extends TestCase
             self::assertSame('dev-main', $composer['require']['helgesverre/slack-bolt']);
             self::assertSame(['type' => 'vcs', 'url' => realpath(dirname(__DIR__, 2))], $composer['repositories'][0]);
             self::assertStringContainsString(
-                'VCS `dev-main` branch',
+                'VCS using `dev-main`',
                 (string) file_get_contents($project . '/README.md'),
             );
             self::assertStringNotContainsString('source', (string) file_get_contents($project . '/.env.example'));

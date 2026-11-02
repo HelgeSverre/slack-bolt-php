@@ -1,5 +1,7 @@
 # Testing, security, and troubleshooting
 
+For application-level handler tests, start with the [public testing toolkit](testing-toolkit.md): signed fixtures, in-memory Slack transport, reply/acknowledgement assertions, and optional real SQLite intake. The commands below test the framework itself.
+
 Start with local, recorded checks. A passing test suite verifies the behavior represented by its fixtures; it does not prove a Slack workspace is configured, an OAuth installation exists, or a worker is running.
 
 ## Verify the framework and a generated project

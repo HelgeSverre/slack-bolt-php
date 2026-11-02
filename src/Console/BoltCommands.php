@@ -30,11 +30,11 @@ final readonly class BoltCommands
         string $transport = 'http',
         #[ConsoleArgument(name: 'auth', description: 'Authorization: token or oauth')]
         string $authorization = 'token',
-        #[ConsoleArgument(name: 'source', description: 'Dependency source: path or vcs')]
-        string $source = 'path',
+        #[ConsoleArgument(name: 'source', description: 'Dependency source: packagist, path or vcs')]
+        string $source = 'packagist',
         #[ConsoleArgument(description: 'VCS repository URL or absolute local Git repository')]
         ?string $repository = null,
-        #[ConsoleArgument(description: 'VCS package version; currently dev-main')]
+        #[ConsoleArgument(description: 'Composer constraint (0.3.0+) or dev-main')]
         ?string $version = null,
     ): ExitCode {
         try {

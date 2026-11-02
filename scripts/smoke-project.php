@@ -75,7 +75,7 @@ $remove = static function (string $path) use (&$remove): void {
     rmdir($path);
 };
 try {
-    echo $command([PHP_BINARY, $root . '/bin/bolt', 'new', 'app', '--no-interaction'], $workspace);
+    echo $command([PHP_BINARY, $root . '/bin/bolt', 'new', 'app', '--source=path', '--no-interaction'], $workspace);
     echo $command(['composer', 'install', '--no-dev', '--no-interaction', '--no-progress', '--prefer-dist'], $project);
     copy($root . '/tests/Fixtures/project-smoke/SmokeHttp.php.stub', $project . '/app/SmokeHttp.php');
     file_put_contents($project . '/config/http.config.php', '<?php return new App\\SmokeHttp();');

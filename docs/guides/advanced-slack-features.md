@@ -98,7 +98,7 @@ Enable Work Object previews, register the entity type, subscribe to detail/comme
 
 ## Message metadata subscriptions
 
-Thunder Bolt can attach outbound `MessageMetadata`. Receiving metadata lifecycle events is a separate Slack capability: subscribe to only the needed `message_metadata_posted`, `message_metadata_updated`, or `message_metadata_deleted` events and add matching `metadata_subscriptions` filters for the app/event types the application actually observes. The starter and playground manifests do not enable those subscriptions, and inbound metadata events currently arrive as generic event payloads rather than dedicated typed models. Do not enable broad metadata wildcards merely because an app sends metadata.
+Thunder Bolt can attach outbound `MessageMetadata`. Receiving metadata lifecycle events is a separate Slack capability: subscribe to only the needed `message_metadata_posted`, `message_metadata_updated`, or `message_metadata_deleted` events and add matching `metadata_subscriptions` filters for the app/event types the application actually observes. The starter and playground manifests do not enable those subscriptions, and inbound metadata events have typed posted/updated/deleted payloads; see the [typed-event guide](typed-events.md). Do not enable broad metadata wildcards merely because an app sends metadata.
 
 ## Capability checklist
 

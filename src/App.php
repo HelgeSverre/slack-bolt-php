@@ -756,31 +756,17 @@ final class App
 
         $event = is_array($body['event'] ?? null) ? $body['event'] : $body;
 
-        return match ($event['type'] ?? null) {
-            'app_mention' => AppMention::fromArray($event),
-            'message' => MessageEvent::fromArray($event),
-            'function_executed' => FunctionExecuted::fromArray($event),
-            'assistant_thread_started' => AssistantThreadStarted::fromArray($event),
-            'assistant_thread_context_changed' => AssistantThreadContextChanged::fromArray($event),
-            'entity_details_requested' => EntityDetailsRequested::fromArray($event),
-            'entity_comments_requested' => EntityCommentsRequested::fromArray($event),
-            'reaction_added' => ReactionAdded::fromArray($event),
-            'reaction_removed' => ReactionRemoved::fromArray($event),
-            'member_joined_channel' => MemberJoinedChannel::fromArray($event),
-            'member_left_channel' => MemberLeftChannel::fromArray($event),
-            'link_shared' => LinkShared::fromArray($event),
-            'file_shared' => FileShared::fromArray($event),
-            'app_uninstalled' => AppUninstalled::fromArray($event),
-            'tokens_revoked' => TokensRevoked::fromArray($event),
-            'agent_session_stopped' => AgentSessionStopped::fromArray($event),
-            'agent_session_title_changed' => AgentSessionTitleChanged::fromArray($event),
-            default => GenericEvent::fromArray($event),
-        };
+        return \Thunder\Bolt\Payloads\EventPayloads::fromArray($event);
     }
 
     private function shouldIgnore(object $payload, Authorization $authorization): bool
     {
         if (!$this->config->ignoreSelf) {
+            return false;
+        }
+        // Metadata notifications are observations, including metadata our bot wrote.
+        // Normalizing user_id must not turn these into newly suppressed self messages.
+        if ($payload instanceof \Thunder\Bolt\Payloads\Events\MessageMetadataEvent) {
             return false;
         }
         if (
@@ -918,65 +904,51 @@ final class App
             $descriptor->kind === ListenerKind::Options => Options::class,
             $descriptor->kind === ListenerKind::View => View::class,
             $descriptor->kind === ListenerKind::Function => FunctionExecuted::class,
-            default => match ($descriptor->selector) {
-                'app_mention' => AppMention::class,
-                'message' => MessageEvent::class,
-                'function_executed' => FunctionExecuted::class,
-                'assistant_thread_started' => AssistantThreadStarted::class,
-                'assistant_thread_context_changed' => AssistantThreadContextChanged::class,
-                'entity_details_requested' => EntityDetailsRequested::class,
-                'entity_comments_requested' => EntityCommentsRequested::class,
-                'reaction_added' => ReactionAdded::class,
-                'reaction_removed' => ReactionRemoved::class,
-                'member_joined_channel' => MemberJoinedChannel::class,
-                'member_left_channel' => MemberLeftChannel::class,
-                'link_shared' => LinkShared::class,
-                'file_shared' => FileShared::class,
-                'app_uninstalled' => AppUninstalled::class,
-                'tokens_revoked' => TokensRevoked::class,
-                'agent_session_stopped' => AgentSessionStopped::class,
-                'agent_session_title_changed' => AgentSessionTitleChanged::class,
-                default => GenericEvent::class,
-            },
+            default => \Thunder\Bolt\Payloads\EventPayloads::classFor(
+                is_string($descriptor->selector) ? $descriptor->selector : '',
+            ),
         };
 
         $declaredPayloadTypes = [];
         foreach ($this->handlerReflection($descriptor->handler)->getParameters() as $parameter) {
             foreach ($this->classTypes($parameter) as $type) {
-                if (in_array(
-                    $type,
-                    [
-                        AppMention::class,
-                        MessageEvent::class,
-                        SlashCommand::class,
-                        GenericEvent::class,
-                        FunctionExecuted::class,
-                        AssistantThreadEvent::class,
-                        AssistantThreadStarted::class,
-                        AssistantThreadContextChanged::class,
-                        EntityRequest::class,
-                        EntityDetailsRequested::class,
-                        EntityCommentsRequested::class,
-                        ReactionEvent::class,
-                        ReactionAdded::class,
-                        ReactionRemoved::class,
-                        ChannelMembership::class,
-                        MemberJoinedChannel::class,
-                        MemberLeftChannel::class,
-                        LinkShared::class,
-                        FileShared::class,
-                        AppUninstalled::class,
-                        TokensRevoked::class,
-                        AgentSessionEvent::class,
-                        AgentSessionStopped::class,
-                        AgentSessionTitleChanged::class,
-                        Action::class,
-                        Shortcut::class,
-                        Options::class,
-                        View::class,
-                    ],
-                    true,
-                )) {
+                if (
+                    is_subclass_of($type, GenericEvent::class)
+                    || in_array(
+                        $type,
+                        [
+                            AppMention::class,
+                            MessageEvent::class,
+                            SlashCommand::class,
+                            GenericEvent::class,
+                            FunctionExecuted::class,
+                            AssistantThreadEvent::class,
+                            AssistantThreadStarted::class,
+                            AssistantThreadContextChanged::class,
+                            EntityRequest::class,
+                            EntityDetailsRequested::class,
+                            EntityCommentsRequested::class,
+                            ReactionEvent::class,
+                            ReactionAdded::class,
+                            ReactionRemoved::class,
+                            ChannelMembership::class,
+                            MemberJoinedChannel::class,
+                            MemberLeftChannel::class,
+                            LinkShared::class,
+                            FileShared::class,
+                            AppUninstalled::class,
+                            TokensRevoked::class,
+                            AgentSessionEvent::class,
+                            AgentSessionStopped::class,
+                            AgentSessionTitleChanged::class,
+                            Action::class,
+                            Shortcut::class,
+                            Options::class,
+                            View::class,
+                        ],
+                        true,
+                    )
+                ) {
                     $declaredPayloadTypes[] = $type;
                 }
             }

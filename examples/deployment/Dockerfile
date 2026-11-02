@@ -16,7 +16,7 @@ COPY src ./src
 COPY bin ./bin
 COPY stubs ./stubs
 RUN composer install --no-dev --no-interaction --prefer-dist --no-progress \
-    && php bin/bolt new work/app --transport=socket --auth=token --no-interaction \
+    && php bin/bolt new work/app --source=path --transport=socket --auth=token --no-interaction \
     && cd work/app && composer install --no-dev --no-interaction --prefer-dist --no-progress
 COPY examples/deployment/app ./work/app/app
 COPY examples/deployment/config ./work/app/config

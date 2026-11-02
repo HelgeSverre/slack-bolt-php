@@ -157,6 +157,34 @@ final class ProjectScaffoldTest extends TestCase
         self::assertCount(1, $http->requests);
     }
 
+    public function test_everyday_event_scaffolds_use_the_same_catalog_as_dispatch(): void
+    {
+        $scaffold = new ProjectScaffold(dirname(__DIR__, 2));
+        foreach ([
+            ['app_home_opened', 'AppHomeOpened', ['user' => 'U1', 'tab' => 'home']],
+            ['channel_rename', 'ChannelRenamed', ['channel' => ['id' => 'C1', 'name' => 'renamed']]],
+            [
+                'message_metadata_deleted',
+                'MessageMetadataDeleted',
+                [
+                    'channel_id' => 'C1',
+                    'message_ts' => '1.0',
+                    'event_ts' => '2.0',
+                    'previous_metadata' => ['event_type' => 'task', 'event_payload' => []],
+                ],
+            ],
+        ] as [$event, $payload, $data]) {
+            $listener = 'Catalog' . $payload;
+            $path = $scaffold->listener($this->workspace, $listener, 'event', $event);
+            self::assertStringContainsString('Payloads\\Events\\' . $payload . ';', (string) file_get_contents($path));
+            require $path;
+            \Thunder\Bolt\Testing\BoltTest::make()
+                ->listeners('App\\Listeners\\' . $listener)
+                ->event($event, $data)
+                ->assertNoApiCalls();
+        }
+    }
+
     public function test_assistant_scaffold_creates_a_safe_configured_listener_without_changing_the_manifest(): void
     {
         $scaffold = new ProjectScaffold(dirname(__DIR__, 2));
@@ -228,7 +256,7 @@ final class ProjectScaffoldTest extends TestCase
         self::assertFileExists($project . '/bolt');
         self::assertFileExists($project . '/public/index.php');
         self::assertFileExists($project . '/app/Listeners/GreetOnMention.php');
-        self::assertStringContainsString('0.2.x-dev', (string) file_get_contents($project . '/composer.json'));
+        self::assertStringContainsString('^0.3', (string) file_get_contents($project . '/composer.json'));
         self::assertStringContainsString(
             'vendor/helgesverre/slack-bolt/bin/bolt',
             (string) file_get_contents($project . '/bolt'),
@@ -238,10 +266,7 @@ final class ProjectScaffoldTest extends TestCase
             'socket_mode_enabled: false',
             (string) file_get_contents($project . '/slack-manifest.yaml'),
         );
-        self::assertStringContainsString(
-            'local Composer path repository',
-            (string) file_get_contents($project . '/README.md'),
-        );
+        self::assertStringContainsString('from Packagist', (string) file_get_contents($project . '/README.md'));
     }
 
     public function test_refuses_existing_or_traversal_project_paths(): void

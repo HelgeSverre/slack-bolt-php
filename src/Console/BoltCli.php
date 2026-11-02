@@ -21,13 +21,13 @@ use Tempest\Highlight\Highlighter;
  */
 final class BoltCli
 {
-    public const string NEW_USAGE = 'Usage: php /path/to/bolt new <directory> [--transport=http|socket] [--auth=token|oauth] [--source=path|vcs] [--repository=<url-or-local-git-repository>] [--version=dev-main] [--no-interaction]';
+    public const string NEW_USAGE = 'Usage: php /path/to/bolt new <directory> [--transport=http|socket] [--auth=token|oauth] [--source=packagist|path|vcs] [--repository=<url-or-local-git-repository>] [--version=<constraint>] [--no-interaction]';
 
     /** @param list<string> $arguments */
     public static function run(array $arguments, string $packageRoot, ?string $composerAutoload = null): int
     {
         if (self::isVersionRequest($arguments)) {
-            self::writeVersion();
+            self::writeVersion($packageRoot, $composerAutoload);
 
             return 0;
         }
@@ -82,11 +82,32 @@ final class BoltCli
         return in_array('--help', $arguments, true) || in_array('-h', $arguments, true);
     }
 
-    private static function writeVersion(): void
+    private static function writeVersion(string $packageRoot, ?string $composerAutoload): void
     {
-        $version = '0.2.x-dev';
+        $version = '0.3.x-dev';
         if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('helgesverre/slack-bolt')) {
             $version = InstalledVersions::getPrettyVersion('helgesverre/slack-bolt') ?? $version;
+        } else {
+            $installed =
+                ($composerAutoload === null ? dirname($packageRoot, 2) : dirname($composerAutoload))
+                . '/composer/installed.json';
+            if (is_file($installed)) {
+                $contents = file_get_contents($installed);
+                $metadata = $contents === false ? null : json_decode($contents, true);
+                $packages = is_array($metadata) ? $metadata['packages'] ?? $metadata : [];
+                if (is_array($packages)) {
+                    foreach ($packages as $package) {
+                        if (
+                            is_array($package)
+                            && ($package['name'] ?? null) === 'helgesverre/slack-bolt'
+                            && is_string($package['version'] ?? null)
+                        ) {
+                            $version = $package['version'];
+                            break;
+                        }
+                    }
+                }
+            }
         }
         fwrite(STDOUT, "Thunder Bolt {$version}\n");
     }

@@ -9,7 +9,7 @@
 
 Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, and explicit durable jobs. Built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style.
 
-**Experimental preview.** Install `helgesverre/slack-bolt:dev-main` for the code shown here. The PHP namespace remains `Thunder\Bolt`. Earlier tags predate the public package rename and current scaffolder. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
+**Experimental v0.3.0.** Install `helgesverre/slack-bolt:^0.3` for the code shown here. The PHP namespace remains `Thunder\Bolt`. Tags before v0.3.0 predate the public package rename and current scaffolder. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
 
 ## Explore the framework
 
@@ -28,6 +28,7 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 | [Assistants and streaming](#assistants-and-streaming) | Thread lifecycle, suggested prompts, sessions, and streaming replies |
 | [Workflow functions](#workflow-functions) | Typed inputs and explicit complete/fail helpers |
 | [Work Objects](#work-objects) | Native entity previews and application-owned comments |
+| [Testing your app](#testing-your-app) | Signed fixtures, fake Slack, and reply/job assertions |
 | [CLI and operations](#cli-and-operations) | Generators, diagnostics, worker status, and deployment |
 | [Playground](#playground) | A shared pet, terminal, AI streaming, and an interactive tour |
 
@@ -45,20 +46,17 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 ### Add the package
 
 ```sh
-composer require helgesverre/slack-bolt:dev-main
+composer require helgesverre/slack-bolt:^0.3
 ```
 
 ### Create a new application
 
-Install the CLI, then generate an application using the public Git source:
+Install the CLI, then generate an application backed by Packagist:
 
 ```sh
-composer global require helgesverre/slack-bolt:dev-main
+composer global require helgesverre/slack-bolt:^0.3
 
-bolt new my-bot \
-  --source=vcs \
-  --repository=https://github.com/HelgeSverre/slack-bolt-php.git \
-  --no-interaction
+bolt new my-bot --no-interaction
 
 cd my-bot
 composer install
@@ -71,11 +69,11 @@ Put Composer's global vendor bin directory on `PATH` if needed: `composer global
 | --- | --- | --- |
 | `--transport` | `http`, `socket` | `http` |
 | `--auth` | `token`, `oauth` | `token` |
-| `--source` | `path`, `vcs` | `path` |
+| `--source` | `packagist`, `path`, `vcs` | `packagist` |
 | `--repository` | HTTPS/SSH URL or absolute local Git repository | Required for `vcs` |
-| `--version` | `dev-main` | `dev-main` for `vcs` |
+| `--version` | Composer constraint for 0.3.0+, or `dev-main` | `^0.3` for Packagist; `dev-main` for Git |
 
-The explicit Git source above lets the app run independently of your CLI installation. The default path source is useful for framework development and requires keeping that local installation available. Existing directories are never overwritten. [Full getting-started guide](docs/guides/getting-started.md).
+Generated apps use Packagist without a custom Composer repository and run independently of your CLI installation. Use `--source=path` for framework development, or `--source=vcs --repository=…` for an explicit Git source. Existing directories are never overwritten. [Full getting-started guide](docs/guides/getting-started.md).
 
 ## Slack configuration
 
@@ -164,7 +162,7 @@ final readonly class Ping
 | `#[Options('search_assignees')]` | `Payloads\Options` | `OptionsResponse` |
 | `#[View('approve_deployment')]` | `Payloads\View` | `ViewResponse` |
 
-Known events have native payload properties such as `userId` and `channelId`. Unknown event types use the generic event payload; `raw` preserves original Slack data.
+Known events have native payload properties such as `userId` and `channelId`. App Home, channel lifecycle, and message-metadata events also have native payloads. Unknown event types use the generic event payload; `raw` preserves original Slack data. [Typed-event catalog](docs/guides/typed-events.md).
 
 **Handlers execute inline.** Commands/interactions must return exactly one response of the correct family across matching listeners, within Slack's three-second deadline. Returning does not flush an acknowledgement early. Queue slow work explicitly.
 
@@ -743,6 +741,32 @@ $client->chat()->postMessage([
 | Authorization callback | Enforce read/post/edit/delete access on every operation |
 
 Slack feature availability, entity types, event subscriptions, and any unfurl domains/scopes must be configured separately. [Work Objects guide](docs/guides/advanced-slack-features.md#work-objects) · [Runnable comment demo](examples/hello-bolt/README.md#work-objects).
+
+## Testing your app
+
+Exercise real handlers without Slack credentials or network calls:
+
+```php
+use App\Listeners\GreetOnMention;
+use Thunder\Bolt\Testing\BoltTest;
+
+$bolt = BoltTest::make()->listeners(GreetOnMention::class);
+
+$bolt->mention('hello', user: 'U123', channel: 'C123')
+    ->assertAcknowledged()
+    ->assertThreadReply('Hello <@U123>!')
+    ->assertNoJobsQueued();
+```
+
+| Test capability | Interface |
+| --- | --- |
+| Commands and interactions | `command()`, `interaction()` |
+| Web API responses | `$bolt->slack->respondsWith('users.info', $response)` |
+| Application dependencies | `bind($fake, as: Reports::class)` |
+| Real SQLite intake | `BoltTest::make(jobs: true)->jobHandlers(PublishNoteHandler::class)` |
+| Assertions | Thread/channel/ephemeral replies, acknowledgements, API calls, queued jobs |
+
+Results are scoped to one delivery. The harness uses the real HTTP receiver, memory conversation state, and optional in-memory SQLite; it does not load `.env`, boot the application kernel, or execute queued jobs. It has no PHPUnit/Pest dependency. [Public testing toolkit](docs/guides/testing-toolkit.md).
 
 ## CLI and operations
 

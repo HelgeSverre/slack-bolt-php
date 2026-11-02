@@ -218,7 +218,24 @@ try {
     }
     run([PHP_BINARY, 'bolt', '--version'], $project, $environment);
 
-    fwrite(STDOUT, "VCS project smoke test passed.\n");
+    run([PHP_BINARY, '-r', <<<'PHP'
+            require 'vendor/autoload.php';
+            if (class_exists(\PHPUnit\Framework\TestCase::class)) {
+                throw new RuntimeException('This proof must use production dependencies only.');
+            }
+            $bolt = \Thunder\Bolt\Testing\BoltTest::make()->listeners(\App\Listeners\GreetOnMention::class);
+            $bolt->mention('hello', user: 'U123')->assertThreadReply('Hello <@U123>!')->assertNoJobsQueued();
+            $received = null;
+            $bolt->app->event('app_home_opened', static function (\Thunder\Bolt\Payloads\Events\AppHomeOpened $event) use (&$received): void {
+                $received = $event->tab;
+            });
+            $bolt->event('app_home_opened', ['user' => 'U123', 'tab' => 'home'])->assertNoApiCalls();
+            if ($received !== 'home') {
+                throw new RuntimeException('The installed toolkit did not deliver the typed App Home event.');
+            }
+            PHP], $project, $environment);
+
+    fwrite(STDOUT, "VCS project smoke test passed, including the public testing toolkit without PHPUnit.\n");
 } finally {
     remove($workspace);
 }

@@ -36,9 +36,43 @@ final class OnboardingBootstrapTest extends TestCase
         $setup = require $this->root . '/app/config/setup.config.php';
         self::assertSame('socket', $setup->transport);
         self::assertSame('oauth', $setup->authorization);
+        $composer = json_decode(
+            (string) file_get_contents($this->root . '/app/composer.json'),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+        self::assertArrayNotHasKey('repositories', $composer);
+        self::assertSame('^0.3', $composer['require']['helgesverre/slack-bolt']);
         [$status] = $this->command(['new', 'invalid', '--transport=invalid']);
         self::assertSame(2, $status);
         self::assertDirectoryDoesNotExist($this->root . '/invalid');
+    }
+
+    public function test_version_reads_installed_package_metadata_without_booting_or_autoloading_an_app(): void
+    {
+        $package = $this->root . '/vendor/helgesverre/slack-bolt';
+        mkdir($package . '/src/Console', 0700, true);
+        mkdir($package . '/bin', 0700);
+        mkdir($this->root . '/vendor/composer', 0700);
+        copy(dirname(__DIR__, 2) . '/bin/bolt', $package . '/bin/bolt');
+        copy(dirname(__DIR__, 2) . '/src/Console/BoltCli.php', $package . '/src/Console/BoltCli.php');
+        file_put_contents($this->root . '/vendor/composer/installed.json', json_encode([
+            'packages' => [['name' => 'helgesverre/slack-bolt', 'version' => 'v0.3.0']],
+        ], JSON_THROW_ON_ERROR));
+        $process = proc_open(
+            [PHP_BINARY, $package . '/bin/bolt', '--version'],
+            [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
+            $pipes,
+            $this->root,
+        );
+        self::assertIsResource($process);
+        fclose($pipes[0]);
+        $output = stream_get_contents($pipes[1]);
+        $error = stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        self::assertSame(0, proc_close($process), $error);
+        self::assertSame("Thunder Bolt v0.3.0\n", str_replace("\r\n", "\n", $output));
     }
 
     public function test_new_treats_version_as_the_vcs_source_option_not_the_global_version_flag(): void

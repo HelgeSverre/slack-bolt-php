@@ -178,7 +178,7 @@ Open **Work Object Previews** and configure the supported entity types. For the 
 
 For link-triggered Work Objects, add `links:read`, `links:write`, `link_shared` and your domains under **Event Subscriptions → App unfurl domains**. Add `entity_details_requested` and, for comments, `entity_comments_requested`; enable interactivity for comment actions. Authorize every external record and comment operation in application code—an external object ID or URL is not permission to access it. [Work Objects](https://docs.slack.dev/messaging/work-objects-overview/), [comments](https://docs.slack.dev/messaging/work-objects-comments/)
 
-Message metadata is separate. Sending metadata does not subscribe the app to metadata events. If you need `message_metadata_posted`, `message_metadata_updated` or `message_metadata_deleted`, add those events and matching `metadata_subscriptions` entries under `settings.event_subscriptions`. The starter/playground manifests do not configure them automatically, and inbound metadata events use the generic event payload. [Message metadata](https://docs.slack.dev/messaging/message-metadata/)
+Message metadata is separate. Sending metadata does not subscribe the app to metadata events. If you need `message_metadata_posted`, `message_metadata_updated` or `message_metadata_deleted`, add those events and matching `metadata_subscriptions` entries under `settings.event_subscriptions`. The starter/playground manifests do not configure them automatically, and inbound metadata events have native posted/updated/deleted payload classes; see [typed events](typed-events.md). [Message metadata](https://docs.slack.dev/messaging/message-metadata/)
 
 ## Check the installation
 

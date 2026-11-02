@@ -553,7 +553,7 @@
       "id": "payload-types",
       "area": "Inbound native payload and state typing",
       "status": "partial",
-      "assessment": "Common event classes and native InputValue/FormState readers cover text, select and ID variants, radio/checkbox, date/time, files and rich text across actions and views. Raw access and existing value()/state() remain compatible. The complete @slack/types event universe and nested polymorphic data still have generic/raw fields; this is narrower native typing, not an unsupported routing family or a promise of one PHP DTO per TypeScript union.",
+      "assessment": "Common event classes and native InputValue/FormState readers cover text, select and ID variants, radio/checkbox, date/time, files and rich text across actions and views. Raw access and existing value()/state() remain compatible. The complete @slack/types event universe and nested polymorphic data still have generic/raw fields; this is narrower native typing, not an unsupported routing family or a promise of one PHP DTO per TypeScript union. A later developer-experience slice adds typed App Home, channel lifecycle and message-metadata payloads, using a shared dispatch/validation/scaffolding catalog. Unknown events remain generic; the row stays partial for the wider event universe.",
       "php": [
         "src/Payloads/Event.php",
         "src/Payloads/Action.php",
@@ -561,12 +561,17 @@
         "src/App.php",
         "src/Payloads/Values/InputValue.php",
         "src/Payloads/Values/FormState.php",
-        "src/Payloads/Values/UploadedFile.php"
+        "src/Payloads/Values/UploadedFile.php",
+        "src/Payloads/EventPayloads.php",
+        "src/Payloads/Events/AppHomeOpened.php",
+        "src/Payloads/Events/ChannelEvent.php",
+        "src/Payloads/Events/MessageMetadataEvent.php"
       ],
       "tests": [
         "tests/Payloads/InteractionPayloadTest.php",
         "tests/Runtime/TypedEventDispatchTest.php",
-        "tests/Payloads/FormStateTest.php"
+        "tests/Payloads/FormStateTest.php",
+        "tests/Payloads/EverydayEventsTest.php"
       ],
       "upstream": [
         "src/types/actions/block-action.ts",

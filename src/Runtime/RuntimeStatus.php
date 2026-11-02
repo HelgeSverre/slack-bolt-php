@@ -24,7 +24,11 @@ final readonly class RuntimeStatus
         if (array_diff($required, ['socket', 'jobs']) !== [])
             throw new \InvalidArgumentException('Require socket, jobs, socket,jobs, or none.');
         $processes = $this->monitor->snapshot($staleAfter);
-        $queue = QueueSnapshot::read($this->queuePath, $this->clock->now()->getTimestamp());
+        try {
+            $queue = QueueSnapshot::read($this->queuePath, $this->clock->now()->getTimestamp());
+        } catch (\Throwable) {
+            $queue = ['available' => false, 'reason' => 'read_failed'];
+        }
         $active = ['socket' => 0, 'jobs' => 0];
         foreach ($processes as $process) {
             if (

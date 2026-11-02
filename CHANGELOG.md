@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Observed runtime status for Socket Mode and durable workers, with heartbeat freshness, queue backlog and uncertain/expired outcome visibility. Diagnostics are read-only and redact sensitive execution data.
+- Observed runtime status for Socket Mode and durable workers, with heartbeat freshness, queue backlog and uncertain/expired outcome visibility. Diagnostics are read-only and redact sensitive execution data. Optional queue failures preserve independent Socket Mode observations.
 - Non-root Docker Compose deployment example with persistent state, separate intake/workers, health checks and graceful restart guidance.
 - Graceful SIGTERM handling for one-shot job workers, real process crash/drain/concurrency tests and an opt-in sustained reliability harness.
 

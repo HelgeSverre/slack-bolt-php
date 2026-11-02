@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-02",
+  "command": "composer test:soak -- --duration=7200 --interval=60",
+  "exit_code": 0,
+  "phase": "passed",
+  "elapsed_seconds": 7200,
+  "rounds": 107,
+  "polls": 1162086,
+  "max_retained_bytes": 1061800,
+  "peak_bytes": 8388608,
+  "live_slack": false,
+  "scope": "Continuous native local WebSocket polling with repeated isolated process, reconnect and OAuth rotation tests. OAuth and Slack responses are recorded fixtures.",
+  "php_version": "8.5.10",
+  "php_memory_limit": "128M",
+  "fixture_note": "Periodic tests used the working checkout. Non-expiry fixture leases increased from 2 to 10 seconds during the run after macOS CI exposed a timing failure; crash-expiry tests retained 2-second leases. The continuous transport code was unchanged."
+}

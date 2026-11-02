@@ -107,6 +107,24 @@ final class RuntimeStatusTest extends TestCase
         self::assertTrue($status->report(['jobs'])['healthy']);
     }
 
+    public function test_unreadable_optional_queue_does_not_hide_a_healthy_socket(): void
+    {
+        $monitor = new RuntimeMonitor($this->directory, $this->clock);
+        $monitor->start('socket')->update('connected');
+        $monitor->start('jobs')->update('idle');
+        $path = $this->directory . '/broken.sqlite';
+        file_put_contents($path, 'private-storage-canary: not a database');
+        $status = new RuntimeStatus($monitor, $path, $this->clock);
+        $socket = $status->report(['socket']);
+        self::assertTrue($socket['healthy']);
+        self::assertSame(1, $socket['active']['socket']);
+        self::assertFalse($socket['queue']['available']);
+        self::assertSame('read_failed', $socket['queue']['reason']);
+        self::assertFalse($status->report(['jobs'])['healthy']);
+        self::assertStringNotContainsString('private-storage-canary', json_encode($socket, JSON_THROW_ON_ERROR));
+        self::assertSame('private-storage-canary: not a database', file_get_contents($path));
+    }
+
     public function test_corrupt_records_fail_closed_without_returning_arbitrary_fields(): void
     {
         file_put_contents($this->directory . '/' . str_repeat('a', 32) . '.json', '{"secret":"never-print-me"}');

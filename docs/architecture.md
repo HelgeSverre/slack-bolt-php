@@ -3,7 +3,7 @@
 The HTTP receiver, dispatcher, reply helper, and Web API client are deep modules: each hides substantial protocol behavior behind a small interface. The seams are exercised by production adapters and local test adapters.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Request[Original HTTP bytes] --> Verify[Signature and timestamp verification]
     Verify --> Decode[Decode trusted Slack payload]
     Decode --> Challenge[URL verification]

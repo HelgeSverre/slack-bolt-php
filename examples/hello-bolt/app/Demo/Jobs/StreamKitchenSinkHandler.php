@@ -7,6 +7,8 @@ namespace App\Demo\Jobs;
 use Tempest\CommandBus\CommandHandler;
 use Thunder\Bolt\Assistant\MessageStream;
 use Thunder\Bolt\Assistant\Session;
+use Thunder\Bolt\Assistant\Streaming\TaskStatus;
+use Thunder\Bolt\Assistant\Streaming\TaskUpdate;
 use Thunder\Bolt\Assistant\ThreadIdentity;
 use Thunder\Bolt\Conversation\ConversationKey;
 use Thunder\Bolt\Jobs\JobCancelled;
@@ -100,12 +102,13 @@ final readonly class StreamKitchenSinkHandler
     private function step(MessageStream $stream, string $id, string $title, string $text): void
     {
         $this->execution->heartbeat();
-        $stream->chunks([['type' => 'task_update', 'id' => $id, 'title' => $title, 'status' => 'in_progress']]);
+        $task = TaskUpdate::make($id, $title);
+        $stream->chunks([$task]);
         for ($tick = 0; $tick < 16; $tick++) {
             delay(0.25);
             $this->execution->checkpoint();
         }
-        $stream->chunks([['type' => 'task_update', 'id' => $id, 'title' => $title, 'status' => 'complete']]);
+        $stream->chunks([$task->status(TaskStatus::Complete)]);
         $stream->append($text . "\n");
     }
 }

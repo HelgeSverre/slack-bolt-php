@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Demo\Ai;
 
+use Thunder\Bolt\Assistant\Streaming\TaskUpdate;
 use Thunder\Bolt\WebApi\Client;
 
 /** One Slack stream per answer; a failed delivery never replays model tools. */
@@ -38,7 +39,7 @@ final class SlackAnswerStream
             // Escape each fragment, including partial Slack mention syntax.
             $this->pendingText .= str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $text);
         } elseif ($event->type === 'task') {
-            $task = ['type' => 'task_update', 'id' => $event->id, 'title' => $event->title, 'status' => $event->status];
+            $task = TaskUpdate::make($event->id, $event->title, $event->status)->toArray();
             $this->tasks[$event->id] = $task;
             $this->pendingTasks[] = $task;
         }

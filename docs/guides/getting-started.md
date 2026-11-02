@@ -1,6 +1,6 @@
 # Getting started
 
-Thunder Bolt runs on PHP 8.5+ and Tempest 3. The public Composer package is `helgesverre/slack-bolt`; its PHP namespace remains `Thunder\Bolt`. Install the current experimental release with `composer require helgesverre/slack-bolt:^0.4`, or use the global CLI flow in the root [README](../../README.md#installation). The contributor workflow below uses this checkout as a Composer path repository.
+Thunder Bolt runs on PHP 8.5+ and Tempest 3. The public Composer package is `helgesverre/slack-bolt`; its PHP namespace remains `Thunder\Bolt`. Install the current experimental release with `composer require helgesverre/slack-bolt:^0.5`, or use the global CLI flow in the root [README](../../README.md#installation). The contributor workflow below uses this checkout as a Composer path repository.
 
 ## Create a project
 
@@ -26,7 +26,7 @@ php bin/bolt new work/oauth-app --source=path --transport=http --auth=oauth --no
 
 The generated `config/setup.config.php` records those onboarding defaults. Runtime configuration stays in `.env` and `BoltConfig`; it is not inferred from a command that happened to run first.
 
-The CLI defaults to Packagist (`helgesverre/slack-bolt:^0.4`), without a custom repository or dependency on the CLI installation. The contributor examples above explicitly use `--source=path` and the checkout’s `0.4.x-dev` alias. To scaffold from a Git repository instead, opt in explicitly:
+The CLI defaults to Packagist (`helgesverre/slack-bolt:^0.5`), without a custom repository or dependency on the CLI installation. The contributor examples above explicitly use `--source=path` and the checkout’s `0.5.x-dev` alias. To scaffold from a Git repository instead, opt in explicitly:
 
 ```sh
 php bin/bolt new work/team-bot \
@@ -36,7 +36,7 @@ php bin/bolt new work/team-bot \
   --no-interaction
 ```
 
-`--repository` accepts an HTTPS URL, a `git@…` URL, or an absolute local Git repository. It is required with `--source=vcs`; `--repository` and `--version` are rejected for an explicit `path` source. `--repository` is also rejected for Packagist. Packagist defaults to `^0.4`; Git defaults to `dev-main`. Both accept valid Composer constraints requiring 0.3.0 or newer, or the explicit `dev-main` branch. Earlier versions are rejected because they predate the current scaffolding contract. Version validation does not contact a registry; Composer later resolves the selected constraint.
+`--repository` accepts an HTTPS URL, a `git@…` URL, or an absolute local Git repository. It is required with `--source=vcs`; `--repository` and `--version` are rejected for an explicit `path` source. `--repository` is also rejected for Packagist. Packagist defaults to `^0.5`; Git defaults to `dev-main`. Both accept valid Composer constraints requiring 0.3.0 or newer, or the explicit `dev-main` branch. Earlier versions are rejected because they predate the current scaffolding contract. Version validation does not contact a registry; Composer later resolves the selected constraint.
 
 ## Configure the local app
 

@@ -118,7 +118,16 @@ final readonly class TestResult
     {
         self::expect(!array_any($this->calls, static fn(SlackCall $call): bool => in_array(
             $call->method,
-            ['chat.postMessage', 'chat.postEphemeral', 'chat.update', 'chat.delete', 'response_url'],
+            [
+                'chat.postMessage',
+                'chat.postEphemeral',
+                'chat.update',
+                'chat.delete',
+                'chat.startStream',
+                'chat.appendStream',
+                'chat.stopStream',
+                'response_url',
+            ],
             true,
         )), 'Unexpected Slack message calls were recorded.');
         return $this;

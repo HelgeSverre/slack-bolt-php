@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f7df6ab7c58d755a8f658a44acc49519",
+    "content-hash": "3370b61de777ccded61fd2192eadb72a",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2111,11 +2111,11 @@
         },
         {
             "name": "helgesverre/slack-bolt",
-            "version": "0.4.x-dev",
+            "version": "0.5.x-dev",
             "dist": {
                 "type": "path",
                 "url": "../..",
-                "reference": "f95d7f69e9716146bca03408b8af3432f9ddf395"
+                "reference": "93b4380cdfb00783ddcfb2b92e0cb731f61b43ea"
             },
             "require": {
                 "amphp/amp": "^3.1",
@@ -2143,7 +2143,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "0.4.x-dev"
+                    "dev-main": "0.5.x-dev"
                 }
             },
             "autoload": {

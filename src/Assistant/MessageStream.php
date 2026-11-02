@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Thunder\Bolt\Assistant;
 
+use Thunder\Bolt\Assistant\Streaming\Chunk;
+use Thunder\Bolt\Assistant\Streaming\MarkdownText;
 use Thunder\Bolt\BlockKit\Block;
 use Thunder\Bolt\WebApi\Client;
 use Thunder\Bolt\WebApi\Response;
@@ -14,6 +16,9 @@ final class MessageStream
     private ?string $timestamp = null;
     private bool $closed = false;
     private bool $failed = false;
+    private int $textLength = 0;
+    /** @var array<string|int, true> */
+    private array $taskIds = [];
 
     public function __construct(
         private readonly Client $client,
@@ -35,27 +40,40 @@ final class MessageStream
 
     public function append(string $markdown): self
     {
-        if ($markdown === '' || mb_strlen($markdown) > 12000) {
-            throw new \InvalidArgumentException('A stream fragment must contain 1 to 12000 characters.');
-        }
         // Slack fixes a stream's wire mode on its first request. Always use chunks
         // so text and task progress can be mixed throughout the same stream.
-        $this->send(['chunks' => [['type' => 'markdown_text', 'text' => $markdown]]]);
-        return $this;
+        return $this->chunks([MarkdownText::make($markdown)]);
     }
 
-    /** @param list<array<string, mixed>> $chunks */
+    /** @param list<Chunk|array<string, mixed>> $chunks */
     public function chunks(array $chunks): self
     {
+        $this->assertOpen();
         if ($chunks === [] || !array_is_list($chunks)) {
             throw new \InvalidArgumentException('Stream chunks must be a non-empty list.');
         }
+        $wire = [];
+        $length = $this->textLength;
+        $tasks = $this->taskIds;
         foreach ($chunks as $chunk) {
+            $chunk = $chunk instanceof Chunk ? $chunk->toArray() : $chunk;
             if (!is_array($chunk) || !is_string($chunk['type'] ?? null)) {
                 throw new \InvalidArgumentException('Each stream chunk needs a type.');
             }
+            if ($chunk['type'] === 'markdown_text' && is_string($chunk['text'] ?? null)) {
+                $length += mb_strlen($chunk['text']);
+            }
+            if ($chunk['type'] === 'task_update' && is_string($chunk['id'] ?? null)) {
+                $tasks[$chunk['id']] = true;
+            }
+            $wire[] = $chunk;
         }
-        $this->send(['chunks' => $chunks]);
+        if ($length > 12000 || count($tasks) > 50) {
+            throw new \LengthException('A stream supports at most 12000 text characters and 50 unique tasks.');
+        }
+        $this->send(['chunks' => $wire]);
+        $this->textLength = $length;
+        $this->taskIds = $tasks;
         return $this;
     }
 
@@ -67,6 +85,9 @@ final class MessageStream
     public function finish(AgentSessionStatus $status = AgentSessionStatus::Active, Block ...$blocks): Response
     {
         $this->assertOpen();
+        if (count($blocks) > 50) {
+            throw new \LengthException('Stream completion supports at most 50 final blocks.');
+        }
         if ($this->timestamp === null) {
             throw new \LogicException('Append text or chunks before stopping a stream.');
         }

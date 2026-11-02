@@ -9,7 +9,7 @@
 
 Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, and explicit durable jobs. Built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style.
 
-**Experimental v0.4.0.** Install `helgesverre/slack-bolt:^0.4` for the code shown here. The PHP namespace remains `Thunder\Bolt`. Tags before v0.3.0 predate the public package rename and current scaffolder. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
+**Experimental v0.5.0.** Install `helgesverre/slack-bolt:^0.5` for the code shown here. The PHP namespace remains `Thunder\Bolt`. Tags before v0.3.0 predate the public package rename and current scaffolder. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
 
 ## Explore the framework
 
@@ -46,7 +46,7 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 ### Add the package
 
 ```sh
-composer require helgesverre/slack-bolt:^0.4
+composer require helgesverre/slack-bolt:^0.5
 ```
 
 ### Create a new application
@@ -54,7 +54,7 @@ composer require helgesverre/slack-bolt:^0.4
 Install the CLI, then generate an application backed by Packagist:
 
 ```sh
-composer global require helgesverre/slack-bolt:^0.4
+composer global require helgesverre/slack-bolt:^0.5
 
 bolt new my-bot --no-interaction
 
@@ -71,7 +71,7 @@ Put Composer's global vendor bin directory on `PATH` if needed: `composer global
 | `--auth` | `token`, `oauth` | `token` |
 | `--source` | `packagist`, `path`, `vcs` | `packagist` |
 | `--repository` | HTTPS/SSH URL or absolute local Git repository | Required for `vcs` |
-| `--version` | Composer constraint for 0.3.0+, or `dev-main` | `^0.4` for Packagist; `dev-main` for Git |
+| `--version` | Composer constraint for 0.3.0+, or `dev-main` | `^0.5` for Packagist; `dev-main` for Git |
 
 Generated apps use Packagist without a custom Composer repository and run independently of your CLI installation. Use `--source=path` for framework development, or `--source=vcs --repository=…` for an explicit Git source. Existing directories are never overwritten. [Full getting-started guide](docs/guides/getting-started.md).
 
@@ -677,6 +677,20 @@ The stream needs at least one nonempty fragment before finishing. `chunks()` als
 | `setStatus()` / `setTitle()` | Retained legacy assistant-thread APIs |
 
 Modern session APIs require the current Slack Agents capability; subscribing to legacy `assistant_thread_*` events alone does not enable them. Use `Assistant::forAgentView()` for typed current focus, Messages-tab opening and root DM routing. Enable Agent View in the target workspace first; see the [Agent View guide](docs/guides/agent-view.md). A Stop event does not cancel arbitrary PHP code: the app must cancel its jobs and check cancellation during work.
+
+Task progress can share the text stream:
+
+```php
+use Thunder\Bolt\Assistant\Streaming\{TaskStatus, TaskUpdate};
+
+$task = TaskUpdate::make('search', 'Read the reference');
+$stream = $thread->sayStream();
+$stream->chunks([$task])->append('Checking the API.');
+$stream->chunks([$task->status(TaskStatus::Complete)->output('Reference found.')]);
+$stream->append('Here is what it supports.')->stop();
+```
+
+Typed chunks also cover markdown, plans and Block Kit. Raw arrays remain available. [Streaming guide and limits](docs/guides/streaming-progress.md).
 
 Modern configuration uses the same application config seam:
 

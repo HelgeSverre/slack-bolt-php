@@ -4,6 +4,8 @@ Assistants, custom functions, and Work Objects are opt-in Slack capabilities. Th
 
 Use the [Slack app setup guide](slack-app-setup.md) for the current UI locations and required scopes/events. The checked-in playground is useful for code patterns, but its wide manifest is a demo surface rather than a baseline application manifest.
 
+Typed text/task/plan/block stream values and raw arrays share one stream. See [streaming progress](streaming-progress.md) for builders, whole-stream limits and testing.
+
 ## Assistants and agent sessions
 
 Thunder Bolt has a typed assistant runtime compatible with the retained Bolt JS assistant-thread contract, plus modern session controls for status and titles. Register exactly one assistant:

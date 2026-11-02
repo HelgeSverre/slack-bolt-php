@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## v0.5.0 — 2026-11-02
+
+- Immutable typed streaming text, task, plan and Block Kit chunks, with native task statuses and source builders. Existing raw arrays remain supported.
+- Whole-stream text/task accounting, local builder/final-block validation, and unchanged terminal failure behavior.
+- AI and kitchen-sink demos use typed task progress; the public fake captures streaming writes and negative message assertions detect them.
+- Streaming examples, limits, failure/testing guidance and current `^0.5` installation instructions.
+
 ## v0.4.0 — 2026-11-02
 
 - Opt-in `Assistant::forAgentView()` with Messages-tab opening, focus changes, human root DMs and thread replies, preserving legacy assistant behavior.

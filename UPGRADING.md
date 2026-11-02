@@ -6,6 +6,12 @@ The Composer package is now `helgesverre/slack-bolt`; the PHP namespace remains 
 
 Use `^0.3` for the first release under the public package name. Tags before v0.3.0 predate the rename and current scaffolding API; `dev-main` remains available explicitly.
 
+## v0.5.0
+
+Use `^0.5` for this release; contributor path overrides and requirements now use `0.5.x-dev`. Typed streaming chunks are additive and can mix with raw arrays. `MessageStream` now rejects batches exceeding 12,000 accumulated markdown characters or 50 unique task IDs before sending them; code relying on per-fragment limits must budget the whole response. Rejected batches leave the stream usable. Final blocks are bounded at 50.
+
+`assertNoMessagesSent()` now detects streaming writes. Ordinary message assertions still target `chat.postMessage`; use `assertApiCalled()` for streams. No store/queue schema changes or Slack configuration changes are required. See the [streaming guide](docs/guides/streaming-progress.md).
+
 ## v0.4.0
 
 Use `^0.4` for this release. Existing `Assistant::make()` applications keep their lifecycle and stores. Adopting `Assistant::forAgentView()` is explicit: replace legacy lifecycle callbacks with optional `opened`/`appContextChanged` and required `userMessage`, enable Slack Agent View and its event subscriptions, and use injected `AppContext`. Focus is delivery-local, never legacy thread metadata. See the [migration and setup guide](docs/guides/agent-view.md). No queue/store schema changes are required.

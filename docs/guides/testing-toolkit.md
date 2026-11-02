@@ -51,7 +51,7 @@ Interactions accept complete Slack-shaped payloads so tests remain explicit abou
 
 ## Stub Web API responses
 
-Common message and view writes receive a minimal successful response by default. Other methods fail unless explicitly stubbed; nothing falls through to a real network client.
+Common message, view and streaming writes receive a minimal successful response by default. Streaming start returns a synthetic timestamp; the fake does not simulate Slack protocol state. Other methods fail unless explicitly stubbed; nothing falls through to a real network client.
 
 ```php
 use Thunder\Bolt\Testing\{BoltTest, SlackCall};

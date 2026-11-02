@@ -1,6 +1,6 @@
 # Getting started
 
-Thunder Bolt runs on PHP 8.5+ and Tempest 3. The public Composer package is `helgesverre/slack-bolt`; its PHP namespace remains `Thunder\Bolt`. Install the development preview with `composer require helgesverre/slack-bolt:dev-main`, or use the global CLI flow in the root [README](../../README.md#install). The contributor workflow below uses this checkout as a Composer path repository.
+Thunder Bolt runs on PHP 8.5+ and Tempest 3. The public Composer package is `helgesverre/slack-bolt`; its PHP namespace remains `Thunder\Bolt`. Install the development preview with `composer require helgesverre/slack-bolt:dev-main`, or use the global CLI flow in the root [README](../../README.md#installation). The contributor workflow below uses this checkout as a Composer path repository.
 
 ## Create a project
 

@@ -74,7 +74,7 @@ See the [client guide](../web-api-client.md), [builder guide](../sdk-and-block-k
 
 ## Socket Mode milestone
 
-`socket:serve` receives events, commands, and interactions through the same App dispatch pipeline. The runner handles Slack envelopes, hello/disconnect frames, bounded reconnect backoff, retry metadata, and shutdown. Amp provides TLS verification, WebSocket framing, message limits, and ping/pong health. Local tests cover lifecycle failures and installation/context isolation; live Slack conformance remains a release gate. See the [README](../../README.md#run-with-socket-mode) for setup; deeper documentation is deferred to the separate docs site.
+`socket:serve` receives events, commands, and interactions through the same App dispatch pipeline. The runner handles Slack envelopes, hello/disconnect frames, bounded reconnect backoff, retry metadata, and shutdown. Amp provides TLS verification, WebSocket framing, message limits, and ping/pong health. Local tests cover lifecycle failures and installation/context isolation; live Slack conformance remains a release gate. See the [README](../../README.md#slack-configuration) for setup; deeper documentation is deferred to the separate docs site.
 
 ## Remaining implementation order
 

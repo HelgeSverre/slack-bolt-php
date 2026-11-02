@@ -7,17 +7,120 @@
 [![Packagist](https://img.shields.io/packagist/v/helgesverre/slack-bolt?include_prereleases&style=flat-square&color=A4AF71)](https://packagist.org/packages/helgesverre/slack-bolt)
 [![License: MIT](https://img.shields.io/badge/license-MIT-A4AF71?style=flat-square)](LICENSE)
 
-Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, and a Slack client that feels at home in your editor.
+Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, and explicit durable jobs. Built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style.
 
-Thunder Bolt is built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style. The PHP namespace is `Thunder\Bolt`; the Composer package is `helgesverre/slack-bolt`.
+**Experimental preview.** Install `helgesverre/slack-bolt:dev-main` for the code shown here. The PHP namespace remains `Thunder\Bolt`. Earlier tags predate the public package rename and current scaffolder. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
 
-**Experimental v0.2.0 preview.** This README follows `main`; the v0.2.0 tag captures the reviewed compatibility milestone. HTTP and Socket Mode runtimes work, but this is still an active port. It is not an official Slack SDK or a complete replacement for Bolt JS yet. [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
+## Explore the framework
 
-The [Bolt JS parity audit](docs/research/bolt-js-parity-audit.md) distinguishes implemented capabilities, PHP adaptations, useful gaps and Node-specific exclusions. Endpoint/model counts do not establish full framework parity.
+| Build with | What it looks like |
+| --- | --- |
+| [Installation](#installation) | Composer package and `bolt new` project scaffolding |
+| [Slack configuration](#slack-configuration) | HTTP or Socket Mode; static token or OAuth |
+| [Handlers](#handlers) | Discovered attributes, typed payloads, or fluent registration |
+| [Messages and views](#messages-and-views) | Immutable Block Kit, modals, and App Home builders |
+| [Interactions](#interactions) | Buttons, shortcuts, select options, and form validation |
+| [Web API client](#web-api-client) | Typed requests/responses, pagination, uploads, and bounded retries |
+| [Middleware and errors](#middleware-and-errors) | Delivery context and an explicit failure policy |
+| [OAuth installations](#oauth-installations) | State validation, installation stores, and bot/user token rotation |
+| [Conversation state](#conversation-state) | Channel/thread snapshots with file, SQLite, or memory adapters |
+| [Durable jobs](#durable-jobs) | Named jobs, deduplication, recovery, retries, and cancellation |
+| [Assistants and streaming](#assistants-and-streaming) | Thread lifecycle, suggested prompts, sessions, and streaming replies |
+| [Workflow functions](#workflow-functions) | Typed inputs and explicit complete/fail helpers |
+| [Work Objects](#work-objects) | Native entity previews and application-owned comments |
+| [CLI and operations](#cli-and-operations) | Generators, diagnostics, worker status, and deployment |
+| [Playground](#playground) | A shared pet, terminal, AI streaming, and an interactive tour |
 
-New adopters should start with the maintained [documentation index](docs/README.md): [getting started](docs/guides/getting-started.md), [Slack app setup](docs/guides/slack-app-setup.md), [building handlers](docs/guides/building-apps.md), [durable operations](docs/guides/durable-operations.md), and [testing/security/troubleshooting](docs/guides/testing-security-troubleshooting.md). The dated inventories under `docs/research/` are maintainer evidence, not setup instructions.
+## Installation
 
-## A Slack app, one handler at a time
+### Requirements
+
+| Dependency | When you need it |
+| --- | --- |
+| PHP 8.5+ and Composer 2 | Every application |
+| `pdo_sqlite` | Durable jobs or SQLite conversation storage |
+| `pcntl` | Signal handling for long-running workers where supported |
+| Node 22+ | Contributor tooling only; not the PHP runtime |
+
+### Add the package
+
+```sh
+composer require helgesverre/slack-bolt:dev-main
+```
+
+### Create a new application
+
+Install the CLI, then generate an application using the public Git source:
+
+```sh
+composer global require helgesverre/slack-bolt:dev-main
+
+bolt new my-bot \
+  --source=vcs \
+  --repository=https://github.com/HelgeSverre/slack-bolt-php.git \
+  --no-interaction
+
+cd my-bot
+composer install
+cp .env.example .env
+```
+
+Put Composer's global vendor bin directory on `PATH` if needed: `composer global config bin-dir --absolute`.
+
+| Scaffold option | Values | Default |
+| --- | --- | --- |
+| `--transport` | `http`, `socket` | `http` |
+| `--auth` | `token`, `oauth` | `token` |
+| `--source` | `path`, `vcs` | `path` |
+| `--repository` | HTTPS/SSH URL or absolute local Git repository | Required for `vcs` |
+| `--version` | `dev-main` | `dev-main` for `vcs` |
+
+The explicit Git source above lets the app run independently of your CLI installation. The default path source is useful for framework development and requires keeping that local installation available. Existing directories are never overwritten. [Full getting-started guide](docs/guides/getting-started.md).
+
+## Slack configuration
+
+Import the generated `slack-manifest.yaml` into a development Slack app, install it, and invite it to a test channel. The starter subscribes to `app_mention` with `app_mentions:read` and `chat:write`.
+
+### Choose a transport
+
+| Delivery | Application credentials | Slack setting | Run |
+| --- | --- | --- | --- |
+| HTTP | Bot token and signing secret | Public HTTPS request URLs ending in `/slack/events` | `php bolt serve` |
+| Socket Mode | Bot token and app-level token | Enable Socket Mode; app-level scope `connections:write` | `php bolt socket:serve` |
+
+These rows show ordinary single-workspace bot delivery. OAuth can replace the static bot token with installation authorization; its browser routes still use HTTP with either transport.
+
+For HTTP, configure `.env`:
+
+```dotenv
+SLACK_BOT_TOKEN=xoxb-replace-me
+SLACK_SIGNING_SECRET=replace-me
+```
+
+For Socket Mode, add an app-level token:
+
+```dotenv
+SLACK_APP_TOKEN=xapp-replace-me
+```
+
+### Verify and run
+
+```sh
+php bolt doctor
+php bolt auth:verify
+php bolt serve
+# Or: php bolt socket:serve --verify-token
+```
+
+`doctor` checks local configuration; `auth:verify` explicitly contacts Slack to verify a static token. For HTTP self-message filtering without request-time lookup, copy the returned `user_id` and `bot_id` into `SLACK_BOT_USER_ID` and `SLACK_BOT_ID`.
+
+`serve` is a development server. HTTP development needs an HTTPS tunnel; production serves `public/index.php` through your PHP host. Socket Mode needs no public event URL. Event subscriptions, interactivity, and slash commands still need their own Slack-side configuration. Follow the [Slack setup guide with screenshots](docs/guides/slack-app-setup.md).
+
+## Handlers
+
+Place handler classes under your application's `app/` directory. Tempest discovers attributes and injects typed payloads and delivery capabilities. Ordinary application services belong in constructors.
+
+### Listen for an event
 
 ```php
 use Thunder\Bolt\Attributes\Event;
@@ -34,113 +137,7 @@ final readonly class GreetMention
 }
 ```
 
-Put the class in your application's `app/` directory. Tempest discovers the handler and injects its dependencies. Payloads expose native properties such as `userId` and `channelId`, while `raw` preserves Slack's original data.
-
-Views and actions share typed form readers: `$view->form()->require('title', 'input')->text()` and `$action->input()->selectedValue()`. Original payloads and existing value/state readers stay available.
-
-Message middleware composes through `MessageFilter::subtype('file_share')` and `MessageFilter::directMention()` from `Thunder\Bolt\Middleware`. For example, `$app->message('', MessageFilter::directMention(), $handler)` selects messages beginning with a mention of the authorized bot. It preserves the message text and requires a known bot user ID.
-
-## Install
-
-Install the current development preview into an existing Composer application:
-
-```sh
-composer require helgesverre/slack-bolt:dev-main
-```
-
-The public package uses `dev-main` while these unreleased APIs settle. Earlier tags predate the package rename and current project setup; use the explicit development constraint for this guide. PHP 8.5+ and Composer 2 are required.
-
-## Create an app
-
-You need PHP 8.5+ and Composer 2. Node is only required for maintainer tooling, including reference generation and documentation checks.
-
-```sh
-composer global require helgesverre/slack-bolt:dev-main
-
-bolt new my-bot \
-  --source=vcs \
-  --repository=https://github.com/HelgeSverre/slack-bolt-php.git \
-  --no-interaction
-cd my-bot
-composer install
-cp .env.example .env
-php bolt doctor
-php bolt serve
-```
-
-Make sure Composer’s global vendor bin directory is on `PATH` (`composer global config bin-dir --absolute`). For contributor development, the [getting started guide](docs/guides/getting-started.md) also covers scaffolding from a checkout.
-
-Set `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` in `.env`. Configure your Slack app's Events API and interactivity request URL as a publicly reachable HTTPS `/slack/events` endpoint, install the app with the scopes in the generated manifest, and invite it to a channel. Use an HTTPS tunnel for local HTTP development.
-
-Run `php bolt auth:verify` to check a static token and print its identity. For HTTP apps, put the returned `user_id` and `bot_id` in `SLACK_BOT_USER_ID` and `SLACK_BOT_ID` so self-message filtering needs no request-time lookup. For Socket Mode, `php bolt socket:serve --verify-token` verifies and caches identity in the worker. Verification is explicit; help and discovery stay network-free.
-
-Choose the transport and installation style when scaffolding:
-
-```sh
-# From a framework checkout; add the same profile flags to a global bolt new.
-php bin/bolt new work/socket-app --transport=socket --auth=token --no-interaction
-php bin/bolt new work/oauth-app --transport=http --auth=oauth --no-interaction
-```
-
-HTTP/token remains the default. Socket Mode needs an app-level token with `connections:write`; OAuth needs client credentials and a registered HTTPS callback. OAuth still uses HTTP install/callback routes when events arrive through Socket Mode. Generated manifests, environment examples and start commands follow the selected profile. `config/setup.config.php` records onboarding defaults; runtime settings remain in `BoltConfig`.
-
-Generated apps default to a local Composer path repository pointing at the scaffolder’s installation; keep it available when using that default. The global CLI example above explicitly selects Git so the application does not depend on that local installation. `bolt new --source=vcs --repository=… --version=dev-main` is the explicit Git alternative. `serve` starts a development server; production serves `public/index.php` through your PHP host.
-
-The [hello-bolt example](examples/hello-bolt/) connects mentions, buttons, shortcuts, external options, modal validation, and stored conversation state.
-
-It also includes a [playground](examples/hello-bolt/README.md): a shared JSON-backed pet, an owner-restricted terminal, and an OpenAI Responses agent with web search and scoped pet-care tools. Run `php bolt jobs:work` for AI and agent sessions, `php bolt demo:work` for pet, terminal and work items, alongside the Socket Mode worker. `/kickensink` opens an interactive tour.
-
-### Run with Socket Mode
-
-Enable Socket Mode in your Slack app settings and create an app-level token with the `connections:write` scope. Set these values in your application's `.env`:
-
-```dotenv
-SLACK_APP_TOKEN=xapp-your-app-token
-SLACK_BOT_TOKEN=xoxb-your-bot-token
-```
-
-```sh
-php bolt socket:serve
-```
-
-The same discovered handlers, middleware, installation authorization, and conversation stores work over Socket Mode. This runner needs no public request URL or signing secret. OAuth applications still need their HTTP installation and callback routes.
-
-The worker acknowledges Slack envelopes, reconnects with bounded backoff, monitors connection health, and stops cleanly on SIGINT/SIGTERM when PHP's `pcntl` extension is available. Handlers still execute inline and must finish within Slack's three-second acknowledgement window. Run one worker per process under your process supervisor.
-
-## Compose messages and views
-
-Factories expose required values; fluent methods add optional behavior. Builders are immutable, and PHP's `#[NoDiscard]` helps catch ignored updates.
-
-```php
-use Thunder\Bolt\BlockKit\{Actions, Button, Input, PlainTextInput, Section};
-use Thunder\Bolt\Messages\Message;
-use Thunder\Bolt\Views\Modal;
-
-$message = Message::blocks(
-    Section::markdown('*Deployment ready*'),
-    Actions::make(Button::make('Approve', 'approve_deployment')->primary()),
-)->fallbackText('Deployment ready for approval.');
-
-$modal = Modal::make('Approve deployment',
-    Input::make('Reason', PlainTextInput::make('reason')->multiline())->id('reason'),
-)->callbackId('approve_deployment')->submit('Approve');
-```
-
-Dedicated builders cover the pinned Block Kit families, including selectors, rich text, tables, cards, and workflow controls. Raw extension points support newer Slack payloads. Message builders also support metadata, legacy attachments, unfurls, and threading.
-
-## Delivery context and errors
-
-Middleware can attach ephemeral values through `Delivery::context`; handlers inject `Thunder\Bolt\Context` and read them with `get()` or `require()`. Context is shared within one delivery and isolated from subsequent deliveries and job attempts. Use conversation/thread stores for persistent state and named job DTOs for durable work.
-
-Configure the `httpContextFactory` option on `BoltConfig` or `contextFactory` on Socket Mode `Config` to enrich that Context from typed transport input after authorization, before middleware. [Factory examples](docs/research/transport-context-factories.md).
-
-OAuth supports per-install scopes, workspace hints and server-side metadata through immutable `InstallRequest` values. Configure `OAuthConfig` with installation hooks for post-save onboarding and failure handling; reuse `OAuthHttpHandler` when your app owns the installation routes. [Installation interface](docs/research/oauth-install-requests.md).
-
-For structured errors, register `$app->onError(function (FailureContext $failure): ErrorHandling { ... })` using types from `Thunder\Bolt\Errors`. The context exposes the original error, listener, processing stage, available delivery and buffered response state. Return `ErrorHandling::Handled` or `ErrorHandling::Rethrow`; log `$failure->summary()` for metadata without payloads or credentials. The existing `error()` callback remains supported. [Interface details and examples](docs/research/delivery-context-identity-errors.md).
-
-## Return acknowledgements explicitly
-
-Commands and interactions return typed response values. For example:
+### Handle a slash command
 
 ```php
 use Thunder\Bolt\Attributes\SlashCommand;
@@ -151,42 +148,416 @@ final readonly class Ping
     #[SlashCommand('/ping')]
     public function __invoke(): CommandResponse
     {
-        return CommandResponse::ephemeral('Pong!');
+        return CommandResponse::ephemeral('Pong.');
     }
 }
 ```
 
-Register `/ping` in Slack with the same request URL. Actions, shortcuts, external options, and views follow the same pattern with their own attributes and response classes.
+### Choose a listener type
 
-**Listeners execute inline.** Slack must receive the acknowledgement within three seconds. Dispatch a named job for slow work; `jobs:work` executes it after durable acceptance.
+| Attribute | Payload | Initial response |
+| --- | --- | --- |
+| `#[Event('app_mention')]` | `Payloads\Events\AppMention` | None |
+| `#[SlashCommand('/ping')]` | `Payloads\SlashCommand` | `CommandResponse` |
+| `#[Action('approve_deployment')]` | `Payloads\Action` | `ActionResponse` |
+| `#[Shortcut('open_deployment')]` | `Payloads\Shortcut` | `ShortcutResponse` |
+| `#[Options('search_assignees')]` | `Payloads\Options` | `OptionsResponse` |
+| `#[View('approve_deployment')]` | `Payloads\View` | `ViewResponse` |
 
-## Use the Slack client
+Known events have native payload properties such as `userId` and `channelId`. Unknown event types use the generic event payload; `raw` preserves original Slack data.
 
-The client preserves Slack's method hierarchy and returns endpoint-specific readonly responses. It includes 273 request/response model pairs: 271 from the pinned SDK and two Work Object comment methods from versioned Slack documentation inputs.
+**Handlers execute inline.** Commands/interactions must return exactly one response of the correct family across matching listeners, within Slack's three-second deadline. Returning does not flush an acknowledgement early. Queue slow work explicitly.
+
+### Register fluently
+
+An embedded application can register handlers on an already configured `Thunder\Bolt\App`:
+
+```php
+use Thunder\Bolt\Payloads\Events\AppMention;
+use Thunder\Bolt\Reply;
+use Thunder\Bolt\Responses\CommandResponse;
+
+$app
+    ->event('app_mention', static function (AppMention $event, Reply $reply): void {
+        $reply->inThread("Hello <@{$event->userId}>.");
+    })
+    ->command('/ping', static fn (): CommandResponse => CommandResponse::ephemeral('Pong.'));
+```
+
+Attribute and fluent registration share the same dispatcher. Choose one registration route for each handler; equivalent duplicate registrations fail at boot. [Handler and middleware guide](docs/guides/building-apps.md).
+
+## Messages and views
+
+Factories require essential values. Fluent methods add optional fields. Builders are immutable: retain the returned value when adding an option.
+
+### Compose a Block Kit message
+
+```php
+use Thunder\Bolt\BlockKit\{Actions, Button, Section};
+use Thunder\Bolt\Messages\Message;
+
+$message = Message::blocks(
+    Section::markdown('*Deployment ready*'),
+    Actions::make(
+        Button::make('Approve', 'approve_deployment')->primary(),
+    ),
+)->fallbackText('Deployment ready for approval.');
+
+$reply->inChannel($message);
+```
+
+### Build a modal
+
+```php
+use Thunder\Bolt\BlockKit\{Input, PlainTextInput};
+use Thunder\Bolt\Views\Modal;
+
+$modal = Modal::make('Approve deployment',
+    Input::make('Reason', PlainTextInput::make('reason')->multiline())
+        ->id('reason'),
+)->callbackId('approve_deployment')->submit('Approve');
+```
+
+In a shortcut handler, use its short-lived `triggerId` to open the modal and return the matching acknowledgement:
+
+```php
+use Thunder\Bolt\Responses\ShortcutResponse;
+
+$client->views()->open([
+    'trigger_id' => $shortcut->triggerId,
+    'view' => $modal->toArray(),
+]);
+
+return ShortcutResponse::empty();
+```
+
+### Publish App Home
+
+```php
+use Thunder\Bolt\BlockKit\Section;
+use Thunder\Bolt\Views\Home;
+
+$home = Home::make(
+    Section::markdown('*Workspace dashboard*'),
+    Section::markdown('No pending approvals.'),
+);
+
+$client->views()->publish([
+    'user_id' => 'U123',
+    'view' => $home->toArray(),
+]);
+```
+
+| Builder family | Examples |
+| --- | --- |
+| Layout | Sections, actions, context, dividers, tables, cards |
+| Controls | Buttons, inputs, date/time pickers, selectors, workflow controls |
+| Rich content | Rich text, images, files, message metadata, legacy attachments |
+| Views | Modals and App Home |
+
+Raw arrays remain an escape hatch for newer Slack fields. [SDK and Block Kit reference](docs/sdk-and-block-kit.md).
+
+## Interactions
+
+### Respond to a button
+
+```php
+use Thunder\Bolt\Attributes\Action as OnAction;
+use Thunder\Bolt\Reply;
+use Thunder\Bolt\Responses\ActionResponse;
+
+final readonly class ApproveDeployment
+{
+    #[OnAction('approve_deployment')]
+    public function __invoke(Reply $reply): ActionResponse
+    {
+        $reply->replaceOriginal('Deployment approved.');
+
+        return ActionResponse::empty();
+    }
+}
+```
+
+`replaceOriginal()` uses the incoming response URL. Some interactions, including modal actions, have no response URL; use only reply helpers supported by that delivery's context.
+
+### Validate a modal submission
+
+```php
+use Thunder\Bolt\Attributes\View as OnView;
+use Thunder\Bolt\Payloads\View;
+use Thunder\Bolt\Responses\ViewResponse;
+
+final readonly class ValidateApproval
+{
+    #[OnView('approve_deployment')]
+    public function __invoke(View $view): ViewResponse
+    {
+        $reason = $view->value('reason', 'reason');
+        if (!is_string($reason) || trim($reason) === '') {
+            return ViewResponse::errors(['reason' => 'Enter a reason.']);
+        }
+
+        return ViewResponse::empty();
+    }
+}
+```
+
+Errors address block IDs. Typed form readers also support `$view->form()->require('reason', 'reason')->text()`; action inputs expose selections through `$action->input()`.
+
+### Load external select options
+
+```php
+use Thunder\Bolt\Attributes\Options as LoadOptions;
+use Thunder\Bolt\BlockKit\Option;
+use Thunder\Bolt\Payloads\Options;
+use Thunder\Bolt\Responses\OptionsResponse;
+
+final readonly class SearchAssignees
+{
+    #[LoadOptions('search_assignees')]
+    public function __invoke(Options $request): OptionsResponse
+    {
+        // Use $request->value to search your application's people directory.
+        return OptionsResponse::options(
+            Option::text('Ada', 'ada'),
+            Option::text('Linus', 'linus'),
+        );
+    }
+}
+```
+
+| Reply capability | Purpose |
+| --- | --- |
+| `inChannel()` | Post to the delivery's channel |
+| `inThread()` | Post under its known thread root |
+| `ephemeral()` | Send a channel/user-scoped ephemeral reply |
+| `respond()` | Use the delivery's response URL |
+| `replaceOriginal()` / `deleteOriginal()` | Update or delete through that response URL |
+
+Missing channel, user, thread, or response-URL context fails explicitly. Global shortcuts do not invent a channel. [Interactivity reference](docs/http-interactivity.md) covers compound selectors, regex captures, view closures, and legacy forms.
+
+## Web API client
+
+Inject `Thunder\Bolt\WebApi\Client` into a handler constructor. OAuth deliveries resolve an installation-scoped client; the application-wide client's credentials remain unchanged.
+
+### Typed requests and responses
 
 ```php
 use Thunder\Bolt\Messages\Message;
 use Thunder\Bolt\WebApi\Requests\ChatPostMessage;
-use Thunder\Bolt\WebApi\Uploads\Upload;
 
 $result = $client->chat()->postMessage(
     new ChatPostMessage('C123', Message::text('Hello from PHP')),
 );
 
 $messageTimestamp = $result->ts;
+```
+
+### Arrays and Slack's method hierarchy
+
+```php
+$client->chat()->postMessage([
+    'channel' => 'C123',
+    'text' => 'A forward-compatible payload.',
+]);
+
+$client->admin()->conversations()->archive(['channel_id' => 'C123']);
+```
+
+### Cursor pagination
+
+```php
+foreach ($client->paginate('conversations.list', ['limit' => 100]) as $page) {
+    foreach ($page->get('channels', []) as $channel) {
+        // Process this page; stop iteration to avoid fetching more pages.
+    }
+}
+```
+
+### Upload a file
+
+```php
+use Thunder\Bolt\WebApi\Uploads\Upload;
 
 $client->upload(
-    Upload::path('report.pdf')->title('Monthly report')->toChannel('C123'),
+    Upload::path('report.pdf')
+        ->title('Monthly report')
+        ->toChannel('C123')
+        ->comment('The report is ready.'),
 );
 ```
 
-The injected client also supports arrays, cursor pagination, streamed multipart fields, and single/multiple external uploads. Unknown response fields remain in `data` and `get()`. Some polymorphic and deeply nested SDK fields deliberately retain raw representations.
+`uploadMany()` handles batches. Upload failures expose partial progress where available; a batch is not an atomic Slack transaction.
 
-Calls send once by default. Background or CLI code can opt into bounded retries with `$client->retrying()`. OAuth exchanges, function completion, response URLs, and file-content transfers remain single-attempt. Supply a PSR-18 transport to configure timeouts or test outgoing requests.
+### Opt into retries in background work
 
-## Durable named jobs
+```php
+use Thunder\Bolt\WebApi\RetryPolicy;
 
-Keep listener responses fast and explicitly queue slow business work. Named jobs are readonly constructor data; Tempest discovers their ordinary `#[CommandHandler]` methods.
+$background = $client->retrying(
+    RetryPolicy::rateLimits(maxRetries: 3, maxTotalWait: 60),
+);
+
+$result = $background->conversations()->list(['limit' => 100]);
+```
+
+| Client capability | Behavior |
+| --- | --- |
+| Typed models | 273 request/response pairs; some nested/polymorphic values remain raw |
+| Unknown fields | Available through response `data` and `get()` |
+| Default retries | One send; no automatic replay |
+| Rate-limit retries | Explicit bounded policy, respecting `Retry-After` |
+| Transport | Replaceable PSR-18 client for timeouts and recorded tests |
+| Uploads | File paths, bytes, streams, and multiple uploads |
+
+Use waits/retries outside the acknowledgement path. Transient-error retries can repeat an already-successful write; choose them only for safe operations. OAuth exchanges, function completion, response URLs, and file-content transfers remain single-attempt. [Web API client guide](docs/web-api-client.md).
+
+## Middleware and errors
+
+### Attach delivery-local context
+
+```php
+use Closure;
+use Thunder\Bolt\Invocation\Delivery;
+use Thunder\Bolt\Middleware\Middleware;
+
+final readonly class RequestContext implements Middleware
+{
+    public function handle(Delivery $delivery, Closure $next): mixed
+    {
+        $delivery->context->set('request_id', bin2hex(random_bytes(8)));
+
+        return $next($delivery);
+    }
+}
+
+$app->use(new RequestContext());
+```
+
+Handlers can inject `Thunder\Bolt\Context` and read `get()`, `require()`, or `has()`. Transport context factories can enrich it after authorization, before middleware. [Context factory examples](docs/research/transport-context-factories.md).
+
+### Compose message filters
+
+```php
+use Thunder\Bolt\Middleware\MessageFilter;
+use Thunder\Bolt\Payloads\Events\Message;
+use Thunder\Bolt\Reply;
+
+$app->message('', MessageFilter::directMention(),
+    static function (Message $message, Reply $reply): void {
+        $reply->inThread('You mentioned me.');
+    },
+);
+```
+
+`directMention()` requires a known authorized bot user ID. `MessageFilter::subtype('file_share')` selects a specific message subtype.
+
+### Decide how failures are handled
+
+```php
+use Thunder\Bolt\Errors\{ErrorHandling, FailureContext};
+
+$app->onError(static function (FailureContext $failure): ErrorHandling {
+    error_log(json_encode($failure->summary(), JSON_THROW_ON_ERROR));
+
+    return ErrorHandling::Handled;
+});
+```
+
+The failure context includes the original error, processing stage, listener, delivery, and buffered acknowledgement state. `summary()` omits payloads and credentials. Return `Rethrow` to propagate the error instead. [Building apps](docs/guides/building-apps.md).
+
+## OAuth installations
+
+Use a static bot token for a single workspace, or enable OAuth for installation-specific credentials:
+
+```dotenv
+SLACK_CLIENT_ID=replace-me
+SLACK_CLIENT_SECRET=replace-me
+SLACK_OAUTH_REDIRECT_URI=https://your-app.example/slack/oauth_redirect
+SLACK_BOT_SCOPES=app_mentions:read,chat:write,commands
+```
+
+| Route or component | Responsibility |
+| --- | --- |
+| `GET /slack/install` | Create state, bind the browser cookie, redirect to Slack |
+| `GET /slack/oauth_redirect` | Validate/consume state, exchange code, persist installation |
+| Installation store | Separate workspace/Grid and bot/user grants |
+| Delivery authorizer | Select the installation before invoking handlers |
+| Token rotator | Refresh expiring OAuth bot/user grants under the store lock |
+
+Register the exact HTTPS callback in Slack. The default private file stores coordinate workers sharing that filesystem; multiple independent hosts need shared store implementations. State is one-time and server-backed. App-level `xapp` credentials are separate and are not refreshed by the OAuth token rotator.
+
+Handlers can inspect the selected installation without capturing credentials globally:
+
+```php
+use Thunder\Bolt\Attributes\Event;
+use Thunder\Bolt\Authorization\Authorization;
+use Thunder\Bolt\Reply;
+
+final readonly class InstallationGreeting
+{
+    #[Event('app_mention')]
+    public function __invoke(Authorization $authorization, Reply $reply): void
+    {
+        $reply->inThread('Hello workspace '.$authorization->teamId);
+    }
+}
+```
+
+Per-install scopes, workspace hints, server-side metadata, installation hooks, and host-owned routes are supported. [OAuth guide](docs/oauth-and-authorization.md).
+
+## Conversation state
+
+### Choose the right lifetime
+
+| Capability | Scope | Persists across deliveries? |
+| --- | --- | --- |
+| `Context` | Current delivery or job attempt | No |
+| `ConversationContext` | Installation and channel | With a durable adapter |
+| `ThreadContext` | Installation, channel, and thread root | With a durable adapter |
+| Assistant focus context | Slack assistant thread | With its configured context store |
+| Named job data | One durable execution | In the job store |
+
+### Update thread state atomically
+
+```php
+use Thunder\Bolt\Attributes\Event;
+use Thunder\Bolt\Conversation\ThreadContext;
+use Thunder\Bolt\Payloads\Events\AppMention;
+
+final readonly class CountMentions
+{
+    #[Event('app_mention')]
+    public function __invoke(AppMention $event, ThreadContext $thread): void
+    {
+        $thread->update(static fn (mixed $state): array => [
+            'mentions' => ($state['mentions'] ?? 0) + 1,
+        ]);
+    }
+}
+```
+
+`value()` reads a delivery snapshot; `replace()`, `update()`, and `delete()` persist explicit changes. Use `update()` for concurrent counters. It does not deduplicate Slack retries automatically.
+
+### Select storage
+
+```dotenv
+SLACK_CONTEXT_STORE=sqlite
+SLACK_CONTEXT_STORE_PATH=/srv/my-bot/context.sqlite
+```
+
+| Driver | Suitable for |
+| --- | --- |
+| `file` | Default generated app; processes sharing persistent files |
+| `sqlite` | Local durable state with transactional updates |
+| `memory` | Tests or one long-lived application instance |
+| `disabled` | Apps that do not need conversation capabilities |
+
+Keep data outside `public/`. Memory is not shared across workers or ordinary HTTP requests. Custom adapters implement `ConversationStore`. [Conversation and thread storage](docs/conversation-and-thread-storage.md).
+
+## Durable jobs
+
+### Queue named data, not a live delivery
 
 ```php
 use Tempest\CommandBus\CommandHandler;
@@ -223,39 +594,97 @@ final readonly class PublishNoteHandler
 }
 ```
 
-Dispatch commits to SQLite before returning. Default duplicate keys use the Events API event ID, partitioned by installation and job class; pass `key:` for commands/interactions or an explicit business identity. Reusing a key with different inputs or destinations fails. The worker resolves current credentials and conversation state in a fresh scope; it does not serialize a live client or delivery.
-
 ```sh
-php bolt make:job PublishNote
 php bolt jobs:work
-php bolt jobs:work --once
-php bolt jobs:list
-php bolt jobs:show JOB_ID
-php bolt jobs:cancel JOB_ID
-php bolt jobs:recover
-php bolt jobs:retry JOB_ID --allow-repeat
-php bolt jobs:migrate
-php bolt jobs:prune --before=30d --dry-run
-php bolt jobs:prune --before=30d --limit=1000
 ```
 
-Requires `pdo_sqlite` when used. The default file is `.thunder-bolt/jobs/queue.sqlite`; `SLACK_JOB_STORE_PATH` or a typed `Jobs\JobConfig` selects another private local path. On POSIX, an existing custom parent directory must be private (`0700`); the factory will not change shared-directory permissions. Help/discovery do not open the database. Run the worker under your process supervisor; `--max-jobs=100` bounds a worker's lifetime and `--lease=120` selects its claim duration.
+Dispatch commits to SQLite before returning. The worker resolves current installation credentials and fresh context for each attempt. Default duplicate keys use the Events API event ID, partitioned by installation and job class. Commands/interactions need an explicit stable `key:` when no delivery event ID exists.
 
-The default is **one attempt**. Opt into bounded retries and expired-lease recovery with `Jobs\RetryPolicy::idempotent(maxAttempts: 3)` only when repeating the **whole handler** is safe. Posting a new Slack message is not inherently idempotent. Unsafe abandoned attempts become `uncertain`; inspect them before explicitly allowing a repeat.
+### Understand execution outcomes
 
-`jobs:show` includes timestamps, attempt history and recovery decisions; `--history-limit=100` bounds the newest entries. History is committed with each state change and contains no job inputs or lease tokens. Heartbeats do not create history entries. Older databases receive one explicitly incomplete legacy snapshot, preserving their existing jobs, leases and keys.
+| Concern | Default or application responsibility |
+| --- | --- |
+| Attempts | One; retries must be explicitly enabled |
+| Safe retries | `Jobs\RetryPolicy::idempotent(maxAttempts: 3)` promises the whole handler is repeatable |
+| Abandoned unsafe attempt | Marked `uncertain` for inspection |
+| Cancellation | Cooperative `JobExecution::checkpoint()` between steps |
+| Lease renewal | Call `heartbeat()` during long work |
+| Retention | Prune terminal payloads/history; compact deduplication receipts remain |
+| Side effects | No automatic rollback or exactly-once external delivery guarantee |
 
-`jobs:prune` deletes inputs and history for succeeded, failed and cancelled jobs completed strictly before the retention cutoff. Pending, running and uncertain jobs are protected. Ages use days or hours (`30d`, `12h`); each call handles at most 1,000 jobs and reports `more_available`. Preview with `--dry-run`, then repeat batches as needed. Compact deduplication receipts remain indefinitely: an identical delivery still returns the original ID, different inputs still conflict, and `jobs:show` identifies a pruned job. Pruned inputs cannot be recovered or retried. Receipts still grow; pruning frees SQLite pages for reuse rather than shrinking the file automatically.
+The default database is `.thunder-bolt/jobs/queue.sqlite`; `SLACK_JOB_STORE_PATH` selects another private persistent path. Do not queue live clients, delivery objects, or workflow tokens. [Durable operations](docs/guides/durable-operations.md) covers retry policy, recovery, cancellation, and upgrades.
 
-Stores apply supported additive schema migrations when opened; `jobs:migrate` opens the store explicitly and reports its version. Before upgrading, stop older workers and make a consistent private SQLite backup. Migrations are transactional and reject newer schemas rather than attempting a downgrade. A prune preview never deletes jobs, but opening an older store can still migrate its schema. [Operations and upgrade details](docs/research/job-operations.md).
+## Assistants and streaming
 
-Cancellation is cooperative: call `checkpoint()` between steps and `heartbeat()` before the lease expires. Pending jobs are cancelled immediately; running jobs stop when they check. A delivery-bound `$jobs->cancelThread()` targets the current installation/channel/root, useful for `agent_session_stopped`; application listeners still enforce business permissions and session UI/status changes. Blocking I/O needs bounded timeouts. Cancellation never rolls back a completed external action.
+### Register the thread lifecycle
 
-Modal validation, option choices and expiring triggers remain synchronous. Temporary workflow credentials require an explicit protected execution reference, as in the custom-function example; normal job dispatch rejects ambient function context. The queue reuses Tempest discovery and DI, with its own SQLite lifecycle rather than Tempest's experimental `#[Async]` queue. [Execution details and validation](docs/research/durable-execution-audit.md).
+Return this from `config/assistant.config.php` in a generated app:
 
-## Custom workflow functions
+```php
+use App\Listeners\WorkspaceAssistant;
+use Thunder\Bolt\Assistant;
 
-Match a Workflow Builder function by its manifest callback ID, then explicitly complete or fail the execution:
+return Assistant::make()
+    ->threadStarted([WorkspaceAssistant::class, 'started'])
+    ->userMessage([WorkspaceAssistant::class, 'message']);
+```
+
+A thread-start handler can greet the user and offer suggested prompts:
+
+```php
+use Thunder\Bolt\Assistant\{SuggestedPrompt, Thread};
+use Thunder\Bolt\Payloads\Events\AssistantThreadStarted;
+
+final readonly class WorkspaceAssistant
+{
+    public function started(AssistantThreadStarted $event, Thread $thread): void
+    {
+        $thread->saveContext();
+        $thread->say('What are we working on?');
+        $thread->setSuggestedPrompts([
+            new SuggestedPrompt('Explain a change', 'Explain the latest change.'),
+        ]);
+    }
+
+    public function message(Thread $thread): void
+    {
+        $thread->say('Message received. Add your application logic here.');
+    }
+}
+```
+
+### Stream text into a thread
+
+Given a thread and text fragments from your model provider, run slow model/tool work in a durable worker:
+
+```php
+use Thunder\Bolt\Assistant\AgentSessionStatus;
+
+$stream = $thread->sayStream();
+foreach ($textFragments as $fragment) {
+    $stream->append($fragment);
+}
+$stream->finish(AgentSessionStatus::Suspended);
+```
+
+The stream needs at least one nonempty fragment before finishing. `chunks()` also accepts Slack streaming chunks for tool/task progress.
+
+| Thread helper | Use |
+| --- | --- |
+| `say()` / `sayStream()` | Replies and streamed output pinned to the thread |
+| `saveContext()` / `context()` | Assistant focus context, separate from chat history |
+| `setSuggestedPrompts()` | Starter prompts |
+| `session()->processing()` / `active()` | Modern session status |
+| `session()->rename()` | Modern session title |
+| `setStatus()` / `setTitle()` | Retained legacy assistant-thread APIs |
+
+Modern session APIs require the current Slack Agents capability; subscribing to legacy `assistant_thread_*` events alone does not enable them. Agent View and `app_context_changed` integration must be validated for the target workspace. A Stop event does not cancel arbitrary PHP code: the app must cancel its jobs and check cancellation during work.
+
+Model execution belongs in application code. The demo uses OpenAI Responses; a configured Laravel application can integrate Laravel AI through the same thread/worker boundary. Neither provider is a core dependency. [Advanced Slack features](docs/guides/advanced-slack-features.md) · [AI playground](examples/hello-bolt/README.md#native-slack-assistant).
+
+## Workflow functions
+
+Map function inputs to a readonly DTO and explicitly complete the execution:
 
 ```php
 use Thunder\Bolt\Attributes\{FromInputs, SlackFunction};
@@ -277,69 +706,18 @@ final readonly class FormatMessage
 }
 ```
 
-`$app->function('format_message', FormatMessage::class)` provides fluent registration. Inputs may also be injected as `Functions\Inputs` for strict accessors such as `string()` and `integer()`, or mapped explicitly with `as(MyInputs::class)`. DTO mapping supports constructor defaults, nullable fields, nested DTOs, backed enums and `#[InputName('wire_name')]` aliases. It does not coerce strings into numbers or booleans. Missing and invalid inputs raise `InvalidInputs`; application error handling remains explicit.
+| Capability | Behavior |
+| --- | --- |
+| Typed inputs | Strict mapping, defaults, nullable fields, nested DTOs, backed enums |
+| `complete()` / `fail()` | One terminal response per delivery |
+| Workflow credential | Delivery-scoped by default; never pooled globally |
+| Slack configuration | Remote function runtime, callback definition, `function_executed`, eligible workspace |
 
-`Execution` supplies `complete()`, `fail()`, `inputs()`, `client()` and a typed execution context. Function-scoped actions and views receive the same capability alongside their normal acknowledgement responses. By default, the workflow token overrides the delivery client after installation authorization; it never enters the global client pool. Set `BoltConfig::attachFunctionToken` or `SLACK_ATTACH_FUNCTION_TOKEN` to `false` to use authorized installation credentials instead. Client injection, replies and completion helpers follow the same selection; opting out requires an installation credential. When using a workflow token, make completion your last Slack call: that credential expires when the function ends. A duplicate terminal call is rejected locally, and a failed completion request leaves the outcome `Uncertain` rather than automatically attempting the opposite result. This guard is per delivery, not distributed idempotency.
-
-The transport acknowledgement confirms delivery; it does not complete the workflow. Inline event handlers need no response value, and the receiver acknowledges after they return. For slow work, the [Tempest async example](examples/hello-bolt/README.md#custom-functions-and-tempest-async) persists an encrypted, short-lived execution credential and queues only an opaque reference. It deduplicates executions before business work. Tempest's async bus is experimental; this example adds explicit claim/outcome handling without presenting it as a framework-wide queue.
-
-## Slack assistants
-
-Register one assistant with typed lifecycle and message handlers. In a Tempest app, return this value from `config/assistant.config.php`; otherwise pass it to `$app->assistant(...)`.
-
-```php
-use App\Listeners\WorkspaceAssistant;
-use Thunder\Bolt\Assistant;
-
-return Assistant::make()
-    ->threadStarted([WorkspaceAssistant::class, 'started'])
-    ->userMessage([WorkspaceAssistant::class, 'message']);
-```
-
-The injected thread object supplies the destination and the authorized client:
-
-```php
-use Thunder\Bolt\Assistant\{SuggestedPrompt, Thread};
-use Thunder\Bolt\Payloads\Events\{AssistantThreadStarted, Message};
-
-final readonly class WorkspaceAssistant
-{
-    public function started(AssistantThreadStarted $event, Thread $thread): void
-    {
-        $thread->saveContext();
-        $thread->say('Ready. What are we working on?');
-        $thread->setSuggestedPrompts([
-            new SuggestedPrompt('Explain something', 'Explain how this works.'),
-        ]);
-    }
-
-    public function message(Message $message, Thread $thread): void
-    {
-        $thread->session()->processing();
-        try {
-            $thread->say('Message received. Add your application logic here.');
-        } finally {
-            $thread->session()->active();
-        }
-    }
-}
-```
-
-Assistant handlers consume IM thread replies with no subtype or `file_share`, matching Bolt JS. Other events continue to ordinary listeners. `threadContextChanged(...)` is optional: its default saves the new focus context. Focus context is separate from conversation history and is scoped by installation, DM and root timestamp; file and SQLite stores survive restarts. `contextStore(...)` accepts another adapter, including `SlackMetadataThreadContextStore` for Bolt-style message metadata storage. Without an explicit adapter, assistants use the application's conversation backend; disabling that backend selects Slack metadata storage, which requires a bot user ID and thread-history access.
-
-`Thread::session()` controls the modern session lifecycle: `processing(?string $title)`, `active()`, `suspended()`, `closed()` and `rename(string $title)`. Set a title when creating a session; respect subsequent `agent_session_title_changed` user edits. `Thread::sayStream()` returns a lazy stream with `append()`, `chunks()` and `stop()`. Call `$stream->finish(AgentSessionStatus::Suspended)` when waiting for input, or `$stream->finish(AgentSessionStatus::Closed)` for completed work; `stop()` finishes as active. All helpers pin the destination to the current thread. Existing `setStatus()`, `clearStatus()` and `setTitle()` retain their older `assistant.threads.*` semantics for compatibility.
-
-Assistant/Agent capabilities are optional and Slack-plan-gated. The retained Bolt JS assistant-thread flow listens for `assistant_thread_started` and `assistant_thread_context_changed`; Slack's current Agents surface also documents `app_context_changed` and Agent View configuration. Validate the exact current UI/event contract in the target workspace before relying on it: the bundled playground demonstrates the legacy-compatible flow and root-DM adapter, not a complete Agent View manifest. Install only the needed scopes/events, including `assistant:write`, `chat:write`, `im:history`, `message.im`, and session stop/title events where supported. The stop subscription enables Slack's native Stop control while processing. A stop event does not itself cancel work or clear status: the application must cancel its jobs and transition the session. [Slack's session contract](https://docs.slack.dev/ai/agent-sessions/) and the [advanced-feature guide](docs/guides/advanced-slack-features.md) explain the boundary.
-
-Slow model calls belong in a worker: the [native assistant playground](examples/hello-bolt/README.md#native-slack-assistant) saves context and queues work before acknowledging. Core handlers execute inline.
-
-### Using Laravel AI
-
-Model execution remains application code. In a configured Laravel application, a worker can call `$agent->prompt($text)->text` and pass the result to `$thread->say(...)`, or translate its text deltas into `sayStream()->append(...)`. Keep Laravel's conversation UUID in your application conversation state and map Slack users to Laravel participants explicitly. This milestone provides the Slack integration seam and a [source-backed compatibility assessment](docs/research/assistant-laravel-ai.md); it does not include a full Laravel AI package or Eloquent integration. Laravel dependencies are not required by Thunder Bolt.
+The transport acknowledgement does not complete the function. Completion expires its workflow credential, so make it the last Slack call using that token. A failed terminal request has an uncertain outcome; do not automatically send the opposite result. [Custom-function guide](docs/guides/advanced-slack-features.md#custom-workflow-functions).
 
 ## Work Objects
 
-Publish external work as native Slack previews, open details, and synchronize comments with your application.
+Publish external domain records as Slack-native previews:
 
 ```php
 use Thunder\Bolt\Messages\Message;
@@ -357,80 +735,93 @@ $client->chat()->postMessage([
 ]);
 ```
 
-`$client->workObjects()` publishes details, unfurls, comment pages and mutation results. Typed `EntityDetailsRequested` and `EntityCommentsRequested` payloads work with ordinary event handlers. `Comments` connects a `CommentProvider` to an explicit application authorization policy; it checks permissions on every operation and derives Slack's edit/delete/reply flags from that policy. Providers own durable storage and must enforce permissions during writes. Event metadata and entity metadata have separate builders.
+| Layer | Responsibility |
+| --- | --- |
+| `Entity` and fields | Typed preview data |
+| `$client->workObjects()` | Publish details, unfurls, and comment results |
+| `CommentProvider` | Application-owned persistence |
+| Authorization callback | Enforce read/post/edit/delete access on every operation |
 
-Slack app configuration and feature availability are required. The [work-item demo](examples/hello-bolt/README.md#work-objects) includes JSON storage, threaded comments, pagination and delivery deduplication.
+Slack feature availability, entity types, event subscriptions, and any unfurl domains/scopes must be configured separately. [Work Objects guide](docs/guides/advanced-slack-features.md#work-objects) · [Runnable comment demo](examples/hello-bolt/README.md#work-objects).
 
-## Included today
+## CLI and operations
 
-- Signed HTTP Events API, URL verification, typed event/message handlers, and middleware.
-- Socket Mode for events, commands, and interactions, with a CLI worker, heartbeat, reconnects, and envelope acknowledgements.
-- Commands, actions, shortcuts, options, view submissions/closures, and retained legacy interactions.
-- OAuth v2 installation, one-time state validation, installation stores, scoped authorization, and token rotation.
-- Conversation/thread state with memory, file, and SQLite adapters and atomic updates.
-- Typed Web API models, message/view builders, uploads, pagination, and opt-in retries.
-- Work Object entities, details, unfurls and bidirectional comments with application-owned storage and authorization.
-- Slack assistant lifecycle handlers, isolated durable focus context, status, titles, suggested prompts and streaming helpers.
-- Custom functions with typed inputs, execution context, workflow-token scoping and explicit complete/fail helpers.
-- Project/listener scaffolding, discovery, diagnostics, and shell completions.
+Run project commands as `php bolt …` from the generated app.
 
-Capability parity is the goal; PHP handlers use native types, dependency injection, and explicit response values. Generated declaration scaffolds under `src/Scaffold/` are planning artifacts, excluded from discovery, and do not represent implemented runtime features.
+### Generate and inspect
 
-## CLI
+| Command | Purpose |
+| --- | --- |
+| `make:listener Greeting --event=app_mention` | Typed event listener |
+| `make:listener Approve --action=approve_deployment` | Button/action listener |
+| `make:listener Form --view=approve_deployment` | Modal handler |
+| `make:listener Format --function=format_message` | Workflow-function handler |
+| `make:assistant WorkspaceAssistant` | Assistant listener and configuration |
+| `make:job PublishNote` | Named job and handler |
+| `listener:list --format=json` | Discovered listeners |
+| `completion:show --shell=zsh` | Project shell-completion script |
 
-Run commands from a generated application:
+Generators refuse to overwrite existing files. They write local code; they do not configure or install the Slack app.
 
-```sh
-php bolt make:listener Greeting --event=app_mention
-php bolt make:listener Reaction --event=reaction_added
-php bolt make:listener Approve --action=approve_deployment
-php bolt make:listener Submission --view=approve_deployment
-php bolt make:listener FormatMessage --function=format_message
-php bolt make:assistant WorkspaceAssistant
-php bolt make:job PublishNote
-php bolt jobs:work
-php bolt listener:list
-php bolt doctor
-php bolt status --format=json --require=socket,jobs
-php bolt socket:serve
-php bolt completion:show --shell=zsh
-```
+### Run and diagnose
 
-Known event selectors receive native payload types; other events receive the generic `Payloads\Event`. Non-chat event templates make no automatic Slack calls. `make:assistant` writes a listener and `config/assistant.config.php`, refuses existing files, and prints the Slack capabilities to enable without changing your manifest.
+| Command | Purpose |
+| --- | --- |
+| `serve` / `socket:serve` | HTTP development server or Socket Mode worker |
+| `auth:verify` | Explicit live static-token identity check |
+| `doctor --format=json` | Local profile, credentials/placeholders, and storage prerequisites |
+| `status --format=json --require=socket,jobs` | Read worker observations and existing queue state |
+| `jobs:work` | Run durable jobs in a separate process |
+| `jobs:list` / `jobs:show JOB_ID` | Inspect executions and attempt history |
+| `jobs:cancel JOB_ID` | Request cancellation |
+| `jobs:recover` | Apply lease-recovery policy |
+| `jobs:retry JOB_ID --allow-repeat` | Explicitly permit another attempt |
+| `jobs:migrate` | Apply supported additive schema migrations |
+| `jobs:prune --before=30d --dry-run` | Preview terminal payload/history retention |
 
-The CLI scaffolds local code; Slack app configuration and installation still happen through Slack. `doctor` checks local requirements, placeholders and storage paths without contacting Slack or printing credentials. It exits nonzero when the selected profile is not ready. Use `php bolt doctor --format=json` for scripts, `--workers` to require durable-job prerequisites, or `--transport=socket --auth=oauth` to override setup defaults. Local readiness does not verify a stored OAuth installation, a token, or a running worker.
+`doctor` does not prove token validity, successful OAuth installation, or a running worker. `status` is read-only: it does not contact Slack or initialize/recover a queue. Use a process supervisor for workers and persistent private storage for state. Before upgrades, stop intake/workers and back up durable state consistently.
 
-`bolt new` defaults to a Composer path repository for this local checkout. To create an app that resolves the unreleased framework from Git, pass `--source=vcs --repository=<HTTPS-or-git@-URL> --version=dev-main`; the VCS flow deliberately rejects older tags that do not contain the project scaffolding contract. The [getting-started guide](docs/guides/getting-started.md) covers both dependency sources and their trade-offs.
+The [Docker Compose example](examples/deployment/README.md) demonstrates separate intake/workers, non-root execution, health checks, persistent volumes, and graceful restarts.
 
-`php bolt status --format=json --require=socket,jobs` checks fresh process observations and reads existing queue counts, due work, expired leases and uncertain outcomes. It does not initialize or recover a queue, contact Slack, or probe your HTTP server. Exit 1 means required processes/storage were not observed healthy; failed/uncertain jobs are reported separately for inspection. Use `--require=jobs` for a worker deployment or `--require=none` for inspection only. Heartbeats older than 30 seconds are stale; long jobs should checkpoint and explicitly renew their leases through `JobExecution::heartbeat()`.
+## Playground
 
-The [deployment example](examples/deployment/README.md) runs intake and workers separately with persistent local storage, health checks and graceful shutdown. SIGTERM lets the current job finish before the next claim, including `jobs:work --once`. A forced kill follows the existing lease-recovery rules. `composer test:soak -- --duration=7200` runs the opt-in local reliability harness; it uses native WebSockets and isolated process tests, with recorded OAuth/Slack responses.
+The [hello-bolt application](examples/hello-bolt/README.md) demonstrates the framework end to end. Its wide Slack manifest is a development reference, not a minimal production permission baseline.
+
+| Demo | What it exercises |
+| --- | --- |
+| `/kickensink` | Interactive feature tour |
+| Boltling | Shared JSON-backed pet, care actions, levels, and App Home dashboard |
+| Terminal | Owner-restricted terminal streamed into Slack |
+| AI conversation | Responses streaming, web search, scoped tools, and progress cards |
+| Agent sessions | Durable work, titles/status, and Stop-driven cancellation |
+| Work items | Entity previews, JSON storage, comments, and pagination |
+
+Run Socket Mode alongside `php bolt jobs:work` for AI/agent work and `php bolt demo:work` for the pet, terminal, and work items. The example README documents required credentials and per-demo configuration.
 
 ## Development
 
+### PHP and documentation checks
+
 ```sh
+composer install
 composer test
 composer test:project
+composer test:vcs-project
 composer analyse
 composer lint
 composer format:check
+npm run verify:docs
 ```
 
-Mago 1.50.0 provides formatting, linting, and static analysis. Native types carry ordinary signatures; PHPDoc adds useful collection types, generics, and explanations. Local fixtures and recorded transports test behavior without sending Slack messages.
+| Check | What it establishes |
+| --- | --- |
+| PHPUnit | Local runtime contracts without live Slack credentials |
+| Fresh-project checks | Path/VCS production installs, discovery, recorded delivery, and durable recovery |
+| Mago | Formatting, lint, and static-analysis gates |
+| Documentation verifier | Local links, images, PHP syntax/imports, public factories and constructors |
+| Opt-in live suite | Narrow real-workspace evidence; separate from ordinary tests |
 
-`composer test:project` creates a disposable app, installs production dependencies through Composer, exercises discovered mention/button handlers with signed fixtures, and recovers an abandoned SQLite job in a separate worker process. It needs network access to package repositories, uses a fixture Slack transport, and removes its temporary app afterward. No Slack credentials are required.
-
-`composer test` excludes live tests. For an explicit workspace smoke run, configure a private token file, a conversation and an existing thread:
-
-```sh
-SLACK_LIVE_TESTS=1 SLACK_LIVE_ENV_FILE=/absolute/path/to/.env \
-SLACK_LIVE_CHANNEL=D123 SLACK_LIVE_THREAD_TS=1700000000.000001 \
-composer test:live
-```
-
-The file supplies `SLACK_BOT_TOKEN` (or use `SLACK_LIVE_TOKEN`). Reads cover conversation info, history, list, members and replies with bounded pagination. Set `SLACK_LIVE_MEMBERS_CHANNEL` if members should use another conversation. Add `SLACK_LIVE_WRITES=1` to verify Slack-metadata context storage using a temporary thread; the test deletes only its own fixture messages. Use a dedicated development conversation. Scopes, conversation access and Slack rate limits apply. [Audited contracts and validation](docs/research/web-api-transport-conformance.md).
-
-Reference tooling requires Node 22+:
+### Reference generators
 
 ```sh
 npm ci
@@ -440,13 +831,22 @@ npm run verify:transport
 npm run verify:parity
 ```
 
-To regenerate from the pinned upstream archives, run `npm run sync:references`, then `npm run generate`. Ownership checks protect generated files from accidental overwrites. JavaScript tooling is not a runtime dependency.
+Regenerate pinned sources with `npm run sync:references`, then `npm run generate`. Generated output has ownership checks; edit the generators rather than generated files. Declaration-only scaffolds under `src/Scaffold/` are excluded from discovery and are not implemented runtime features.
 
-## What's next
+[Development guide](docs/development.md) · [Testing, security, and troubleshooting](docs/guides/testing-security-troubleshooting.md) · [Architecture](docs/architecture.md).
 
-The preview includes a transport contract inventory for all 273 catalogued endpoints, a fresh-project integration check, and upgrade guidance. Next comes adopter feedback, broader opt-in live coverage and demand-led native typing of additional Slack events. Larger deployments may need additional durable-store adapters and an explicit deduplication-key expiry policy.
+## Documentation
 
-The maintained adopter guides currently live in [docs/](docs/README.md); a separate docs site can later publish that material. Historical design notes and coverage inventories remain under `docs/research/` for maintainers. Recorded integration checks and Linux/macOS CI are release gates. Opt-in live checks provide narrower real-workspace evidence; generated coverage alone does not establish full Bolt JS conformance.
+| Start here | For |
+| --- | --- |
+| [Documentation index](docs/README.md) | All maintained adopter guides |
+| [Getting started](docs/guides/getting-started.md) | Project layout, source choices, and first listener |
+| [Slack setup with screenshots](docs/guides/slack-app-setup.md) | Current app-settings UI and feature prerequisites |
+| [Building apps](docs/guides/building-apps.md) | Dispatch, acknowledgements, context, and errors |
+| [Durable operations](docs/guides/durable-operations.md) | Recovery, cancellation, workers, and deployment |
+| [Upgrading](UPGRADING.md) | Package migration and operator actions |
+
+The maintained guides live in `docs/` for a future separate docs site. Dated `docs/research/` notes record decisions and evidence; they are not current setup instructions. The parity audit distinguishes implemented capabilities, PHP adaptations, useful gaps, and Node-specific exclusions.
 
 ## License
 

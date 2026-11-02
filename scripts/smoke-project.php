@@ -83,6 +83,9 @@ try {
     if (($doctor['ready'] ?? false) !== true || ($doctor['networkChecked'] ?? true) !== false) {
         throw new RuntimeException('Fresh application readiness check failed.');
     }
+    $status = json_decode($command([PHP_BINARY, 'bolt', 'status', '--format=json', '--require=jobs'], $project, expectedExit: 1), true, flags: JSON_THROW_ON_ERROR);
+    if (($status['healthy'] ?? true) !== false || ($status['active']['jobs'] ?? -1) !== 0 || is_file($project . '/.thunder-bolt/jobs/queue.sqlite'))
+        throw new RuntimeException('Status must not invent a running worker or initialize its queue.');
     $badConfig = $project . '/config/doctor-failure.config.php';
     file_put_contents($badConfig, '<?php throw new RuntimeException("doctor-private-canary");');
     try {
@@ -91,6 +94,9 @@ try {
         if (($failure['configurationError'] ?? false) !== true || str_contains($failureOutput, 'doctor-private-canary')) {
             throw new RuntimeException('Doctor did not safely report invalid application configuration.');
         }
+        $statusFailure = $command([PHP_BINARY, 'bolt', 'status', '--format=json'], $project, expectedExit: 1);
+        if (json_decode($statusFailure, true, flags: JSON_THROW_ON_ERROR)['healthy'] !== false || str_contains($statusFailure, 'doctor-private-canary'))
+            throw new RuntimeException('Status did not safely report invalid configuration.');
     } finally {
         unlink($badConfig);
     }

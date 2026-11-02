@@ -313,6 +313,49 @@ final class RunnerTest extends TestCase
         self::assertLessThan(2.001, $time);
     }
 
+    public function test_monitor_confirms_hello_and_removes_the_record_on_graceful_stop(): void
+    {
+        $directory = sys_get_temp_dir() . '/bolt-socket-monitor-' . bin2hex(random_bytes(6));
+        $monitor = new \Thunder\Bolt\Runtime\RuntimeMonitor($directory);
+        $http = new RecordingHttpClient([new Response(
+            200,
+            [],
+            '{"ok":true,"url":"wss://socket.slack.test/?ticket=private"}',
+        )]);
+        $client = new Client($http, 'xoxb-fixture');
+        $app = $this->app($client);
+        $observed = false;
+        $app->command('/hello', static function () use ($monitor, &$observed): CommandResponse {
+            $records = $monitor->snapshot();
+            self::assertCount(1, $records);
+            self::assertSame('connected', $records[0]['state']);
+            self::assertFalse($records[0]['stale']);
+            self::assertStringNotContainsString('private', json_encode($records, JSON_THROW_ON_ERROR));
+            $observed = true;
+            return CommandResponse::empty();
+        });
+        $connection = new RecordingConnection([
+            self::frame(['type' => 'hello']),
+            self::frame(self::commandEnvelope('E-monitor', false)),
+        ]);
+        try {
+            new Runner(
+                $app,
+                $client,
+                new Config(appToken: 'xapp-fixture'),
+                new RecordingConnector($connection),
+                monitor: $monitor,
+            )->run(static fn(): bool => $connection->receiveCalls >= 2);
+            self::assertTrue($observed);
+            self::assertSame([], $monitor->snapshot());
+        } finally {
+            foreach (glob($directory . '/*') ?: [] as $file)
+                unlink($file);
+            if (is_dir($directory))
+                rmdir($directory);
+        }
+    }
+
     private function runner(App $app, Client $client, RecordingConnection $connection): Runner
     {
         return new Runner(

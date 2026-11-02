@@ -1,0 +1,39 @@
+x-app: &app
+  build:
+    context: ../..
+    dockerfile: examples/deployment/Dockerfile
+  image: thunder-bolt-deployment:local
+  init: true
+  restart: unless-stopped
+  env_file: .env
+  volumes:
+    - app-state:/opt/thunder/work/app/.thunder-bolt/state
+  stop_signal: SIGTERM
+  stop_grace_period: 90s
+  logging:
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  socket:
+    <<: *app
+    command: ["php", "bolt", "socket:serve"]
+    healthcheck:
+      test: ["CMD", "php", "bolt", "status", "--format=json", "--require=socket"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+  jobs:
+    <<: *app
+    command: ["php", "bolt", "jobs:work", "--lease=60"]
+    healthcheck:
+      test: ["CMD", "php", "bolt", "status", "--format=json", "--require=jobs"]
+      interval: 15s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+volumes:
+  app-state:

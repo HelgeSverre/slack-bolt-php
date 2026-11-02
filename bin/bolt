@@ -92,21 +92,21 @@ $container = Tempest\Core\Tempest::boot(
     internalStorage: $projectRoot.'/.thunder-bolt',
 );
 } catch (Throwable $error) {
-    if (($arguments[0] ?? null) !== 'doctor') throw $error;
+    if (!in_array($arguments[0] ?? null, ['doctor', 'status'], true)) throw $error;
     $message = is_file($projectRoot.'/vendor/composer/installed.json')
         ? 'Application configuration could not be loaded. Check .env and config/; OAuth requires complete credentials and an HTTPS redirect URL.'
         : 'Composer dependencies are missing. Run composer install in this project, then run doctor again.';
     $json = in_array('--format=json', $arguments, true);
     $formatIndex = array_search('--format', $arguments, true);
     $json = $json || ($formatIndex !== false && ($arguments[$formatIndex + 1] ?? null) === 'json');
-    if ($json) fwrite(STDOUT, json_encode(['ok' => false, 'ready' => false, 'configurationError' => true, 'failures' => [$message]], JSON_THROW_ON_ERROR).PHP_EOL);
+    if ($json) fwrite(STDOUT, json_encode(['ok' => false, 'ready' => false, 'healthy' => false, 'configurationError' => true, 'failures' => [$message]], JSON_THROW_ON_ERROR).PHP_EOL);
     else fwrite(STDERR, $message.PHP_EOL);
     exit(1);
 }
 $consoleConfig = $container->get(ConsoleConfig::class);
 $consoleConfig->name = 'Thunder Bolt';
 $allowedCommands = [
-    'new', 'make:listener', 'make:assistant', 'serve', 'socket:serve', 'auth:verify', 'listener:list', 'doctor', 'routes', 'about',
+    'new', 'make:listener', 'make:assistant', 'serve', 'socket:serve', 'auth:verify', 'listener:list', 'doctor', 'status', 'routes', 'about',
     'discovery:generate', 'discovery:clear', 'discovery:status',
     'command:monitor', 'command:handle',
     'make:job', 'jobs:work', 'jobs:list', 'jobs:show', 'jobs:cancel', 'jobs:recover', 'jobs:retry', 'jobs:prune', 'jobs:migrate',

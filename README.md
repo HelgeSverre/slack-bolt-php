@@ -368,6 +368,7 @@ php bolt make:job PublishNote
 php bolt jobs:work
 php bolt listener:list
 php bolt doctor
+php bolt status --format=json --require=socket,jobs
 php bolt socket:serve
 php bolt completion:show --shell=zsh
 ```
@@ -375,6 +376,10 @@ php bolt completion:show --shell=zsh
 Known event selectors receive native payload types; other events receive the generic `Payloads\Event`. Non-chat event templates make no automatic Slack calls. `make:assistant` writes a listener and `config/assistant.config.php`, refuses existing files, and prints the Slack capabilities to enable without changing your manifest.
 
 The CLI scaffolds local code; Slack app configuration and installation still happen through Slack. `doctor` checks local requirements, placeholders and storage paths without contacting Slack or printing credentials. It exits nonzero when the selected profile is not ready. Use `php bolt doctor --format=json` for scripts, `--workers` to require durable-job prerequisites, or `--transport=socket --auth=oauth` to override setup defaults. Local readiness does not verify a stored OAuth installation, a token, or a running worker.
+
+`php bolt status --format=json --require=socket,jobs` checks fresh process observations and reads existing queue counts, due work, expired leases and uncertain outcomes. It does not initialize or recover a queue, contact Slack, or probe your HTTP server. Exit 1 means required processes/storage were not observed healthy; failed/uncertain jobs are reported separately for inspection. Use `--require=jobs` for a worker deployment or `--require=none` for inspection only. Heartbeats older than 30 seconds are stale; long jobs should checkpoint and explicitly renew their leases through `JobExecution::heartbeat()`.
+
+The [deployment example](examples/deployment/README.md) runs intake and workers separately with persistent local storage, health checks and graceful shutdown. SIGTERM lets the current job finish before the next claim, including `jobs:work --once`. A forced kill follows the existing lease-recovery rules. `composer test:soak -- --duration=7200` runs the opt-in local reliability harness; it uses native WebSockets and isolated process tests, with recorded OAuth/Slack responses.
 
 ## Development
 

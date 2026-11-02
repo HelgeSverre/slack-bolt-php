@@ -11,6 +11,8 @@ use Psr\Log\NullLogger;
 use Throwable;
 use Thunder\Bolt\App;
 use Thunder\Bolt\Invocation\Delivery;
+use Thunder\Bolt\Runtime\ProcessHeartbeat;
+use Thunder\Bolt\Runtime\RuntimeMonitor;
 use Thunder\Bolt\SocketMode\Transport\Connection;
 use Thunder\Bolt\SocketMode\Transport\ConnectionClosed;
 use Thunder\Bolt\SocketMode\Transport\Connector;
@@ -24,6 +26,8 @@ use Thunder\Bolt\WebApi\SlackApiException;
  */
 final class Runner
 {
+    private ?ProcessHeartbeat $heartbeat = null;
+
     private readonly LoggerInterface $logger;
 
     private readonly Closure $sleep;
@@ -38,6 +42,7 @@ final class Runner
         ?LoggerInterface $logger = null,
         ?callable $sleep = null,
         ?callable $clock = null,
+        private readonly ?RuntimeMonitor $monitor = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
         $this->sleep = $sleep === null
@@ -70,14 +75,28 @@ final class Runner
             return;
         }
 
+        $this->heartbeat = $this->monitor?->start('socket');
+        try {
+            $this->runConnections($shouldStop);
+        } finally {
+            $this->heartbeat?->stop();
+            $this->heartbeat = null;
+        }
+    }
+
+    /** @param callable(): bool $shouldStop */
+    private function runConnections(callable $shouldStop): void
+    {
         $backoffSeconds = $this->config->initialBackoffMilliseconds / 1_000;
 
         while (!$shouldStop()) {
+            $this->heartbeat?->pulse();
             $connection = null;
             $immediateReconnect = false;
             $rateLimitDelay = null;
 
             try {
+                $this->heartbeat?->update('connecting');
                 $connection = $this->connector->connect($this->connectionUrl());
                 $ready = $this->awaitHello($connection, $shouldStop);
                 if ($ready === null) {
@@ -87,6 +106,7 @@ final class Runner
                     $immediateReconnect = $ready === 'refresh';
                 } else {
                     $backoffSeconds = $this->config->initialBackoffMilliseconds / 1_000;
+                    $this->heartbeat?->update('connected');
                     $outcome = $this->receiveEnvelopes($connection, $shouldStop);
                     if ($outcome === null) {
                         return;
@@ -117,6 +137,7 @@ final class Runner
             if ($shouldStop()) {
                 return;
             }
+            $this->heartbeat?->update('backoff');
             if ($rateLimitDelay !== null) {
                 $this->sleepInterruptibly(max($rateLimitDelay, 0.001), $shouldStop);
 
@@ -136,6 +157,7 @@ final class Runner
         $deadline = $this->now() + $this->config->helloTimeoutSeconds;
 
         while (!$shouldStop()) {
+            $this->heartbeat?->pulse();
             $remaining = $deadline - $this->now();
             if ($remaining <= 0) {
                 $this->logger->warning('Socket Mode did not receive a hello frame before its deadline.');
@@ -170,6 +192,7 @@ final class Runner
     private function receiveEnvelopes(Connection $connection, callable $shouldStop): ?bool
     {
         while (!$shouldStop()) {
+            $this->heartbeat?->pulse();
             $frame = $connection->receive($this->pollTimeout());
             if ($frame === null) {
                 continue;
@@ -379,6 +402,7 @@ final class Runner
     {
         $deadline = $this->now() + $seconds;
         while (!$shouldStop()) {
+            $this->heartbeat?->pulse();
             $remaining = $deadline - $this->now();
             if ($remaining <= 0) {
                 return;

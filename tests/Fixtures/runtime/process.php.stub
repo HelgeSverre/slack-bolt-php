@@ -1,0 +1,122 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ThunderBoltReliability;
+
+use Tempest\CommandBus\CommandBusConfig;
+use Tempest\CommandBus\CommandHandler;
+use Tempest\Container\GenericContainer;
+use Tempest\Reflection\MethodReflector;
+use Thunder\Bolt\BoltConfig;
+use Thunder\Bolt\Jobs;
+use Thunder\Bolt\Jobs\Job;
+use Thunder\Bolt\Jobs\JobCodec;
+use Thunder\Bolt\Jobs\JobContext;
+use Thunder\Bolt\Jobs\JobExecution;
+use Thunder\Bolt\Jobs\SqliteJobStore;
+use Thunder\Bolt\Jobs\Worker;
+use Thunder\Bolt\Runtime\RuntimeMonitor;
+use Thunder\Bolt\WebApi\Client;
+
+require_once dirname(__DIR__, 3) . '/vendor/autoload.php';
+
+final readonly class ProbeJob implements Job
+{
+    public function __construct(
+        public string $directory,
+        public string $mode,
+        public int $number,
+    ) {}
+}
+
+final readonly class ProbeHandler
+{
+    public function __construct(
+        private JobExecution $execution,
+    ) {}
+
+    #[CommandHandler]
+    public function handle(ProbeJob $job): void
+    {
+        file_put_contents(
+            $job->directory . '/attempts',
+            $job->number . ':' . $this->execution->job->attempts . "\n",
+            FILE_APPEND | LOCK_EX,
+        );
+        if ($job->mode === 'crash-after')
+            file_put_contents($job->directory . '/effect-' . $job->number, 'effect');
+        file_put_contents($job->directory . '/ready-' . $this->execution->job->id, 'ready');
+        if ($this->execution->job->attempts === 1 && str_starts_with($job->mode, 'crash-')) {
+            for ($step = 0; $step < 1000; $step++) {
+                $this->execution->checkpoint();
+                usleep(10_000);
+            }
+        }
+        if (in_array($job->mode, ['cancel', 'drain'], true)) {
+            for ($step = 0; $step < 50; $step++) {
+                $this->execution->checkpoint();
+                usleep(10_000);
+            }
+        }
+        $this->execution->checkpoint();
+        // Explicitly idempotent local effect, so a recovered safe job may replace it.
+        file_put_contents($job->directory . '/effect-' . $job->number, 'effect');
+    }
+}
+
+function setup(string $directory): array
+{
+    $store = SqliteJobStore::open($directory . '/queue.sqlite');
+    $commands = new CommandBusConfig();
+    $commands->addHandler(
+        new CommandHandler(),
+        ProbeJob::class,
+        MethodReflector::fromParts(ProbeHandler::class, 'handle'),
+    );
+    $codec = new JobCodec($commands);
+    $http = new class implements \Psr\Http\Client\ClientInterface {
+        public function sendRequest(\Psr\Http\Message\RequestInterface $request): \Psr\Http\Message\ResponseInterface
+        {
+            throw new \LogicException('Reliability jobs must never contact Slack.');
+        }
+    };
+    $worker = new Worker(
+        $store,
+        $codec,
+        new GenericContainer(),
+        new Client($http, 'local-fixture-token'),
+        new BoltConfig('local-fixture-token'),
+        monitor: new RuntimeMonitor($directory . '/runtime'),
+    );
+    return [$store, new Jobs($store, $codec)->in(JobContext::workspace('T-reliability', 'C-local')), $worker];
+}
+
+if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) {
+    if (($argv[3] ?? '') === 'socket') {
+        require __DIR__ . '/socket.php.stub';
+        exit(runSocket($argv[1]));
+    }
+    [, , $worker] = setup($argv[1]);
+    if (($argv[3] ?? '') === 'console-once') {
+        $container = new GenericContainer();
+        $container->singleton(Worker::class, $worker);
+        GenericContainer::setInstance($container);
+        exit(new \Thunder\Bolt\Console\JobCommands()->work(once: true, lease: 2)->value);
+    }
+    $stop = false;
+    if (function_exists('pcntl_async_signals')) {
+        pcntl_async_signals(true);
+        pcntl_signal(SIGTERM, static function () use (&$stop): void {
+            $stop = true;
+        });
+    }
+    $deadline = hrtime(true) + 10_000_000_000;
+    $worker->run(
+        static function () use (&$stop, $deadline): bool {
+            return $stop || hrtime(true) >= $deadline;
+        },
+        2,
+        (int) ($argv[2] ?? 1),
+    );
+}

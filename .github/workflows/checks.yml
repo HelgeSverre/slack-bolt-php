@@ -61,4 +61,15 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: php bin/bolt --version
       - run: php bin/bolt new --help
-      - run: php vendor/bin/phpunit tests/Console/NewProjectInputTest.php tests/Console/ProjectDoctorTest.php tests/Console/ScaffoldSetupTest.php tests/Console/OnboardingBootstrapTest.php
+      - run: php vendor/bin/phpunit tests/Console/NewProjectInputTest.php tests/Console/ProjectDoctorTest.php tests/Console/ScaffoldSetupTest.php tests/Console/OnboardingBootstrapTest.php tests/Runtime/Operations/RuntimeStatusTest.php
+
+  deployment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - run: php scripts/smoke-deployment.php

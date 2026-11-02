@@ -45,10 +45,6 @@ final class JobCommands
                 throw new \InvalidArgumentException('Use a lease of 1–86400 seconds and a non-negative job limit.');
             }
             $worker = \Tempest\Container\get(Worker::class);
-            if ($once) {
-                $this->output($worker->runOnce($lease)?->summary());
-                return ExitCode::SUCCESS;
-            }
             if (function_exists('pcntl_signal') && function_exists('pcntl_signal_get_handler')) {
                 $previousAsync = pcntl_async_signals();
                 pcntl_async_signals(true);
@@ -63,6 +59,10 @@ final class JobCommands
                         $stop = true;
                     });
                 }
+            }
+            if ($once) {
+                $this->output($worker->runOnce($lease)?->summary());
+                return ExitCode::SUCCESS;
             }
             $worker->run(
                 static function () use (&$stop): bool {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Observed runtime status for Socket Mode and durable workers, with heartbeat freshness, queue backlog and uncertain/expired outcome visibility. Diagnostics are read-only and redact sensitive execution data.
+- Non-root Docker Compose deployment example with persistent state, separate intake/workers, health checks and graceful restart guidance.
+- Graceful SIGTERM handling for one-shot job workers, real process crash/drain/concurrency tests and an opt-in sustained reliability harness.
+
 - HTTP/Socket Mode and static-token/OAuth project profiles, with aligned manifests, environment examples and onboarding instructions.
 - Mode-aware local diagnostics, placeholder and private-storage checks, machine-readable bootstrap failures and meaningful readiness exit codes.
 - Live development-workspace acceptance of OAuth/account metadata, typed modal submission, separate-process durable completion and running cancellation; reusable opt-in fixtures.

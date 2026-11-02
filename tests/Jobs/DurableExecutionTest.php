@@ -511,6 +511,10 @@ final class DurableExecutionTest extends TestCase
         $container->singleton(BoltConfig::class, $config);
         $container->singleton(SqliteJobStore::class, $this->store);
         $container->singleton(CommandBusConfig::class, $commands);
+        $container->singleton(
+            \Thunder\Bolt\Runtime\RuntimeMonitor::class,
+            new \Thunder\Bolt\Runtime\RuntimeMonitor($this->directory),
+        );
         $worker = new \Thunder\Bolt\Integration\JobWorkerInitializer()->initialize($container);
         $app->authorizeUsing(static fn($source): Authorization => new Authorization(
             botToken: 'latest',

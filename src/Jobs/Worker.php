@@ -17,6 +17,8 @@ use Thunder\Bolt\Conversation\ThreadContext;
 use Thunder\Bolt\Invocation\InvocationScope;
 use Thunder\Bolt\Jobs;
 use Thunder\Bolt\Reply;
+use Thunder\Bolt\Runtime\ProcessHeartbeat;
+use Thunder\Bolt\Runtime\RuntimeMonitor;
 use Thunder\Bolt\WebApi\Client;
 
 final readonly class Worker
@@ -32,6 +34,7 @@ final readonly class Worker
         private ?Authorizer $authorizer = null,
         private ?ConversationStore $conversations = null,
         ?LoggerInterface $logger = null,
+        private ?RuntimeMonitor $monitor = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
     }
@@ -41,12 +44,25 @@ final readonly class Worker
         if ($leaseSeconds < 1 || $leaseSeconds > 86400) {
             throw new \InvalidArgumentException('A job lease must last between one second and one day.');
         }
+        $process = $this->monitor?->start('jobs');
+        $process?->update('idle');
+        try {
+            return $this->attempt($leaseSeconds, $process);
+        } finally {
+            $process?->stop();
+        }
+    }
+
+    private function attempt(int $leaseSeconds, ?ProcessHeartbeat $process): ?JobRecord
+    {
+        $process?->pulse();
         $this->store->recoverExpired();
         $record = $this->store->claim($leaseSeconds);
         if ($record === null) {
             return null;
         }
-        $execution = new JobExecution($this->store, $record, $leaseSeconds);
+        $process?->update('running', $record->id);
+        $execution = new JobExecution($this->store, $record, $leaseSeconds, $process);
         try {
             $execution->checkpoint();
             $job = $this->codec->decode($record->type, $record->payload);
@@ -122,6 +138,7 @@ final readonly class Worker
                 'exception_type' => $exception::class,
             ]);
         }
+        $process?->update('idle');
         return $this->store->find($record->id);
     }
 
@@ -131,16 +148,24 @@ final readonly class Worker
         if ($maxJobs < 0) {
             throw new \InvalidArgumentException('The worker job limit cannot be negative.');
         }
+        if ($leaseSeconds < 1 || $leaseSeconds > 86400)
+            throw new \InvalidArgumentException('A job lease must last between one second and one day.');
+        $process = $this->monitor?->start('jobs');
         $handled = 0;
-        while (!$shouldStop()) {
-            if ($this->runOnce($leaseSeconds) !== null) {
-                $handled++;
-                if ($maxJobs !== 0 && $handled >= $maxJobs) {
-                    return;
+        $process?->update('idle');
+        try {
+            while (!$shouldStop()) {
+                $process?->pulse();
+                if ($this->attempt($leaseSeconds, $process) !== null) {
+                    $handled++;
+                    if ($maxJobs !== 0 && $handled >= $maxJobs)
+                        return;
+                } else {
+                    usleep(100_000);
                 }
-            } else {
-                usleep(100_000);
             }
+        } finally {
+            $process?->stop();
         }
     }
 }

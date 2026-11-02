@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ThunderBoltReliability;
+
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Tempest\Console\Console;
+use Tempest\Container\GenericContainer;
+use Thunder\Bolt\App;
+use Thunder\Bolt\BoltConfig;
+use Thunder\Bolt\Console\SocketCommands;
+use Thunder\Bolt\Responses\CommandResponse;
+use Thunder\Bolt\Runtime\RuntimeMonitor;
+use Thunder\Bolt\SocketMode\Config;
+use Thunder\Bolt\SocketMode\Runner;
+use Thunder\Bolt\SocketMode\Transport\Connection;
+use Thunder\Bolt\SocketMode\Transport\Connector;
+use Thunder\Bolt\WebApi\Client;
+
+function runSocket(string $directory): int
+{
+    $http = new class implements ClientInterface {
+        public function sendRequest(RequestInterface $request): ResponseInterface
+        {
+            return new Response(200, [], '{"ok":true,"url":"wss://local.invalid/probe"}');
+        }
+    };
+    $container = new GenericContainer();
+    GenericContainer::setInstance($container);
+    $client = new Client($http, 'local-fixture-token');
+    $app = new App($container, $client, new BoltConfig('local-fixture-token'));
+    $app->command('/probe', static function () use ($directory): CommandResponse {
+        file_put_contents($directory . '/ready-socket', 'ready');
+        usleep(500_000);
+        file_put_contents($directory . '/socket-effect', 'finished current delivery');
+        return CommandResponse::empty();
+    });
+    $connector = new class($directory) implements Connector {
+        public function __construct(private string $directory) {}
+        public function connect(string $url): Connection
+        {
+            return new class($this->directory) implements Connection {
+                private int $receives = 0;
+                public function __construct(private string $directory) {}
+                public function receive(float $timeoutSeconds): ?string
+                {
+                    file_put_contents($this->directory . '/socket-receives', "receive\n", FILE_APPEND | LOCK_EX);
+                    return match (++$this->receives) {
+                        1 => '{"type":"hello"}',
+                        2 => '{"type":"slash_commands","envelope_id":"E-probe","payload":{"command":"/probe","user_id":"U-local","channel_id":"C-local"}}',
+                        default => null,
+                    };
+                }
+                public function send(string $payload): void
+                { file_put_contents($this->directory . '/socket-ack', $payload); }
+                public function close(): void
+                { file_put_contents($this->directory . '/socket-closed', 'closed'); }
+            };
+        }
+    };
+    $config = new Config(appToken: 'xapp-local-fixture-token');
+    $container->singleton(App::class, $app);
+    $container->singleton(Config::class, $config);
+    $container->singleton(Runner::class, new Runner($app, $client, $config, $connector, monitor: new RuntimeMonitor($directory . '/runtime')));
+    $console = new \PHPUnit\Framework\MockObject\Generator\Generator()->testDouble(Console::class, false);
+    return new SocketCommands($console)->serve()->value;
+}

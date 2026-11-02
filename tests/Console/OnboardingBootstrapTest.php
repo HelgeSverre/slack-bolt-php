@@ -64,6 +64,17 @@ final class OnboardingBootstrapTest extends TestCase
         self::assertStringNotContainsString($this->root, $output . $error);
     }
 
+    public function test_status_boot_errors_remain_machine_readable_and_redacted(): void
+    {
+        $this->project("<?php throw new \\RuntimeException('status-private-canary');");
+        [$status, $output, $error] = $this->command(['status', '--format=json']);
+        self::assertSame(1, $status);
+        $report = json_decode($output, true, flags: JSON_THROW_ON_ERROR);
+        self::assertFalse($report['healthy']);
+        self::assertTrue($report['configurationError']);
+        self::assertStringNotContainsString('status-private-canary', $output . $error);
+    }
+
     private function project(string $configuration): void
     {
         mkdir($this->root . '/config');

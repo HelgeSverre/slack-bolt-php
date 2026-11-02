@@ -29,6 +29,7 @@
         "test": "@php vendor/bin/phpunit --exclude-group live",
         "test:live": "@php vendor/bin/phpunit tests/Live",
         "test:project": "@php scripts/smoke-project.php",
+        "test:soak": ["Composer\\Config::disableProcessTimeout", "@php -d memory_limit=128M scripts/soak-runtime.php"],
         "analyse": "@php vendor/bin/mago analyze",
         "lint": "@php vendor/bin/mago lint",
         "format": "@php vendor/bin/mago format",

@@ -2,7 +2,7 @@ version = "1.50.0"
 php-version = "8.5"
 
 [source]
-paths = ["src", "tests", "examples/hello-bolt/app", "examples/hello-bolt/public"]
+paths = ["src", "tests", "examples/hello-bolt/app", "examples/hello-bolt/public", "examples/deployment/app", "examples/deployment/config"]
 includes = ["vendor"]
 excludes = ["work/**", "examples/**/vendor/**", "vendor/**/vendor/**", "src/Scaffold/**"]
 

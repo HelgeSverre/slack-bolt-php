@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+Restart workers/intake after updating to enable runtime observations. `status` cannot verify processes started with an older version, and is scoped to processes sharing its local state directory. New heartbeat files live under `.thunder-bolt/runtime`; they are separate from job ownership and do not require a queue schema migration. Custom library hosts opt in by passing a `RuntimeMonitor` to `Worker` or `SocketMode\Runner`.
+
 `doctor` now exits 1 when local prerequisites for the selected transport/authorization profile are incomplete. Scripts that previously relied on exit 0 for an unconfigured app should inspect `--format=json` and its `ready` field. Legacy projects infer Socket Mode from an app token and OAuth from runtime configuration; use explicit flags if inference does not match your intent. New projects store these defaults in `config/setup.config.php`.
 
 Restart long-running Socket Mode workers after updating to receive the idle-memory fix. No store migrations are introduced.

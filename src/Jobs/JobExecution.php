@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Thunder\Bolt\Jobs;
 
+use Thunder\Bolt\Runtime\ProcessHeartbeat;
+
 /** Cooperative cancellation and lease renewal for one attempt. */
 final readonly class JobExecution
 {
@@ -11,15 +13,18 @@ final readonly class JobExecution
         private SqliteJobStore $store,
         public JobRecord $job,
         private int $leaseSeconds = 60,
+        private ?ProcessHeartbeat $process = null,
     ) {}
 
     public function checkpoint(): void
     {
+        $this->process?->pulse();
         $this->store->checkpoint($this->job->id, $this->token());
     }
 
     public function heartbeat(): void
     {
+        $this->process?->pulse();
         $this->store->heartbeat($this->job->id, $this->token(), $this->leaseSeconds);
     }
 

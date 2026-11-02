@@ -14,6 +14,7 @@ use Thunder\Bolt\Conversation\ConversationStore;
 use Thunder\Bolt\Jobs\JobCodec;
 use Thunder\Bolt\Jobs\SqliteJobStore;
 use Thunder\Bolt\Jobs\Worker;
+use Thunder\Bolt\Runtime\RuntimeMonitor;
 use Thunder\Bolt\WebApi\Client;
 
 final class JobWorkerInitializer implements Initializer
@@ -31,6 +32,7 @@ final class JobWorkerInitializer implements Initializer
             new \Thunder\Bolt\Authorization\CallbackAuthorizer($app->authorizeSource(...)),
             $container->has(ConversationStore::class) ? $container->get(ConversationStore::class) : null,
             $container->has(LoggerInterface::class) ? $container->get(LoggerInterface::class) : null,
+            $container->get(RuntimeMonitor::class),
         );
     }
 }

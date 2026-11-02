@@ -13,6 +13,25 @@ use Thunder\Bolt\SocketMode\Transport\ConnectionClosed;
 
 final class AmpLocalServerTest extends TestCase
 {
+    public function test_idle_polling_bounds_memory_before_automatic_collection(): void
+    {
+        $process = proc_open(
+            [PHP_BINARY, dirname(__DIR__, 2) . '/Fixtures/socket-mode/idle-memory.php.stub'],
+            [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
+            $pipes,
+        );
+        self::assertIsResource($process);
+        fclose($pipes[0]);
+        $output = stream_get_contents($pipes[1]);
+        $error = stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        self::assertSame(0, proc_close($process), $output . $error);
+        $report = json_decode($output, true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame(400, $report['polls']);
+        self::assertTrue($report['bounded']);
+    }
+
     public function test_receives_a_text_frame_after_a_real_local_websocket_handshake(): void
     {
         $server = stream_socket_server(

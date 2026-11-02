@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- HTTP/Socket Mode and static-token/OAuth project profiles, with aligned manifests, environment examples and onboarding instructions.
+- Mode-aware local diagnostics, placeholder and private-storage checks, machine-readable bootstrap failures and meaningful readiness exit codes.
+- Live development-workspace acceptance of OAuth/account metadata, typed modal submission, separate-process durable completion and running cancellation; reusable opt-in fixtures.
+- Bound idle Socket Mode cancellation cycles before deep worker stacks exhaust PHP memory; real WebSocket regression coverage.
+
 ## v0.2.0 — 2026-10-28
 
 Experimental compatibility preview; not full Bolt JS conformance.

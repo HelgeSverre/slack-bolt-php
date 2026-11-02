@@ -1,0 +1,101 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App;
+
+use Thunder\Bolt\Attributes\Action;
+use Thunder\Bolt\Attributes\View;
+use Thunder\Bolt\BlockKit\Actions;
+use Thunder\Bolt\BlockKit\Button;
+use Thunder\Bolt\BlockKit\Input;
+use Thunder\Bolt\BlockKit\PlainTextInput;
+use Thunder\Bolt\BlockKit\Section;
+use Thunder\Bolt\Context;
+use Thunder\Bolt\Jobs;
+use Thunder\Bolt\Jobs\RetryPolicy;
+use Thunder\Bolt\Messages\Message;
+use Thunder\Bolt\Payloads\Action as ActionPayload;
+use Thunder\Bolt\Payloads\View as ViewPayload;
+use Thunder\Bolt\Reply;
+use Thunder\Bolt\Responses\ActionResponse;
+use Thunder\Bolt\Responses\ViewResponse;
+use Thunder\Bolt\Views\Modal;
+use Thunder\Bolt\WebApi\Client;
+
+final readonly class Interactions
+{
+    #[Action('acceptance.open')]
+    public function open(ActionPayload $action, Context $context, Client $client): ActionResponse
+    {
+        $client
+            ->views()
+            ->open([
+                'trigger_id' => $action->triggerId,
+                'view' => Modal::make(
+                    'Bolt acceptance',
+                    Input::make(
+                        'Test note',
+                        PlainTextInput::make('note')->initial('Durable work from a real Slack modal'),
+                    )->id('note'),
+                )
+                    ->callbackId('acceptance.submit')
+                    ->submit('Queue work')
+                    ->privateMetadata($action->channelId ?? '')
+                    ->toArray(),
+            ]);
+        Acceptance::record(['stage' => 'modal_opened', 'account_id' => $context->require('account')->id]);
+        return ActionResponse::empty();
+    }
+
+    #[View('acceptance.submit')]
+    public function submit(ViewPayload $view, Context $context, Client $client, Jobs $jobs): ViewResponse
+    {
+        $note = $view->form()->require('note', 'note')->text();
+        if ($note === null || trim($note) === '')
+            return ViewResponse::errors(['note' => 'Enter a test note.']);
+        $channel = $view->view['private_metadata'] ?? '';
+        if (!is_string($channel) || $channel !== \Tempest\env('BOLT_ACCEPTANCE_CHANNEL'))
+            throw new \RuntimeException('Missing acceptance channel.');
+        $posted = $client->chat()->postMessage(['channel' => $channel, 'text' => 'Acceptance work queued.']);
+        $ts = $posted->get('ts');
+        if (!is_string($ts))
+            throw new \RuntimeException('No acceptance receipt timestamp.');
+        $job = $jobs->dispatch(
+            new AcceptanceJob($note, $channel, $ts),
+            key: 'acceptance:' . $view->viewId,
+            retry: RetryPolicy::once(),
+        );
+        $client
+            ->chat()
+            ->update([
+                'channel' => $channel,
+                'ts' => $ts,
+                ...Message::blocks(
+                    Section::text('Acceptance work queued. Start a worker, or cancel this test.'),
+                    Actions::make(Button::make('Cancel acceptance work', 'acceptance.cancel')->value($job->id)),
+                )
+                    ->fallbackText('Acceptance work queued.')
+                    ->toArray(),
+            ]);
+        Acceptance::record([
+            'stage' => 'job_queued',
+            'job_id' => $job->id,
+            'account_id' => $context->require('account')->id,
+            'transport' => $context->require('transport'),
+            'note' => $note,
+        ]);
+        return ViewResponse::empty();
+    }
+
+    #[Action('acceptance.cancel')]
+    public function cancel(ActionPayload $action, Jobs $jobs, Reply $reply): ActionResponse
+    {
+        $id = $action->input()->text();
+        if ($id !== null && $jobs->cancel($id)) {
+            $reply->replaceOriginal('Cancellation requested. The worker will stop at its next checkpoint.');
+            Acceptance::record(['stage' => 'cancel_requested', 'job_id' => $id]);
+        }
+        return ActionResponse::empty();
+    }
+}

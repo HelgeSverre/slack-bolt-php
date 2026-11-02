@@ -1,5 +1,11 @@
 # Upgrading
 
+## Unreleased
+
+`doctor` now exits 1 when local prerequisites for the selected transport/authorization profile are incomplete. Scripts that previously relied on exit 0 for an unconfigured app should inspect `--format=json` and its `ready` field. Legacy projects infer Socket Mode from an app token and OAuth from runtime configuration; use explicit flags if inference does not match your intent. New projects store these defaults in `config/setup.config.php`.
+
+Restart long-running Socket Mode workers after updating to receive the idle-memory fix. No store migrations are introduced.
+
 ## v0.2.0 preview
 
 PHP 8.5+ and Tempest 3 remain the baseline. For local path installations, stop intake/workers, preserve private configuration and durable stores, check out `v0.2.0`, and run `composer install` in the framework checkout. Change existing app constraints and path-repository version overrides from `0.1.x-dev` to `0.2.x-dev`, then run `composer update thunder/bolt --with-dependencies` in each app. Newly scaffolded apps already use the new development alias. Restart all processes on the same version. This release adds no job database schema migration beyond v0.1.0.

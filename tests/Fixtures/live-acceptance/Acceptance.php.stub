@@ -1,0 +1,37 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App;
+
+use Thunder\Bolt\Invocation\Delivery;
+
+final class Acceptance
+{
+    public static function path(string $name): string
+    {
+        $directory = dirname(__DIR__) . '/.thunder-bolt/acceptance';
+        if (!is_dir($directory))
+            mkdir($directory, 0700, true);
+        return $directory . '/' . $name;
+    }
+
+    public static function enrich(Delivery $delivery, string $transport): void
+    {
+        if ($delivery->authorizationSource?->userId !== \Tempest\env('BOLT_ACCEPTANCE_OWNER')) throw new \RuntimeException('This acceptance run belongs to its configured owner.');
+        $account = json_decode(file_get_contents(self::path('account.json')), flags: JSON_THROW_ON_ERROR);
+        if ($account->team_id !== $delivery->authorization?->teamId)
+            throw new \RuntimeException('Wrong acceptance installation.');
+        $delivery->context->set('account', $account)->set('transport', $transport);
+        self::record(['stage' => 'context', 'transport' => $transport, 'account_id' => $account->id]);
+    }
+
+    public static function record(array $data): void
+    {
+        file_put_contents(
+            self::path('evidence.jsonl'),
+            json_encode($data, JSON_THROW_ON_ERROR) . "\n",
+            FILE_APPEND | LOCK_EX,
+        );
+    }
+}

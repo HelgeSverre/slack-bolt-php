@@ -1,0 +1,44 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Acceptance;
+use Thunder\Bolt\BoltConfig;
+use Thunder\Bolt\Http\ContextInput as HttpInput;
+use Thunder\Bolt\OAuth\InstallHooks;
+use Thunder\Bolt\OAuth\InstallResult;
+use Thunder\Bolt\OAuth\OAuthConfig;
+use Thunder\Bolt\SocketMode\Config;
+use Thunder\Bolt\SocketMode\ContextInput as SocketInput;
+
+return new BoltConfig(
+    signingSecret: (string) Tempest\env('SLACK_SIGNING_SECRET', ''),
+    oauth: new OAuthConfig(
+        (string) Tempest\env('SLACK_CLIENT_ID'),
+        (string) Tempest\env('SLACK_CLIENT_SECRET'),
+        (string) Tempest\env('SLACK_OAUTH_REDIRECT_URI'),
+        ['commands', 'chat:write'],
+        hooks: InstallHooks::make()->onSuccess(static function (InstallResult $result): void {
+            if (
+                $result->request?->metadata['account_id'] !== 42
+                || $result->request?->metadata['purpose'] !== 'bolt-live-acceptance'
+            ) {
+                throw new RuntimeException('Acceptance metadata was not validated.');
+            }
+            file_put_contents(
+                Acceptance::path('account.json'),
+                json_encode([
+                    'id' => 42,
+                    'team_id' => $result->installation->teamId,
+                ], JSON_THROW_ON_ERROR),
+            );
+            Acceptance::record(['stage' => 'installed', 'account_id' => 42]);
+        }),
+    ),
+    conversationStoreDriver: 'sqlite',
+    httpContextFactory: static fn(HttpInput $input) => Acceptance::enrich($input->delivery, 'http'),
+    socketMode: new Config(
+        appToken: (string) Tempest\env('SLACK_APP_TOKEN'),
+        contextFactory: static fn(SocketInput $input) => Acceptance::enrich($input->delivery, 'socket_mode'),
+    ),
+);

@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App;
+
+use Tempest\Http\GenericResponse;
+use Tempest\Router\Get;
+use Tempest\Router\Stateless;
+use Thunder\Bolt\Integration\OAuthHttpHandler;
+use Thunder\Bolt\OAuth\Installer;
+use Thunder\Bolt\OAuth\InstallRequest;
+
+#[Stateless]
+final readonly class Install
+{
+    public function __construct(
+        private Installer $installer,
+    ) {}
+
+    #[Get('/acceptance/install')]
+    public function __invoke(): GenericResponse
+    {
+        return new OAuthHttpHandler($this->installer)->install(InstallRequest::make()->metadata([
+            'account_id' => 42,
+            'purpose' => 'bolt-live-acceptance',
+        ]));
+    }
+}

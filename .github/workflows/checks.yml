@@ -48,3 +48,17 @@ jobs:
       - run: npm run verify:generated
       - run: npm run verify:transport
       - run: npm run verify:parity
+
+  cli-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: dom, fileinfo, intl, mbstring, pdo_sqlite
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist
+      - run: php bin/bolt --version
+      - run: php bin/bolt new --help
+      - run: php vendor/bin/phpunit tests/Console/NewProjectInputTest.php tests/Console/ProjectDoctorTest.php tests/Console/ScaffoldSetupTest.php tests/Console/OnboardingBootstrapTest.php

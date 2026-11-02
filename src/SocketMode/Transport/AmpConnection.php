@@ -9,11 +9,15 @@ use Amp\TimeoutCancellation;
 use Amp\TimeoutException;
 use Amp\Websocket\Client\WebsocketConnection;
 
-final readonly class AmpConnection implements Connection
+final class AmpConnection implements Connection
 {
+    private const int IDLE_POLLS_PER_COLLECTION = 64;
+
+    private int $idlePolls = 0;
+
     public function __construct(
-        private WebsocketConnection $connection,
-        private int $maxMessageBytes,
+        private readonly WebsocketConnection $connection,
+        private readonly int $maxMessageBytes,
     ) {}
 
     public function receive(float $timeoutSeconds): ?string
@@ -41,6 +45,14 @@ final readonly class AmpConnection implements Connection
                 throw new ConnectionClosed('Socket Mode WebSocket connection closed.');
             }
             if (!$messageReceived) {
+                // Amp cancellation exceptions retain collectible stack cycles. Deep worker
+                // stacks can exhaust memory before PHP's automatic root threshold is hit.
+                if (++$this->idlePolls === self::IDLE_POLLS_PER_COLLECTION) {
+                    $this->idlePolls = 0;
+                    if (gc_enabled()) {
+                        gc_collect_cycles();
+                    }
+                }
                 return null;
             }
             // A cancellation while buffering can consume part of a fragmented frame.

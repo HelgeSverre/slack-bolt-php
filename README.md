@@ -44,12 +44,22 @@ php bin/bolt new work/my-bot --no-interaction
 cd work/my-bot
 composer install
 cp .env.example .env
+php bolt doctor
 php bolt serve
 ```
 
 Set `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET` in `.env`. Configure your Slack app's Events API and interactivity request URL as a publicly reachable HTTPS `/slack/events` endpoint, install the app with the scopes in the generated manifest, and invite it to a channel. Use an HTTPS tunnel for local HTTP development.
 
 Run `php bolt auth:verify` to check a static token and print its identity. For HTTP apps, put the returned `user_id` and `bot_id` in `SLACK_BOT_USER_ID` and `SLACK_BOT_ID` so self-message filtering needs no request-time lookup. For Socket Mode, `php bolt socket:serve --verify-token` verifies and caches identity in the worker. Verification is explicit; help and discovery stay network-free.
+
+Choose the transport and installation style when scaffolding:
+
+```sh
+php bin/bolt new work/socket-app --transport=socket --auth=token --no-interaction
+php bin/bolt new work/oauth-app --transport=http --auth=oauth --no-interaction
+```
+
+HTTP/token remains the default. Socket Mode needs an app-level token with `connections:write`; OAuth needs client credentials and a registered HTTPS callback. OAuth still uses HTTP install/callback routes when events arrive through Socket Mode. Generated manifests, environment examples and start commands follow the selected profile. `config/setup.config.php` records onboarding defaults; runtime settings remain in `BoltConfig`.
 
 Until the package is published, generated apps use a local Composer path repository pointing at this checkout. Keep the checkout available. `serve` starts a development server; production serves `public/index.php` through your PHP host.
 
@@ -364,7 +374,7 @@ php bolt completion:show --shell=zsh
 
 Known event selectors receive native payload types; other events receive the generic `Payloads\Event`. Non-chat event templates make no automatic Slack calls. `make:assistant` writes a listener and `config/assistant.config.php`, refuses existing files, and prints the Slack capabilities to enable without changing your manifest.
 
-The CLI scaffolds local code; Slack app configuration and installation still happen through Slack. `doctor` checks local requirements and configuration without contacting Slack or printing credentials.
+The CLI scaffolds local code; Slack app configuration and installation still happen through Slack. `doctor` checks local requirements, placeholders and storage paths without contacting Slack or printing credentials. It exits nonzero when the selected profile is not ready. Use `php bolt doctor --format=json` for scripts, `--workers` to require durable-job prerequisites, or `--transport=socket --auth=oauth` to override setup defaults. Local readiness does not verify a stored OAuth installation, a token, or a running worker.
 
 ## Development
 

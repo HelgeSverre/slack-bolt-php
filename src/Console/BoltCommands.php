@@ -26,10 +26,17 @@ final readonly class BoltCommands
         string $directory,
         #[ConsoleArgument(name: 'no-interaction', description: 'Use defaults and never prompt')]
         bool $noInteraction = false,
+        #[ConsoleArgument(description: 'Delivery transport: http or socket')]
+        string $transport = 'http',
+        #[ConsoleArgument(name: 'auth', description: 'Authorization: token or oauth')]
+        string $authorization = 'token',
     ): ExitCode {
         try {
-            $project = new ProjectScaffold(dirname(__DIR__, 2))->create($directory);
-        } catch (RuntimeException|JsonException $exception) {
+            $project = new ProjectScaffold(dirname(__DIR__, 2))->create(
+                $directory,
+                new ProjectSetup($transport, $authorization),
+            );
+        } catch (RuntimeException|JsonException|\InvalidArgumentException $exception) {
             $this->console->error($exception->getMessage());
 
             return ExitCode::INVALID;
@@ -39,7 +46,8 @@ final readonly class BoltCommands
             "cd {$directory}",
             'composer install',
             'cp .env.example .env',
-            'php vendor/bin/bolt doctor',
+            'php bolt doctor',
+            new ProjectSetup($transport, $authorization)->startCommand(),
         ]);
 
         return ExitCode::SUCCESS;
@@ -207,86 +215,76 @@ final readonly class BoltCommands
         return ExitCode::SUCCESS;
     }
 
-    #[ConsoleCommand(name: 'doctor', description: 'Check local Thunder Bolt requirements without contacting Slack')]
+    #[ConsoleCommand(
+        name: 'doctor',
+        description: 'Check local setup and selected transport readiness without contacting Slack',
+    )]
     public function doctor(
         #[ConsoleArgument(name: 'format', description: 'Output format: table or json')]
         string $format = 'table',
+        #[ConsoleArgument(description: 'Check http or socket; default is the project setup')]
+        ?string $transport = null,
+        #[ConsoleArgument(name: 'auth', description: 'Check token or oauth; default is the project setup')]
+        ?string $authorization = null,
+        #[ConsoleArgument(description: 'Also require durable job worker prerequisites')]
+        bool $workers = false,
     ): ExitCode {
         if (!in_array($format, ['table', 'json'], true)) {
             $this->console->error('Format must be table or json.');
-
             return ExitCode::INVALID;
         }
-        $failures = [];
-        foreach (['json', 'mbstring', 'openssl'] as $extension) {
-            if (!extension_loaded($extension)) {
-                $failures[] = "Missing PHP extension: {$extension}.";
-            }
+        $container = \Tempest\Container\get(\Tempest\Container\Container::class);
+        $config = $container->get(BoltConfig::class);
+        $defaults = $container->has(ProjectSetup::class)
+            ? $container->get(ProjectSetup::class)
+            : new ProjectSetup(
+                $config->socketMode?->isConfigured() ?? false ? 'socket' : 'http',
+                $config->oauth !== null ? 'oauth' : 'token',
+            );
+        try {
+            $setup = new ProjectSetup($transport ?? $defaults->transport, $authorization ?? $defaults->authorization);
+        } catch (\InvalidArgumentException $error) {
+            $this->console->error($error->getMessage());
+            return ExitCode::INVALID;
         }
-        $configuration = [];
-        $config = \Tempest\Container\get(BoltConfig::class);
-        $socketMode = $config->socketMode ?? new SocketModeConfig();
-        if ($config->conversationStoreDriver === 'sqlite' && !extension_loaded('pdo_sqlite')) {
-            $failures[] = 'The SQLite context adapter requires the pdo_sqlite extension.';
-        }
-        $oauth = $config->oauth !== null;
-        $values = $oauth
-            ? [
-                'SLACK_CLIENT_ID' => $config->oauth->clientId,
-                'SLACK_CLIENT_SECRET' => $config->oauth->clientSecret,
-                'SLACK_OAUTH_REDIRECT_URI' => $config->oauth->redirectUri,
-                'SLACK_SIGNING_SECRET' => $config->signingSecret,
-            ]
-            : ['SLACK_BOT_TOKEN' => $config->token, 'SLACK_SIGNING_SECRET' => $config->signingSecret];
-        foreach ($values as $variable => $value) {
-            if ($value === '') {
-                $configuration[$variable] = 'missing';
-            } else {
-                $configuration[$variable] = 'configured';
-            }
-        }
+        $report = new ProjectDoctor(
+            $config,
+            $setup,
+            getcwd() ?: '.',
+            $container->get(\Thunder\Bolt\Jobs\JobConfig::class),
+        )->report([
+            'SLACK_CLIENT_ID' => (string) \Tempest\env('SLACK_CLIENT_ID', ''),
+            'SLACK_CLIENT_SECRET' => (string) \Tempest\env('SLACK_CLIENT_SECRET', ''),
+            'SLACK_OAUTH_REDIRECT_URI' => (string) \Tempest\env('SLACK_OAUTH_REDIRECT_URI', ''),
+        ], $workers);
         if ($format === 'json') {
             $this->console->writeRaw(
-                json_encode(
-                    [
-                        'ok' => $failures === [],
-                        'ready' => $failures === [] && !in_array('missing', $configuration, true),
-                        'php' => PHP_VERSION,
-                        'authorization' => $oauth ? 'oauth' : 'static-token',
-                        'contextStore' => $config->conversationStoreDriver,
-                        'socketTokenConfigured' => $socketMode->isConfigured(),
-                        'socketAuthorizationConfigured' => $config->token !== '' || $oauth,
-                        'socketReady' =>
-                            $failures === [] && $socketMode->isConfigured() && ($config->token !== '' || $oauth),
-                        'configuration' => $configuration,
-                        'failures' => $failures,
-                    ],
-                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
-                )
-                    . PHP_EOL,
+                json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL,
             );
-
-            return $failures === [] ? ExitCode::SUCCESS : ExitCode::ERROR;
-        }
-        foreach ($configuration as $variable => $status) {
-            if ($status === 'missing') {
-                $this->console->warning("{$variable} is not set; HTTP dispatch will remain unconfigured.");
-            }
-        }
-        foreach ($failures as $failure) {
-            $this->console->error($failure);
-        }
-        if ($failures !== []) {
-            return ExitCode::ERROR;
-        }
-        if ($oauth) {
+        } else {
             $this->console->info(
-                'OAuth is configured. Start installation at /slack/install; successful dispatch requires a stored installation.',
+                'Checking '
+                . $report['transport']
+                . ' / '
+                . $report['authorization']
+                . ' setup. No network checks were run.',
             );
+            foreach ($report['configuration'] as $name => $status)
+                $this->console->writeln($name . ': ' . $status);
+            foreach ($report['failures'] as $failure)
+                $this->console->error($failure);
+            foreach ($report['warnings'] as $warning)
+                $this->console->warning($warning);
+            foreach ($report['nextSteps'] as $step)
+                $this->console->writeln($step);
+            if ($report['ready'])
+                $this->console->success(
+                    'Local configuration is ready. Slack authorization and running workers have not been verified.',
+                );
+            else
+                $this->console->warning('Setup is incomplete. Follow the steps above, then run doctor again.');
         }
-        $this->console->success('Local requirements look good. No network checks were run.');
-
-        return ExitCode::SUCCESS;
+        return $report['ready'] ? ExitCode::SUCCESS : ExitCode::ERROR;
     }
 
     #[ConsoleCommand(name: 'serve', description: 'Run the development HTTP server')]

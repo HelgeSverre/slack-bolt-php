@@ -46,7 +46,7 @@ $environment += [
     'SLACK_CONTEXT_STORE_PATH' => '',
     'SLACK_CONTEXT_STORE' => 'memory',
 ];
-$command = static function (array $arguments, string $directory) use ($environment): string {
+$command = static function (array $arguments, string $directory, int $expectedExit = 0) use ($environment): string {
     $process = proc_open(
         $arguments,
         [0 => ['file', '/dev/null', 'r'], 1 => ['pipe', 'w'], 2 => STDERR],
@@ -59,7 +59,7 @@ $command = static function (array $arguments, string $directory) use ($environme
     }
     $output = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
-    if (proc_close($process) !== 0) {
+    if (proc_close($process) !== $expectedExit) {
         throw new RuntimeException('Smoke command failed: ' . implode(' ', $arguments) . "\n" . $output);
     }
     return $output ?: '';
@@ -79,6 +79,21 @@ try {
     echo $command(['composer', 'install', '--no-dev', '--no-interaction', '--no-progress', '--prefer-dist'], $project);
     copy($root . '/tests/Fixtures/project-smoke/SmokeHttp.php.stub', $project . '/app/SmokeHttp.php');
     file_put_contents($project . '/config/http.config.php', '<?php return new App\\SmokeHttp();');
+    $doctor = json_decode($command([PHP_BINARY, 'bolt', 'doctor', '--format=json'], $project), true, flags: JSON_THROW_ON_ERROR);
+    if (($doctor['ready'] ?? false) !== true || ($doctor['networkChecked'] ?? true) !== false) {
+        throw new RuntimeException('Fresh application readiness check failed.');
+    }
+    $badConfig = $project . '/config/doctor-failure.config.php';
+    file_put_contents($badConfig, '<?php throw new RuntimeException("doctor-private-canary");');
+    try {
+        $failureOutput = $command([PHP_BINARY, 'bolt', 'doctor', '--format=json'], $project, expectedExit: 1);
+        $failure = json_decode($failureOutput, true, flags: JSON_THROW_ON_ERROR);
+        if (($failure['configurationError'] ?? false) !== true || str_contains($failureOutput, 'doctor-private-canary')) {
+            throw new RuntimeException('Doctor did not safely report invalid application configuration.');
+        }
+    } finally {
+        unlink($badConfig);
+    }
     echo $command([PHP_BINARY, 'bolt', 'make:listener', 'SmokeAction', '--action=smoke'], $project);
     echo $command([PHP_BINARY, 'bolt', 'make:job', 'SmokeJob'], $project);
     foreach ([

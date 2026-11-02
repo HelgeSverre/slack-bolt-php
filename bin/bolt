@@ -16,6 +16,7 @@ use Tempest\Reflection\MethodReflector;
 use Thunder\Bolt\Console\CompletionCommands;
 use Thunder\Bolt\Console\PlainTheme;
 use Thunder\Bolt\Console\ProjectScaffold;
+use Thunder\Bolt\Console\NewProjectInput;
 
 if (PHP_VERSION_ID < 80500) {
     fwrite(STDERR, "Thunder Bolt requires PHP 8.5 or newer.\n");
@@ -57,29 +58,25 @@ $projectRoot = getcwd();
 $hasProject = is_file($projectRoot.'/composer.json');
 
 if (($arguments[0] ?? null) === 'new') {
-    $directory = $arguments[1] ?? null;
-    $flags = array_slice($arguments, 2);
-    if ($directory === '--help' || $directory === '-h') {
-        fwrite(STDOUT, "Usage: php /path/to/bolt new <directory> [--no-interaction]\n");
+    if (in_array('--help', $arguments, true) || in_array('-h', $arguments, true)) {
+        fwrite(STDOUT, NewProjectInput::USAGE.PHP_EOL);
         exit(0);
     }
-    if (! is_string($directory) || $directory === '' || array_diff($flags, ['--no-interaction']) !== []) {
-        fwrite(STDERR, "Usage: php /path/to/bolt new <directory> [--no-interaction]\n");
-        exit(2);
-    }
     try {
-        $project = (new ProjectScaffold(dirname(__DIR__)))->create($directory);
+        $input = NewProjectInput::fromArguments(array_slice($arguments, 1));
+        $project = (new ProjectScaffold(dirname(__DIR__)))->create($input->directory, $input->setup);
     } catch (Throwable $exception) {
         fwrite(STDERR, $exception->getMessage().PHP_EOL);
         exit(2);
     }
     fwrite(STDOUT, "Created {$project}".PHP_EOL);
-    fwrite(STDOUT, "Next: cd {$directory} && composer install && php vendor/bin/bolt doctor".PHP_EOL);
+    fwrite(STDOUT, "Next: cd ".$input->directory." && composer install && cp .env.example .env && php bolt doctor".PHP_EOL);
+    fwrite(STDOUT, "After configuration: ".$input->setup->startCommand().". Read README.md for OAuth and worker setup.".PHP_EOL);
     exit(0);
 }
 
 if (! $hasProject && (($arguments[0] ?? null) === '--help' || ($arguments[0] ?? null) === '-h')) {
-    fwrite(STDOUT, "Thunder Bolt\n\nUsage:\n  php /path/to/bolt new <directory> [--no-interaction]\n\nAfter installing a project, use php vendor/bin/bolt --help for its local commands.\n");
+    fwrite(STDOUT, "Thunder Bolt\n\nUsage:\n  php /path/to/bolt new <directory> [--transport=http|socket] [--auth=token|oauth] [--no-interaction]\n\nAfter installing a project, use php vendor/bin/bolt --help for its local commands.\n");
     exit(0);
 }
 
@@ -88,11 +85,24 @@ if (! $hasProject) {
     exit(2);
 }
 
+try {
 $container = Tempest\Core\Tempest::boot(
     root: $projectRoot,
     discoveryLocations: is_dir($projectRoot.'/config') ? [new DiscoveryLocation('', $projectRoot.'/config')] : [],
     internalStorage: $projectRoot.'/.thunder-bolt',
 );
+} catch (Throwable $error) {
+    if (($arguments[0] ?? null) !== 'doctor') throw $error;
+    $message = is_file($projectRoot.'/vendor/composer/installed.json')
+        ? 'Application configuration could not be loaded. Check .env and config/; OAuth requires complete credentials and an HTTPS redirect URL.'
+        : 'Composer dependencies are missing. Run composer install in this project, then run doctor again.';
+    $json = in_array('--format=json', $arguments, true);
+    $formatIndex = array_search('--format', $arguments, true);
+    $json = $json || ($formatIndex !== false && ($arguments[$formatIndex + 1] ?? null) === 'json');
+    if ($json) fwrite(STDOUT, json_encode(['ok' => false, 'ready' => false, 'configurationError' => true, 'failures' => [$message]], JSON_THROW_ON_ERROR).PHP_EOL);
+    else fwrite(STDERR, $message.PHP_EOL);
+    exit(1);
+}
 $consoleConfig = $container->get(ConsoleConfig::class);
 $consoleConfig->name = 'Thunder Bolt';
 $allowedCommands = [

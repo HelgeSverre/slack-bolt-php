@@ -1,0 +1,65 @@
+<?php
+
+require dirname(__DIR__, 3) . '/vendor/autoload.php';
+use Amp\Websocket\Client\Rfc6455Connector;
+use Amp\Websocket\Client\WebsocketHandshake;
+use Revolt\EventLoop;
+use Thunder\Bolt\SocketMode\Transport\AmpConnection;
+
+$server = stream_socket_server('tcp://127.0.0.1:0', $errno, $error, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN);
+stream_set_blocking($server, false);
+$address = stream_socket_get_name($server, false);
+$peer = null;
+$request = '';
+$ready = false;
+$watcher = EventLoop::repeat(0.0005, static function () use ($server, &$peer, &$request, &$ready) {
+    if (!is_resource($peer))
+        $peer = @stream_socket_accept($server, 0);
+    if (!is_resource($peer))
+        return;
+    stream_set_blocking($peer, false);
+    $chunk = fread($peer, 8192);
+    if (is_string($chunk))
+        $request .= $chunk;
+    if ($ready) {
+        if (strlen($request) >= 2 && (ord($request[0]) & 15) === 8) {
+            fwrite($peer, "\x88\x02\x03\xe8");
+            $request = '';
+        }
+        return;
+    }
+    if (!str_contains($request, "\r\n\r\n"))
+        return;
+    preg_match('/^Sec-WebSocket-Key:\s*(.+)$/mi', $request, $m);
+    $accept = base64_encode(sha1(trim($m[1]) . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11', true));
+    fwrite(
+        $peer,
+        "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: {$accept}\r\n\r\n",
+    );
+    $ready = true;
+    $request = '';
+});
+$native = null;
+try {
+    $native = new Rfc6455Connector()->connect(new WebsocketHandshake('ws://' . $address));
+    $connection = new AmpConnection($native, 1024);
+    for ($i = 0; $i < 20; $i++)
+        $connection->receive(0.0005);
+    gc_collect_cycles();
+    $baseline = memory_get_usage();
+    for ($i = 0; $i < 400; $i++) {
+        if ($connection->receive(0.0005) !== null)
+            throw new RuntimeException('Unexpected idle data.');
+    }
+    $growth = memory_get_usage() - $baseline;
+    echo json_encode(['polls' => 400, 'retained_bytes' => $growth, 'bounded' => $growth < (2 * 1024 * 1024)]), PHP_EOL;
+    $failed = $growth >= (2 * 1024 * 1024);
+} finally {
+    if ($native !== null)
+        $native->close();
+    EventLoop::cancel($watcher);
+    if (is_resource($peer))
+        fclose($peer);
+    fclose($server);
+}
+exit($failed ? 1 : 0);

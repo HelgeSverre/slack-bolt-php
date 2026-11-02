@@ -1,0 +1,44 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App;
+
+use Tempest\CommandBus\CommandHandler;
+use Thunder\Bolt\Context;
+use Thunder\Bolt\Jobs\JobExecution;
+use Thunder\Bolt\WebApi\Client;
+
+final readonly class AcceptanceHandler
+{
+    public function __construct(
+        private JobExecution $execution,
+        private Context $context,
+        private Client $client,
+    ) {}
+
+    #[CommandHandler]
+    public function __invoke(AcceptanceJob $job): void
+    {
+        if ($this->context->has('account'))
+            throw new \RuntimeException('Request context leaked into the worker.');
+        Acceptance::record(['stage' => 'job_started', 'job_id' => $this->execution->job->id]);
+        for ($step = 0; $step < 240; $step++) {
+            $this->execution->checkpoint();
+            usleep(250_000);
+        }
+        $this->execution->checkpoint();
+        $this->client
+            ->chat()
+            ->update([
+                'channel' => $job->channel,
+                'ts' => $job->messageTs,
+                'text' => 'Acceptance complete: ' . $job->note,
+                'blocks' => [[
+                    'type' => 'section',
+                    'text' => ['type' => 'plain_text', 'text' => 'Acceptance complete: ' . $job->note],
+                ]],
+            ]);
+        Acceptance::record(['stage' => 'job_completed', 'job_id' => $this->execution->job->id, 'note' => $job->note]);
+    }
+}

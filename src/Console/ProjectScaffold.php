@@ -12,9 +12,10 @@ final readonly class ProjectScaffold
         private string $packageRoot,
     ) {}
 
-    public function create(string $directory, ?ProjectSetup $setup = null): string
+    public function create(string $directory, ?ProjectSetup $setup = null, ?ProjectSource $source = null): string
     {
         $setup ??= new ProjectSetup();
+        $source ??= ProjectSource::local($this->packageRoot);
         $project = $this->resolveNewProjectPath($directory);
         $projectName = basename($project);
         if (!mkdir($project, 0775, true) && !is_dir($project)) {
@@ -28,12 +29,8 @@ final readonly class ProjectScaffold
             'description' => 'A Slack application built with Thunder Bolt.',
             'type' => 'project',
             'license' => 'proprietary',
-            'require' => ['php' => '^8.5', 'thunder/bolt' => '0.2.x-dev'],
-            'repositories' => [[
-                'type' => 'path',
-                'url' => $this->packageRoot,
-                'options' => ['symlink' => true, 'versions' => ['thunder/bolt' => '0.2.x-dev']],
-            ]],
+            'require' => ['php' => '^8.5', 'thunder/bolt' => $source->version],
+            'repositories' => [$source->composerRepository()],
             'autoload' => ['psr-4' => ['App\\' => 'app/']],
             'minimum-stability' => 'dev',
             'prefer-stable' => true,
@@ -73,7 +70,7 @@ final readonly class ProjectScaffold
             . var_export($setup->authorization, true)
             . ");\n",
         );
-        $this->write("{$project}/README.md", $this->projectReadme($setup));
+        $this->write("{$project}/README.md", $this->projectReadme($setup, $source));
         $this->copyStub('public-index.php.stub', "{$project}/public/index.php");
         $this->copyStub('mention-listener.php.stub', "{$project}/app/Listeners/GreetOnMention.php");
         $this->write(
@@ -85,7 +82,7 @@ final readonly class ProjectScaffold
         return $project;
     }
 
-    private function projectReadme(ProjectSetup $setup): string
+    private function projectReadme(ProjectSetup $setup, ProjectSource $source): string
     {
         $authorization = $setup->authorization === 'oauth'
             ? 'Set SLACK_CLIENT_ID, SLACK_CLIENT_SECRET and an HTTPS SLACK_OAUTH_REDIRECT_URI. Start php bolt serve for the installation/callback routes (also with Socket Mode), expose them through HTTPS, configure the same callback URL in Slack, then open /slack/install to create an installation.'
@@ -93,7 +90,10 @@ final readonly class ProjectScaffold
         $transport = $setup->transport === 'socket'
             ? 'Set SLACK_APP_TOKEN to an app-level token with connections:write. The generated manifest enables Socket Mode. OAuth still needs an HTTPS installation/callback route.'
             : "Set SLACK_SIGNING_SECRET. Expose your local HTTP server through trusted HTTPS, then configure Slack's Events API URL as /slack/events.";
-        return "# Your Slack app\n\nThis app uses {$setup->transport} delivery and {$setup->authorization} authorization.\n\n1. Run composer install.\n2. Copy .env.example to .env and fill in your app credentials.\n3. {$authorization}\n4. {$transport}\n5. Run php bolt doctor, then {$setup->startCommand()}.\n\nNever commit .env. The framework checkout must remain available while using the local Composer path repository.\n\n## Background work\n\nUse php bolt make:job MyJob to scaffold an explicit named job. Run php bolt jobs:work in a separate process when dispatching durable jobs; SQLite requires pdo_sqlite. Configuration readiness does not prove a worker is running.\n\n## Useful commands\n\n- php bolt doctor --format=json\n- php bolt status --format=json --require=jobs\n- php bolt listener:list\n- php bolt make:listener MyListener --event=app_mention\n- php bolt make:job MyJob\n\nThe onboarding defaults live in config/setup.config.php. For an HTTP readiness check alongside Socket Mode, use php bolt doctor --transport=http.\n";
+        $sourceNote = $source->type === ProjectSource::VCS
+            ? 'This project installs Thunder Bolt from its VCS `dev-main` branch. Keep access to that repository available.'
+            : 'This project uses a local Composer path repository. Keep the framework checkout available while developing.';
+        return "# Your Slack app\n\nThis app uses {$setup->transport} delivery and {$setup->authorization} authorization.\n\n1. Run composer install.\n2. Copy .env.example to .env and fill in your app credentials.\n3. {$authorization}\n4. {$transport}\n5. Run php bolt doctor, then {$setup->startCommand()}.\n\nNever commit .env. {$sourceNote}\n\n## Background work\n\nUse php bolt make:job MyJob to scaffold an explicit named job. Run php bolt jobs:work in a separate process when dispatching durable jobs; SQLite requires pdo_sqlite. Configuration readiness does not prove a worker is running.\n\n## Useful commands\n\n- php bolt doctor --format=json\n- php bolt status --format=json --require=jobs\n- php bolt listener:list\n- php bolt make:listener MyListener --event=app_mention\n- php bolt make:job MyJob\n\nThe onboarding defaults live in config/setup.config.php. For an HTTP readiness check alongside Socket Mode, use php bolt doctor --transport=http.\n";
     }
 
     public function listener(string $root, string $name, string $kind, string $selector, ?string $type = null): string

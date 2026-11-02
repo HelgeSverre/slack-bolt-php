@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thunder\Bolt\Console\ProjectScaffold;
 use Thunder\Bolt\Console\ProjectSetup;
+use Thunder\Bolt\Console\ProjectSource;
 
 final class ScaffoldSetupTest extends TestCase
 {
@@ -58,6 +59,34 @@ final class ScaffoldSetupTest extends TestCase
         foreach (['http', 'socket'] as $transport)
             foreach (['token', 'oauth'] as $authorization)
                 yield [$transport, $authorization];
+    }
+
+    public function test_vcs_source_uses_only_composer_metadata_and_does_not_write_credentials_elsewhere(): void
+    {
+        $root = sys_get_temp_dir() . '/bolt-vcs-source-' . bin2hex(random_bytes(6));
+        mkdir($root, 0700);
+        $previous = getcwd();
+        chdir($root);
+        try {
+            $source = ProjectSource::fromOptions('vcs', dirname(__DIR__, 2), 'dev-main', dirname(__DIR__, 2));
+            $project = new ProjectScaffold(dirname(__DIR__, 2))->create('app', new ProjectSetup(), $source);
+            $composer = json_decode(
+                (string) file_get_contents($project . '/composer.json'),
+                true,
+                flags: JSON_THROW_ON_ERROR,
+            );
+
+            self::assertSame('dev-main', $composer['require']['thunder/bolt']);
+            self::assertSame(['type' => 'vcs', 'url' => realpath(dirname(__DIR__, 2))], $composer['repositories'][0]);
+            self::assertStringContainsString(
+                'VCS `dev-main` branch',
+                (string) file_get_contents($project . '/README.md'),
+            );
+            self::assertStringNotContainsString('source', (string) file_get_contents($project . '/.env.example'));
+        } finally {
+            chdir($previous);
+            $this->remove($root);
+        }
     }
 
     private function remove(string $path): void

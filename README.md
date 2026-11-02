@@ -8,6 +8,8 @@ Thunder Bolt is built on **PHP 8.5+** and **Tempest 3**, with inspiration from B
 
 The [Bolt JS parity audit](docs/research/bolt-js-parity-audit.md) distinguishes implemented capabilities, PHP adaptations, useful gaps and Node-specific exclusions. Endpoint/model counts do not establish full framework parity.
 
+New adopters should start with the maintained [documentation index](docs/README.md): [getting started](docs/guides/getting-started.md), [Slack app setup](docs/guides/slack-app-setup.md), [building handlers](docs/guides/building-apps.md), [durable operations](docs/guides/durable-operations.md), and [testing/security/troubleshooting](docs/guides/testing-security-troubleshooting.md). The dated inventories under `docs/research/` are maintainer evidence, not setup instructions.
+
 ## A Slack app, one handler at a time
 
 ```php
@@ -33,7 +35,7 @@ Message middleware composes through `MessageFilter::subtype('file_share')` and `
 
 ## Get started
 
-You need PHP 8.5+ and Composer 2. Node is only required when maintaining the reference generators.
+You need PHP 8.5+ and Composer 2. Node is only required for maintainer tooling, including reference generation and documentation checks.
 
 ```sh
 git clone --branch main https://github.com/HelgeSverre/slack-bolt-php.git
@@ -61,7 +63,7 @@ php bin/bolt new work/oauth-app --transport=http --auth=oauth --no-interaction
 
 HTTP/token remains the default. Socket Mode needs an app-level token with `connections:write`; OAuth needs client credentials and a registered HTTPS callback. OAuth still uses HTTP install/callback routes when events arrive through Socket Mode. Generated manifests, environment examples and start commands follow the selected profile. `config/setup.config.php` records onboarding defaults; runtime settings remain in `BoltConfig`.
 
-Until the package is published, generated apps use a local Composer path repository pointing at this checkout. Keep the checkout available. `serve` starts a development server; production serves `public/index.php` through your PHP host.
+Until the package is published, generated apps default to a local Composer path repository pointing at this checkout; keep it available. `bolt new --source=vcs --repository=… --version=dev-main` is the explicit Git alternative. `serve` starts a development server; production serves `public/index.php` through your PHP host.
 
 The [hello-bolt example](examples/hello-bolt/) connects mentions, buttons, shortcuts, external options, modal validation, and stored conversation state.
 
@@ -304,9 +306,9 @@ final readonly class WorkspaceAssistant
 
 Assistant handlers consume IM thread replies with no subtype or `file_share`, matching Bolt JS. Other events continue to ordinary listeners. `threadContextChanged(...)` is optional: its default saves the new focus context. Focus context is separate from conversation history and is scoped by installation, DM and root timestamp; file and SQLite stores survive restarts. `contextStore(...)` accepts another adapter, including `SlackMetadataThreadContextStore` for Bolt-style message metadata storage. Without an explicit adapter, assistants use the application's conversation backend; disabling that backend selects Slack metadata storage, which requires a bot user ID and thread-history access.
 
-`Thread::session()` controls the modern session lifecycle: `processing(?string $title)`, `active()`, `suspended()`, `closed()` and `rename(string $title)`. Set a title when creating a session; respect subsequent `agent_session_title_changed` user edits. `Thread::sayStream()` returns a lazy stream with `append()`, `chunks()` and `stop()`. Use `finish(AgentSessionStatus::Suspended)` when waiting for input, or `Closed` for completed work. `stop()` finishes as active. All helpers pin the destination to the current thread. Existing `setStatus()`, `clearStatus()` and `setTitle()` retain their older `assistant.threads.*` semantics for compatibility.
+`Thread::session()` controls the modern session lifecycle: `processing(?string $title)`, `active()`, `suspended()`, `closed()` and `rename(string $title)`. Set a title when creating a session; respect subsequent `agent_session_title_changed` user edits. `Thread::sayStream()` returns a lazy stream with `append()`, `chunks()` and `stop()`. Call `$stream->finish(AgentSessionStatus::Suspended)` when waiting for input, or `$stream->finish(AgentSessionStatus::Closed)` for completed work; `stop()` finishes as active. All helpers pin the destination to the current thread. Existing `setStatus()`, `clearStatus()` and `setTitle()` retain their older `assistant.threads.*` semantics for compatibility.
 
-Enable your Slack app's **Agent experience**, install with `assistant:write`, `chat:write` and `im:history`, and subscribe to `assistant_thread_started`, `assistant_thread_context_changed`, `message.im`, `agent_session_stopped` and `agent_session_title_changed`. The stop subscription enables Slack's native Stop control while processing. A stop event does not itself cancel your work or clear status: the application must cancel its jobs and transition the session. The playground demonstrates both, including interrupting a pending Responses HTTP read. [Slack's session contract](https://docs.slack.dev/ai/agent-sessions/) describes the lifecycle.
+Assistant/Agent capabilities are optional and Slack-plan-gated. The retained Bolt JS assistant-thread flow listens for `assistant_thread_started` and `assistant_thread_context_changed`; Slack's current Agents surface also documents `app_context_changed` and Agent View configuration. Validate the exact current UI/event contract in the target workspace before relying on it: the bundled playground demonstrates the legacy-compatible flow and root-DM adapter, not a complete Agent View manifest. Install only the needed scopes/events, including `assistant:write`, `chat:write`, `im:history`, `message.im`, and session stop/title events where supported. The stop subscription enables Slack's native Stop control while processing. A stop event does not itself cancel work or clear status: the application must cancel its jobs and transition the session. [Slack's session contract](https://docs.slack.dev/ai/agent-sessions/) and the [advanced-feature guide](docs/guides/advanced-slack-features.md) explain the boundary.
 
 Slow model calls belong in a worker: the [native assistant playground](examples/hello-bolt/README.md#native-slack-assistant) saves context and queues work before acknowledging. Core handlers execute inline.
 
@@ -377,6 +379,8 @@ Known event selectors receive native payload types; other events receive the gen
 
 The CLI scaffolds local code; Slack app configuration and installation still happen through Slack. `doctor` checks local requirements, placeholders and storage paths without contacting Slack or printing credentials. It exits nonzero when the selected profile is not ready. Use `php bolt doctor --format=json` for scripts, `--workers` to require durable-job prerequisites, or `--transport=socket --auth=oauth` to override setup defaults. Local readiness does not verify a stored OAuth installation, a token, or a running worker.
 
+`bolt new` defaults to a Composer path repository for this local checkout. To create an app that resolves the unreleased framework from Git, pass `--source=vcs --repository=<HTTPS-or-git@-URL> --version=dev-main`; the VCS flow deliberately rejects older tags that do not contain the project scaffolding contract. The [getting-started guide](docs/guides/getting-started.md) covers both dependency sources and their trade-offs.
+
 `php bolt status --format=json --require=socket,jobs` checks fresh process observations and reads existing queue counts, due work, expired leases and uncertain outcomes. It does not initialize or recover a queue, contact Slack, or probe your HTTP server. Exit 1 means required processes/storage were not observed healthy; failed/uncertain jobs are reported separately for inspection. Use `--require=jobs` for a worker deployment or `--require=none` for inspection only. Heartbeats older than 30 seconds are stale; long jobs should checkpoint and explicitly renew their leases through `JobExecution::heartbeat()`.
 
 The [deployment example](examples/deployment/README.md) runs intake and workers separately with persistent local storage, health checks and graceful shutdown. SIGTERM lets the current job finish before the next claim, including `jobs:work --once`. A forced kill follows the existing lease-recovery rules. `composer test:soak -- --duration=7200` runs the opt-in local reliability harness; it uses native WebSockets and isolated process tests, with recorded OAuth/Slack responses.
@@ -421,7 +425,7 @@ To regenerate from the pinned upstream archives, run `npm run sync:references`, 
 
 The preview includes a transport contract inventory for all 273 catalogued endpoints, a fresh-project integration check, and upgrade guidance. Next comes adopter feedback, broader opt-in live coverage and demand-led native typing of additional Slack events. Larger deployments may need additional durable-store adapters and an explicit deduplication-key expiry policy.
 
-Extended guides and API documentation will live on a separate docs site. Existing design notes and coverage inventories remain under `docs/` for maintainers. Recorded integration checks and Linux/macOS CI are release gates. Opt-in live checks provide narrower real-workspace evidence; generated coverage alone does not establish full Bolt JS conformance.
+The maintained adopter guides currently live in [docs/](docs/README.md); a separate docs site can later publish that material. Historical design notes and coverage inventories remain under `docs/research/` for maintainers. Recorded integration checks and Linux/macOS CI are release gates. Opt-in live checks provide narrower real-workspace evidence; generated coverage alone does not establish full Bolt JS conformance.
 
 ## License
 

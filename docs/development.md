@@ -40,3 +40,17 @@ npm run generate
 The TypeScript compiler is a development tool, locked by `package-lock.json`. Generated PHP and its model inventory are committed, so applications require no JavaScript tooling. Ownership checks reject hand-edited generated files and unexpected orphans.
 
 Linux/macOS CI checks PHP syntax and CLI startup, PHPUnit, Mago, and generator determinism. Local checks do not establish live Slack behavior or prove a remote CI run succeeded.
+
+## Documentation and fresh-project checks
+
+```sh
+npm run verify:docs
+composer test:project
+composer test:vcs-project
+```
+
+`verify:docs` needs Node and installed Composer dependencies. It checks repository-owned Markdown links, images, heading anchors, maintained PHP imports, snippet syntax, and referenced public factories and constructors. It does not execute examples, validate every chained method or argument, or check external URLs. Dated research notes receive link checks; their historical API examples are excluded. Current Slack configuration instructions live in [Slack app setup](guides/slack-app-setup.md), with a verification date and screenshots.
+
+The project smoke checks install dependencies into disposable applications. `test:project` covers the local path source. `test:vcs-project` snapshots the current package inputs into a disposable Git repository, installs through Composer's VCS resolver, then detaches that source to prove the generated application works without a path symlink. Neither check publishes a package or contacts Slack. Composer may download dependencies. VCS scaffolding currently targets `dev-main`; the older release tag does not contain the generated application's setup API.
+
+CI runs the documentation and fresh-project checks on Linux and macOS, a focused CLI suite on Windows, generated-reference checks, and the disposable Docker deployment smoke test.

@@ -24,11 +24,16 @@ jobs:
           php-version: '8.5'
           extensions: dom, fileinfo, intl, mbstring, pcntl, pdo, pdo_sqlite, posix, readline, simplexml
           coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - run: composer install --no-interaction --prefer-dist
+      - run: npm run verify:docs
       - run: php -l bin/bolt
       - run: php bin/bolt --version
       - run: composer test
       - run: composer test:project
+      - run: composer test:vcs-project
       - run: mago format --check
       - run: mago lint
         if: success() || failure()
@@ -61,7 +66,7 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: php bin/bolt --version
       - run: php bin/bolt new --help
-      - run: php vendor/bin/phpunit tests/Console/NewProjectInputTest.php tests/Console/ProjectDoctorTest.php tests/Console/ScaffoldSetupTest.php tests/Console/OnboardingBootstrapTest.php tests/Runtime/Operations/RuntimeStatusTest.php
+      - run: php vendor/bin/phpunit tests/Console/NewProjectInputTest.php tests/Console/ProjectDoctorTest.php tests/Console/ScaffoldSetupTest.php tests/Console/OnboardingBootstrapTest.php tests/Runtime/Operations/RuntimeStatusTest.php tests/Console/CommandCatalogTest.php tests/Console/ProjectSourceTest.php
 
   deployment:
     runs-on: ubuntu-latest

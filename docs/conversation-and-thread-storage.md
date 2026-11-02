@@ -130,4 +130,4 @@ $record = $store->get($thread);
 
 Bind a custom adapter in Tempest before resolving `App`. It must preserve canonical keys, portable JSON values, exact expiry semantics, and atomic updates across its deployment. When using SQLite, provide a dedicated connection; update transactions cannot run inside an application-owned transaction.
 
-The checked-in `RememberConversation` example counts channel/thread mentions. The [source parity reference](research/conversation-storage.md) records the retained Bolt behavior and PHP extensions. This generic thread storage does not implement Bolt's Assistant-specific metadata-backed context protocol; Assistant listeners remain a separate milestone.
+The checked-in `RememberConversation` example counts channel/thread mentions. The [source parity reference](research/conversation-storage.md) records the retained Bolt behavior and PHP extensions. Assistant focus context uses its own scoped adapter (`StoredThreadContextStore` or Slack metadata) so it remains distinct from generic conversation state; see [advanced Slack features](guides/advanced-slack-features.md).

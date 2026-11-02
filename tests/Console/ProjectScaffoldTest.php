@@ -238,6 +238,10 @@ final class ProjectScaffoldTest extends TestCase
             'socket_mode_enabled: false',
             (string) file_get_contents($project . '/slack-manifest.yaml'),
         );
+        self::assertStringContainsString(
+            'local Composer path repository',
+            (string) file_get_contents($project . '/README.md'),
+        );
     }
 
     public function test_refuses_existing_or_traversal_project_paths(): void

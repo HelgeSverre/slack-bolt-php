@@ -39,7 +39,7 @@ Thunder has a deliberately PHP-native HTTP entry point and Socket Mode worker, b
 
 ## How to read the scaffold count
 
-`src/Scaffold/` is a migration inventory, excluded from Tempest discovery; it is not executable framework coverage ([`README.md`](../../README.md#L146)). The generated inventory contains **28 scaffold classes, 85 interfaces, 13 options/config DTOs, 147 declaration-only exports, and 86 unresolved re-exports** ([`api-parity.md`](api-parity.md#L34)). Of the 28 scaffold classes, **28 files contain 66 explicit `NotPortedYet` method/constructor throws** in this checkout.
+`src/Scaffold/` is a migration inventory, excluded from Tempest discovery; it is not executable framework coverage ([`README.md`](../../README.md#L146)). The generated inventory contains **28 scaffold classes, 85 interfaces, 13 options/config DTOs, 147 declaration-only exports, and 86 unresolved re-exports** ([`api-parity.md`](api-parity.md)). Of the 28 scaffold classes, **28 files contain 66 explicit `NotPortedYet` method/constructor throws** in this checkout.
 
 That count is useful as a map of remaining design work, but it must not be read as “28 broken runtime classes”: the real `App`, HTTP receiver, conversation stores, and Socket Mode runner have intentionally different PHP implementations.
 

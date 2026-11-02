@@ -108,7 +108,7 @@ Workspace and organization lookups remain separate. The authorizer combines the 
 
 ## Token rotation
 
-When Slack issues refresh tokens, the installer persists access tokens, refresh tokens, scopes, and absolute UTC expiry timestamps for each grant. `InstallationAuthorizer` invokes `TokenRotator` before dispatch. It refreshes grants at or within two hours of expiry, matching the pinned Bolt JS default.
+When Slack issues refresh tokens, the installer persists access tokens, refresh tokens, scopes, and absolute UTC expiry timestamps for each bot/user grant. `InstallationAuthorizer` invokes `TokenRotator` before dispatch. It refreshes grants at or within two hours of expiry, matching the pinned Bolt JS default. App-level Socket Mode (`xapp`) tokens are configuration credentials, not persisted OAuth grants, and are not rotated by this component.
 
 Each refresh reads the latest record under an exclusive lock, calls `oauth.v2.access`, and persists the returned credential before releasing the lock. Bot and user refreshes commit independently, preserving a successful bot refresh if the user refresh fails. Failures propagate to the delivery; HTTP handlers are not run with a failed authorization result. OAuth exchange/refresh requests carry client credentials in form data and no bot bearer token.
 

@@ -6,15 +6,16 @@ namespace Thunder\Bolt\Console;
 
 final readonly class NewProjectInput
 {
-    public const string USAGE = 'Usage: php /path/to/bolt new <directory> [--transport=http|socket] [--auth=token|oauth] [--no-interaction]';
+    public const string USAGE = BoltCli::NEW_USAGE;
 
     private function __construct(
         public string $directory,
         public ProjectSetup $setup,
+        public ProjectSource $source,
     ) {}
 
     /** @param list<string> $arguments Arguments after new; no prompting or network activity. */
-    public static function fromArguments(array $arguments): self
+    public static function fromArguments(array $arguments, ?string $packageRoot = null): self
     {
         $directory = null;
         $options = [];
@@ -25,7 +26,10 @@ final readonly class NewProjectInput
             }
             if (str_starts_with($argument, '--')) {
                 [$key, $value] = array_pad(explode('=', substr($argument, 2), 2), 2, null);
-                if (!in_array($key, ['transport', 'auth'], true) || array_key_exists($key, $options)) {
+                if (
+                    !in_array($key, ['transport', 'auth', 'source', 'repository', 'version'], true)
+                    || array_key_exists($key, $options)
+                ) {
                     throw new \InvalidArgumentException('Use each supported option once. ' . self::USAGE);
                 }
                 $value ??= $arguments[++$i] ?? null;
@@ -42,6 +46,15 @@ final readonly class NewProjectInput
         if ($directory === null) {
             throw new \InvalidArgumentException(self::USAGE);
         }
-        return new self($directory, new ProjectSetup($options['transport'] ?? 'http', $options['auth'] ?? 'token'));
+        return new self(
+            $directory,
+            new ProjectSetup($options['transport'] ?? 'http', $options['auth'] ?? 'token'),
+            ProjectSource::fromOptions(
+                $options['source'] ?? null,
+                $options['repository'] ?? null,
+                $options['version'] ?? null,
+                $packageRoot ?? dirname(__DIR__, 2),
+            ),
+        );
     }
 }

@@ -41,6 +41,42 @@ final class OnboardingBootstrapTest extends TestCase
         self::assertDirectoryDoesNotExist($this->root . '/invalid');
     }
 
+    public function test_new_treats_version_as_the_vcs_source_option_not_the_global_version_flag(): void
+    {
+        [$status, $output, $error] = $this->command([
+            'new',
+            'vcs-app',
+            '--source=vcs',
+            '--repository',
+            dirname(__DIR__, 2),
+            '--version',
+            'dev-main',
+            '--no-interaction',
+        ]);
+
+        self::assertSame(0, $status, $error);
+        self::assertStringContainsString('Created ', $output);
+        self::assertFileExists($this->root . '/vcs-app/composer.json');
+        $composer = json_decode(
+            (string) file_get_contents($this->root . '/vcs-app/composer.json'),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+        self::assertSame('dev-main', $composer['require']['thunder/bolt']);
+        self::assertSame('vcs', $composer['repositories'][0]['type']);
+    }
+
+    public function test_help_and_version_do_not_require_a_project_or_composer_autoloader(): void
+    {
+        foreach ([['--help'], ['new', '--help'], ['--version']] as $arguments) {
+            [$status, $output, $error] = $this->command($arguments);
+
+            self::assertSame(0, $status, $error);
+            self::assertSame('', $error);
+            self::assertNotSame('', $output);
+        }
+    }
+
     public function test_doctor_reports_missing_composer_dependencies_as_json(): void
     {
         $this->project("<?php return new \\Thunder\\Bolt\\BoltConfig(conversationStoreDriver: 'memory');");

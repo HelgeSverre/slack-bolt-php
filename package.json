@@ -16,9 +16,10 @@
     "generate": "npm run extract:typescript && npm run generate:web-api-models && npm run generate:scaffold",
     "generate:web-api-models": "node scripts/generate-web-api-models.mjs",
     "verify:generated": "node scripts/generate-web-api-models.mjs --verify && node scripts/generate-scaffold.mjs --verify",
-    "test:tooling": "node --test test/tooling/generator.test.mjs",
+    "test:tooling": "node --test test/tooling/*.test.mjs",
     "verify:transport": "node scripts/audit-web-api-transport.mjs --verify",
-    "verify:parity": "node scripts/audit-bolt-parity.mjs --verify"
+    "verify:parity": "node scripts/audit-bolt-parity.mjs --verify",
+    "verify:docs": "node scripts/check-documentation.mjs"
   },
   "devDependencies": {
     "typescript": "5.9.3"

@@ -30,11 +30,20 @@ final readonly class BoltCommands
         string $transport = 'http',
         #[ConsoleArgument(name: 'auth', description: 'Authorization: token or oauth')]
         string $authorization = 'token',
+        #[ConsoleArgument(name: 'source', description: 'Dependency source: path or vcs')]
+        string $source = 'path',
+        #[ConsoleArgument(description: 'VCS repository URL or absolute local Git repository')]
+        ?string $repository = null,
+        #[ConsoleArgument(description: 'VCS package version; currently dev-main')]
+        ?string $version = null,
     ): ExitCode {
         try {
+            $packageRoot = dirname(__DIR__, 2);
+            $projectSource = ProjectSource::fromOptions($source, $repository, $version, $packageRoot);
             $project = new ProjectScaffold(dirname(__DIR__, 2))->create(
                 $directory,
                 new ProjectSetup($transport, $authorization),
+                $projectSource,
             );
         } catch (RuntimeException|JsonException|\InvalidArgumentException $exception) {
             $this->console->error($exception->getMessage());

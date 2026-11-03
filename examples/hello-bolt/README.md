@@ -2,10 +2,12 @@
 
 Use this example with the framework checkout and a Slack app configured for Socket Mode. Register `/bolt`, `/kickensink` (or `/kitchensink`) in your app manifest; mentions work too.
 
+Before importing the checked-in manifest for this Socket Mode walkthrough, set `settings.socket_mode_enabled` to `true`. The file retains HTTP placeholder URLs; Socket Mode does not use them. In Slack's **Socket Mode** settings, confirm it is enabled and use an app-level token with `connections:write`.
+
 ```sh
 composer install
 cp .env.example .env
-php bolt socket:serve
+php bolt socket:serve --verify-token
 ```
 
 In separate terminals, from this directory:

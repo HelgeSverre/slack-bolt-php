@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+use Psr\Http\Client\ClientInterface;
+use Thunder\Bolt\App;
+
+require getcwd() . '/vendor/autoload.php';
+$container = Tempest\Core\Tempest::boot(
+    root: getcwd(),
+    discoveryLocations: [new Tempest\Discovery\DiscoveryLocation('', getcwd() . '/config')],
+    internalStorage: getcwd() . '/.thunder-bolt',
+);
+$app = $container->get(App::class);
+$http = $container->get(ClientInterface::class);
+$http->requests = [];
+$app->dispatch([
+    'type' => 'event_callback', 'team_id' => 'T-smoke', 'event_id' => 'Ev-agent-root',
+    'event' => ['type' => 'message', 'channel_type' => 'im', 'channel' => 'D-smoke', 'user' => 'U-smoke', 'ts' => '3.001', 'text' => 'hello'],
+]);
+$methods = array_map(static fn($request): string => basename($request->getUri()->getPath()), $http->requests);
+if ($methods !== ['agents.sessions.setStatus', 'chat.startStream', 'chat.appendStream', 'chat.appendStream', 'chat.stopStream', 'agents.sessions.setStatus']) {
+    throw new RuntimeException('Generated Agent View handler did not stream and settle its session.');
+}
+foreach ($http->requests as $request) {
+    if ($request->getHeaderLine('Authorization') !== 'Bearer smoke-installed-token') {
+        throw new RuntimeException('Generated Agent View handler did not use the installed credential.');
+    }
+}
+$app->dispatch([
+    'type' => 'event_callback', 'team_id' => 'T-smoke', 'event_id' => 'Ev-agent-stop',
+    'event' => ['type' => 'agent_session_stopped', 'channel' => 'D-smoke', 'thread_ts' => '3.001', 'user' => 'U-smoke', 'event_ts' => '4.001', 'streaming_message_ts' => []],
+]);
+$last = json_decode((string) $http->requests[array_key_last($http->requests)]->getBody(), true, flags: JSON_THROW_ON_ERROR);
+if (($last['status'] ?? null) !== 'active') {
+    throw new RuntimeException('Generated Stop handler did not settle session status.');
+}
+echo "Fresh Agent View generator, installed discovery, typed streaming and native Stop accepted.\n";

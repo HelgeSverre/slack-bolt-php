@@ -1,5 +1,11 @@
 # Upgrading
 
+## Unreleased Agent View starter
+
+`make:assistant` retains its legacy default; pass `--agent-view` for the modern starter. Existing listeners, assistant configuration and app manifests are preserved. Review the [Agent View guide](docs/guides/agent-view.md) for Slack settings and migration constraints.
+
+The demo configuration now selects Agent View. Enable its modern feature and focus/message/Stop subscriptions before running it; keep intake and durable workers separate. A new `AgentAnswer` command stores per-turn app context, while existing `Answer` inputs/handlers remain compatible with queued work. No database migration is required. Modern `Thread::setSuggestedPrompts()` no longer sends a legacy thread timestamp; legacy assistants retain it.
+
 ## Public package name
 
 The Composer package is now `helgesverre/slack-bolt`; the PHP namespace remains `Thunder\Bolt`. Existing applications using `thunder/bolt` must update their Composer requirement and any path-repository `options.versions` key, then run `composer update helgesverre/slack-bolt thunder/bolt`. Update a hand-written launcher from `vendor/thunder/bolt/bin/bolt` to `vendor/helgesverre/slack-bolt/bin/bolt`. Newly generated apps already use the new path. Do not change application imports.

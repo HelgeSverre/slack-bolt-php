@@ -13,9 +13,11 @@ use Amp\Http\Client\Response;
 use App\Demo\Ai\JobCancellation;
 use App\Demo\DemoConfig;
 use App\Demo\DemoHttpException;
+use App\Demo\Jobs\AgentAnswer;
 use App\Demo\Jobs\Answer;
 use App\Demo\Jobs\AnswerHandler;
 use App\Demo\OpenAiHttp;
+use App\Listeners\DurableJobs;
 use GuzzleHttp\Psr7\Request as PsrRequest;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -24,6 +26,7 @@ use Tempest\CommandBus\CommandBusConfig;
 use Tempest\CommandBus\CommandHandler;
 use Tempest\Container\GenericContainer;
 use Tempest\Reflection\MethodReflector;
+use Thunder\Bolt\App;
 use Thunder\Bolt\BoltConfig;
 use Thunder\Bolt\Jobs;
 use Thunder\Bolt\Jobs\JobCancelled;
@@ -41,7 +44,8 @@ use function Amp\delay;
 
 final class OpenAiHttpCancellationTest extends TestCase
 {
-    public function test_real_answer_handler_closes_a_partial_stream_and_worker_settles_cancelled(): void
+    #[DataProvider('turnTypes')]
+    public function test_real_answer_handler_closes_a_partial_stream_and_worker_settles_cancelled(bool $modern): void
     {
         $directory = sys_get_temp_dir() . '/bolt-ai-transport-' . bin2hex(random_bytes(6));
         $store = SqliteJobStore::forTesting();
@@ -51,9 +55,17 @@ final class OpenAiHttpCancellationTest extends TestCase
             Answer::class,
             MethodReflector::fromParts(AnswerHandler::class, 'handle'),
         );
+        $commands->addHandler(
+            new CommandHandler(),
+            AgentAnswer::class,
+            MethodReflector::fromParts(AnswerHandler::class, 'agent'),
+        );
         $codec = new JobCodec($commands);
         $jobs = new Jobs($store, $codec)->in(JobContext::workspace('T1', 'D1', '1.0', 'U1'));
-        $accepted = $jobs->dispatch(new Answer('A slow answer', thread: '1.0'), key: 'cancel-live');
+        $jobs->dispatch(
+            $modern ? new AgentAnswer('A slow answer') : new Answer('A slow answer', thread: '1.0'),
+            key: 'cancel-live',
+        );
         $body = new WaitingResponseBody(firstFragment: true);
         $delegate = new class($body) implements DelegateHttpClient {
             public function __construct(
@@ -76,8 +88,26 @@ final class OpenAiHttpCancellationTest extends TestCase
             new Client($slack, 'xoxb-test'),
             new BoltConfig(token: 'xoxb-test'),
         );
-        $timer = EventLoop::delay(0.01, static function () use ($store, $accepted): void {
-            $store->cancel($accepted->id, 'team:T1');
+        $app = new App(
+            $container,
+            new Client($slack, 'xoxb-test'),
+            new BoltConfig(token: 'xoxb-test'),
+            jobs: new Jobs($store, $codec),
+        );
+        $app->registerClass(DurableJobs::class);
+        $timer = EventLoop::delay(0.01, static function () use ($app): void {
+            $app->dispatch([
+                'type' => 'event_callback',
+                'team_id' => 'T1',
+                'event' => [
+                    'type' => 'agent_session_stopped',
+                    'channel' => 'D1',
+                    'thread_ts' => '1.0',
+                    'user' => 'U1',
+                    'event_ts' => '2.0',
+                    'streaming_message_ts' => [],
+                ],
+            ]);
         });
         try {
             $outcome = $worker->runOnce();
@@ -106,6 +136,12 @@ final class OpenAiHttpCancellationTest extends TestCase
                 rmdir($directory);
             }
         }
+    }
+
+    public static function turnTypes(): iterable
+    {
+        yield 'legacy command' => [false];
+        yield 'Agent View command' => [true];
     }
 
     public static function stages(): iterable

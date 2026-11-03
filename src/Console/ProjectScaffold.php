@@ -180,7 +180,7 @@ final readonly class ProjectScaffold
     }
 
     /** @return array{listener: string, config: string} */
-    public function assistant(string $root, string $name = 'AssistantListener'): array
+    public function assistant(string $root, string $name = 'AssistantListener', bool $agentView = false): array
     {
         $class = $this->normalizeClassName($name);
         $listenerDirectory = rtrim($root, DIRECTORY_SEPARATOR) . '/app/Listeners';
@@ -194,10 +194,13 @@ final readonly class ProjectScaffold
         }
         $this->makeDirectory($listenerDirectory);
         $this->makeDirectory($configDirectory);
-        $this->write($listener, strtr($this->stub('assistant-listener.php.stub'), [
-            '{{ class }}' => $class,
-        ]));
-        $this->write($config, strtr($this->stub('assistant.config.php.stub'), [
+        $this->write($listener, strtr(
+            $this->stub($agentView ? 'agent-listener.php.stub' : 'assistant-listener.php.stub'),
+            [
+                '{{ class }}' => $class,
+            ],
+        ));
+        $this->write($config, strtr($this->stub($agentView ? 'agent.config.php.stub' : 'assistant.config.php.stub'), [
             '{{ class }}' => $class,
         ]));
 

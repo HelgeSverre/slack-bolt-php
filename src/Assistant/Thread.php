@@ -146,7 +146,7 @@ final class Thread
             ->threads()
             ->setSuggestedPrompts([
                 'channel_id' => $this->identity->channelId(),
-                'thread_ts' => $this->identity->threadTs(),
+                ...($this->agentContext === null ? ['thread_ts' => $this->identity->threadTs()] : []),
                 'prompts' => array_map(
                     static fn(SuggestedPrompt $prompt): array => $prompt->toArray(),
                     array_values($prompts),

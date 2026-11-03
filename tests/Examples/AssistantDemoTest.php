@@ -184,7 +184,7 @@ final class AssistantDemoTest extends TestCase
                 ->userMessage([AssistantDemo::class, 'message'])
                 ->contextStore($contextStore),
         );
-        $app->registerClass(AssistantDemo::class);
+        $app->event('message', [AssistantDemo::class, 'directMessage']);
 
         return [$app, $store, $http];
     }

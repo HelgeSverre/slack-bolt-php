@@ -2,7 +2,7 @@
 
 Generated from [the reviewed audit manifest](bolt-js-parity.json) by `node scripts/audit-bolt-parity.mjs`. The human verdict and priorities are in [the audit](bolt-js-parity-audit.md).
 
-Baseline: Bolt JS 5.1.0, commit `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. PHP revision: `v0.2.0 preview preparation, 28 October 2026`. Audited 2026-10-28.
+Baseline: Bolt JS 5.1.0, commit `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. PHP revision: `v0.5.0 plus unreleased Agent View starter and durable demo, 3 November 2026`. Audited 2026-11-03.
 
 Mapping presence is a bookkeeping check, not proof of behavioral equality. No percentage is reported: features differ in importance, and excluded Node APIs/type aliases are not missing PHP capabilities.
 
@@ -249,11 +249,11 @@ Upstream: [src/receivers/SocketModeReceiver.ts](https://github.com/slackapi/bolt
 
 ### assistant
 
-**Assistant lifecycle and context helpers — covered.** Started/context-changed/user-message routing, scoped context, status/title/prompts, say and streaming helpers have behavioral coverage. Local durable context is the default; explicit Slack-metadata storage provides upstream-compatible storage behavior.
+**Assistant lifecycle and context helpers — covered.** Legacy Assistant::make lifecycle, scoped thread context, status/title/prompts and streaming remain covered. Modern Agent View is opt-in and assessed separately as an extension, not baseline parity credit. Suggested prompts omit thread_ts in modern mode and retain it for legacy threads.
 
 PHP: [src/Assistant.php](../../src/Assistant.php), [src/Assistant/Runtime.php](../../src/Assistant/Runtime.php), [src/Assistant/Thread.php](../../src/Assistant/Thread.php), [src/Assistant/MessageStream.php](../../src/Assistant/MessageStream.php).
 
-Behavioral evidence: [tests/Assistant/RuntimeTest.php](../../tests/Assistant/RuntimeTest.php), [tests/Assistant/ThreadTest.php](../../tests/Assistant/ThreadTest.php), [tests/Assistant/MessageStreamTest.php](../../tests/Assistant/MessageStreamTest.php), [tests/Assistant/SlackMetadataThreadContextStoreTest.php](../../tests/Assistant/SlackMetadataThreadContextStoreTest.php).
+Behavioral evidence: [tests/Assistant/RuntimeTest.php](../../tests/Assistant/RuntimeTest.php), [tests/Assistant/ThreadTest.php](../../tests/Assistant/ThreadTest.php), [tests/Assistant/MessageStreamTest.php](../../tests/Assistant/MessageStreamTest.php), [tests/Assistant/SlackMetadataThreadContextStoreTest.php](../../tests/Assistant/SlackMetadataThreadContextStoreTest.php), [tests/Assistant/AgentViewTest.php](../../tests/Assistant/AgentViewTest.php), [tests/Assistant/StreamingChunksTest.php](../../tests/Assistant/StreamingChunksTest.php).
 
 Upstream: [src/Assistant.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts), [src/AssistantThreadContextStore.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/AssistantThreadContextStore.ts), [src/context/create-say-stream.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-say-stream.ts), [src/context/create-set-status.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-set-status.ts).
 
@@ -346,6 +346,16 @@ PHP: [src/Jobs.php](../../src/Jobs.php), [src/Jobs/SqliteJobStore.php](../../src
 Behavioral evidence: [tests/Jobs/DurableExecutionTest.php](../../tests/Jobs/DurableExecutionTest.php), [tests/Jobs/JobOperationsTest.php](../../tests/Jobs/JobOperationsTest.php), [tests/Assistant/SessionTest.php](../../tests/Assistant/SessionTest.php), [tests/WorkObjects/PublisherTest.php](../../tests/WorkObjects/PublisherTest.php).
 
 Upstream: [src/App.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/App.ts).
+
+### agent-view
+
+**Modern Agent View and typed streaming — extension.** Assistant::forAgentView routes human root DMs/replies and optional Messages-tab/focus events. Ordered app-context entities retain raw extensions and use fresh delivery scopes without stale focus fallback. Typed streaming values preserve raw arrays, bound whole-stream text/tasks and keep failures terminal. make:assistant --agent-view scaffolds modern handlers and Stop routing; the demo snapshots focus in a separate named SQLite job and reuses cancellable model execution. Live validation is recorded separately and does not broaden the pinned legacy Bolt baseline.
+
+PHP: [src/Assistant.php](../../src/Assistant.php), [src/Assistant/Runtime.php](../../src/Assistant/Runtime.php), [src/Assistant/AppContext.php](../../src/Assistant/AppContext.php), [src/Assistant/MessageStream.php](../../src/Assistant/MessageStream.php), [src/Assistant/Streaming/TaskUpdate.php](../../src/Assistant/Streaming/TaskUpdate.php), [src/Console/ProjectScaffold.php](../../src/Console/ProjectScaffold.php), [examples/hello-bolt/app/Demo/AgentViewDemo.php](../../examples/hello-bolt/app/Demo/AgentViewDemo.php), [examples/hello-bolt/app/Demo/Jobs/AgentAnswer.php](../../examples/hello-bolt/app/Demo/Jobs/AgentAnswer.php).
+
+Behavioral evidence: [tests/Assistant/AgentViewTest.php](../../tests/Assistant/AgentViewTest.php), [tests/Assistant/StreamingChunksTest.php](../../tests/Assistant/StreamingChunksTest.php), [tests/Console/ProjectScaffoldTest.php](../../tests/Console/ProjectScaffoldTest.php), [tests/Examples/AgentViewDemoTest.php](../../tests/Examples/AgentViewDemoTest.php), [tests/Examples/OpenAiHttpCancellationTest.php](../../tests/Examples/OpenAiHttpCancellationTest.php).
+
+Upstream: [src/Assistant.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/Assistant.ts), [src/context/create-say-stream.ts](https://github.com/slackapi/bolt-js/blob/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d/src/context/create-say-stream.ts).
 
 ## All AppOptions
 

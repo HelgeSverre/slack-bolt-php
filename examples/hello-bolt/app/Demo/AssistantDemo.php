@@ -10,7 +10,6 @@ use Thunder\Bolt\Assistant\Stores\StoredThreadContextStore;
 use Thunder\Bolt\Assistant\Thread;
 use Thunder\Bolt\Assistant\ThreadContext;
 use Thunder\Bolt\Assistant\ThreadIdentity;
-use Thunder\Bolt\Attributes\Event;
 use Thunder\Bolt\Conversation\ConversationKey;
 use Thunder\Bolt\Conversation\Stores\FileConversationStore;
 use Thunder\Bolt\Invocation\Delivery;
@@ -55,7 +54,6 @@ final readonly class AssistantDemo
      * Starts the playground from a direct message while Slack's Assistant surface
      * has not sent an assistant_thread_started event yet.
      */
-    #[Event('message')]
     public function directMessage(Message $message, Delivery $delivery, Jobs $jobs): void
     {
         if (

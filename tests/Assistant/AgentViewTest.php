@@ -17,6 +17,24 @@ use Thunder\Bolt\Testing\BoltTest;
 
 final class AgentViewTest extends TestCase
 {
+    public function test_modern_suggested_prompts_omit_the_legacy_thread_timestamp(): void
+    {
+        $test = BoltTest::make();
+        $test->slack->respondsWith('assistant.threads.setSuggestedPrompts', ['ok' => true]);
+        $test->app->assistant(Assistant::forAgentView()->userMessage(static function (Thread $thread): void {
+            $thread->setSuggestedPrompts([new \Thunder\Bolt\Assistant\SuggestedPrompt('Explore', 'What can you do?')]);
+        }));
+        $test->event('message', [
+            'channel_type' => 'im',
+            'channel' => 'D1',
+            'user' => 'U1',
+            'ts' => '1.001',
+        ])->assertApiCalled(
+            'assistant.threads.setSuggestedPrompts',
+            static fn(\Thunder\Bolt\Testing\SlackCall $call): bool => !isset($call->arguments['thread_ts']),
+        );
+    }
+
     public function test_constructor_injection_does_not_reuse_focus_from_an_earlier_delivery(): void
     {
         $test = BoltTest::make();

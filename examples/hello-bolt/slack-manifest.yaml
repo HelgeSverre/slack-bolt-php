@@ -19,8 +19,12 @@ functions:
         description: The formatted message.
         is_required: true
 features:
+  agent_view:
+    agent_description: Ask questions, search the web, and look after the shared Boltling pet.
   app_home:
     home_tab_enabled: true
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: false
   bot_user:
     display_name: Thunder Bolt
   shortcuts:
@@ -64,8 +68,7 @@ settings:
     bot_events:
       - app_home_opened
       - app_mention
-      - assistant_thread_started
-      - assistant_thread_context_changed
+      - app_context_changed
       - agent_session_stopped
       - agent_session_title_changed
       - message.im

@@ -1,0 +1,59 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use Thunder\Bolt\Assistant\AppContext;
+use Thunder\Bolt\Assistant\Streaming\TaskStatus;
+use Thunder\Bolt\Assistant\Streaming\TaskUpdate;
+use Thunder\Bolt\Assistant\Thread;
+use Thunder\Bolt\Attributes\Event;
+use Thunder\Bolt\Invocation\Delivery;
+use Thunder\Bolt\Payloads\Events\AgentSessionStopped;
+use Thunder\Bolt\Payloads\Events\AppContextChanged;
+use Thunder\Bolt\Payloads\Events\AppHomeOpened;
+use Thunder\Bolt\Payloads\Events\Message;
+use Thunder\Bolt\WebApi\Client;
+
+final readonly class {{ class }}
+{
+    public function opened(AppHomeOpened $event, AppContext $context): void
+    {
+        // No Thread exists until a message supplies a root timestamp.
+    }
+
+    public function contextChanged(AppContextChanged $event, AppContext $context): void
+    {
+        // Focus is a delivery snapshot, not permission to fetch its contents.
+    }
+
+    public function message(Message $message, Thread $thread, AppContext $context): void
+    {
+        // This quick example runs inline. Enqueue slow work as a named durable job.
+        $thread->session()->processing();
+        try {
+            $task = TaskUpdate::make('reply', 'Prepare reply');
+            $stream = $thread->sayStream();
+            $stream->chunks([$task]);
+            $stream->append('Ready. What would you like to explore?');
+            $stream->chunks([$task->status(TaskStatus::Complete)])->stop();
+        } finally {
+            $thread->session()->active();
+        }
+    }
+
+    #[Event('agent_session_stopped')]
+    public function stopped(AgentSessionStopped $event, Delivery $delivery, Client $client): void
+    {
+        if ($event->channelId === null || $event->threadTs === null) {
+            return;
+        }
+        $delivery->jobs?->cancelThread();
+        $client->agents()->sessions()->setStatus([
+            'channel_id' => $event->channelId,
+            'thread_ts' => $event->threadTs,
+            'status' => 'active',
+        ]);
+    }
+}

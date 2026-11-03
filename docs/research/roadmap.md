@@ -1,8 +1,23 @@
 # Implementation plan
 
-Current ordering refreshed 28 October 2026; earlier milestone sections below retain their historical scope. The [Bolt JS parity audit](bolt-js-parity-audit.md) is the current compatibility assessment. The target is useful capability and protocol coverage of pinned Bolt JS 5.1.0 through idiomatic PHP, with explicit host adaptations and Node-specific exclusions. The v0.1.0 preview is tagged; further demos and package publishing should not displace the meaningful gaps found in that audit.
+Current ordering refreshed 3 November 2026 for the public package through v0.5.0 and the Agent View starter/durable demo. The [parity matrix](bolt-js-parity-matrix.md) tracks the pinned Bolt JS 5.1.0 contract. Historical milestone sections below describe their original scope and are not an outstanding task list.
 
-## Next compatibility slices
+## Current position
+
+- Public Packagist installation, independent `bolt new` projects, typed everyday events and a public testing toolkit shipped in v0.3.0.
+- Opt-in Agent View routing and per-delivery focus shipped in v0.4.0; typed streaming progress and whole-stream limits shipped in v0.5.0.
+- The current starter adds `make:assistant --agent-view`. The demo queues separate `AgentAnswer` commands with focus snapshots, uses typed task progress, and handles native Stop through durable cancellation. Existing legacy command JSON remains compatible. [Validation](agent-view-starter-validation.md).
+- Production status, supervised deployment, process-failure coverage and the two-hour reliability run are complete. [Operations evidence](production-operations-plan.md).
+
+## Next sensible work
+
+1. Strengthen adoption coverage: keep generated modern/legacy starters, registry installs and both delivery transports in executable fresh-project checks. Extend live acceptance to additional eligible workspaces as access permits.
+2. Expand native DTOs and host/store adapters when real applications demonstrate a need. Preserve raw extension fields and explicit installation scoping.
+3. Publish a separate documentation site from the maintained guides, with verified examples and a clear release/upgrade policy. Add shared application composition only when concrete applications expose needs beyond Tempest and Bolt.
+
+Keep Node host classes, early-ack callback emulation, classic workflow steps and exhaustive TypeScript union replicas outside the practical PHP target.
+
+## Completed compatibility slices — historical
 
 1. Completed 28 October: delivery-local Context, structured failure context/policy and explicit static-token identity verification/hydration. [Implementation and evidence](delivery-context-identity-errors.md). Help and discovery stay network-free.
 2. Completed 28 October: workflow-token opt-out, composable subtype/direct-mention filters and sanitized SSL probes. [Implementation and evidence](message-filters-function-policy-ssl.md). Transport context factories were completed in the v0.2 work below.

@@ -138,6 +138,17 @@ try {
     if (trim($command([PHP_BINARY, 'bolt', 'jobs:work', '--once'], $project)) !== 'null') {
         throw new RuntimeException('Completed fixture was executed again.');
     }
+    $manifestBefore = file_get_contents($project . '/slack-manifest.yaml');
+    echo $command([PHP_BINARY, 'bolt', 'make:assistant', 'FreshAgent', '--agent-view'], $project);
+    if (file_get_contents($project . '/slack-manifest.yaml') !== $manifestBefore) {
+        throw new RuntimeException('Agent generator changed the application manifest.');
+    }
+    $completion = $project . '/.thunder-bolt/agent-completion.json';
+    $command([PHP_BINARY, 'bolt', 'completion:generate', $completion], $project);
+    if (!str_contains((string) file_get_contents($completion), 'agent-view')) {
+        throw new RuntimeException('Agent View flag is missing from discovered completions.');
+    }
+    echo $command([PHP_BINARY, $root . '/tests/Fixtures/project-smoke/agent-view.php.stub'], $project);
     echo
         "Fresh project passed: production install, discovery, OAuth metadata, HTTP/Socket context and typed forms, deduplication, worker restart and recovery.\n";
 } catch (Throwable $exception) {

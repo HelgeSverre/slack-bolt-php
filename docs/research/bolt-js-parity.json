@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "auditedAt": "2026-10-28",
-  "phpRevision": "v0.2.0 preview preparation, 28 October 2026",
+  "auditedAt": "2026-11-03",
+  "phpRevision": "v0.5.0 plus unreleased Agent View starter and durable demo, 3 November 2026",
   "baseline": {
     "package": "@slack/bolt",
     "version": "5.1.0",
@@ -488,7 +488,7 @@
       "id": "assistant",
       "area": "Assistant lifecycle and context helpers",
       "status": "covered",
-      "assessment": "Started/context-changed/user-message routing, scoped context, status/title/prompts, say and streaming helpers have behavioral coverage. Local durable context is the default; explicit Slack-metadata storage provides upstream-compatible storage behavior.",
+      "assessment": "Legacy Assistant::make lifecycle, scoped thread context, status/title/prompts and streaming remain covered. Modern Agent View is opt-in and assessed separately as an extension, not baseline parity credit. Suggested prompts omit thread_ts in modern mode and retain it for legacy threads.",
       "php": [
         "src/Assistant.php",
         "src/Assistant/Runtime.php",
@@ -499,7 +499,9 @@
         "tests/Assistant/RuntimeTest.php",
         "tests/Assistant/ThreadTest.php",
         "tests/Assistant/MessageStreamTest.php",
-        "tests/Assistant/SlackMetadataThreadContextStoreTest.php"
+        "tests/Assistant/SlackMetadataThreadContextStoreTest.php",
+        "tests/Assistant/AgentViewTest.php",
+        "tests/Assistant/StreamingChunksTest.php"
       ],
       "upstream": [
         "src/Assistant.ts",
@@ -685,6 +687,33 @@
       ],
       "upstream": [
         "src/App.ts"
+      ]
+    },
+    {
+      "id": "agent-view",
+      "area": "Modern Agent View and typed streaming",
+      "status": "extension",
+      "assessment": "Assistant::forAgentView routes human root DMs/replies and optional Messages-tab/focus events. Ordered app-context entities retain raw extensions and use fresh delivery scopes without stale focus fallback. Typed streaming values preserve raw arrays, bound whole-stream text/tasks and keep failures terminal. make:assistant --agent-view scaffolds modern handlers and Stop routing; the demo snapshots focus in a separate named SQLite job and reuses cancellable model execution. Live validation is recorded separately and does not broaden the pinned legacy Bolt baseline.",
+      "php": [
+        "src/Assistant.php",
+        "src/Assistant/Runtime.php",
+        "src/Assistant/AppContext.php",
+        "src/Assistant/MessageStream.php",
+        "src/Assistant/Streaming/TaskUpdate.php",
+        "src/Console/ProjectScaffold.php",
+        "examples/hello-bolt/app/Demo/AgentViewDemo.php",
+        "examples/hello-bolt/app/Demo/Jobs/AgentAnswer.php"
+      ],
+      "tests": [
+        "tests/Assistant/AgentViewTest.php",
+        "tests/Assistant/StreamingChunksTest.php",
+        "tests/Console/ProjectScaffoldTest.php",
+        "tests/Examples/AgentViewDemoTest.php",
+        "tests/Examples/OpenAiHttpCancellationTest.php"
+      ],
+      "upstream": [
+        "src/Assistant.ts",
+        "src/context/create-say-stream.ts"
       ]
     }
   ],

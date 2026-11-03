@@ -1,10 +1,16 @@
-# Bolt JS parity audit — 26 October 2026
+# Bolt JS parity audit
+
+**Current assessment — 3 November 2026:** refreshed for v0.5.0 and the Agent View starter/durable demo. The pinned Bolt JS baseline remains 5.1.0; this is not a new audit of moving upstream HEAD. Practical legacy contracts remain covered or explicitly adapted, broad inbound native typing remains partial, and Node-specific exclusions remain intentional. Modern Agent View is recorded as a PHP extension without extra baseline parity credit. See the [current matrix](bolt-js-parity-matrix.md) and [Agent View acceptance record](agent-view-starter-validation.md).
+
+The material below is the historical 26 October baseline and its follow-ups. Its P1/P2 recommendations have been implemented; they are not the current backlog.
+
+## Historical audit — 26 October 2026
 
 **28 October follow-up:** the first three gaps below now have PHP implementations: explicit static-token identity verification/hydration, delivery-local Context and structured failure context/policy. See the [implementation and evidence](delivery-context-identity-errors.md) and refreshed [matrix](bolt-js-parity-matrix.md). The dated findings and counts below describe the v0.1.0 baseline; the current matrix records the changes. Identity and receiver policies deliberately retain explicit PHP execution boundaries.
 
 **Second 28 October follow-up:** composable message filters, configurable workflow-token attachment and sanitized SSL probes are also implemented. [Behavior and evidence](message-filters-function-policy-ssl.md). Those were the next priorities at that checkpoint. The v0.2 follow-up below records their implementation.
 
-**Current v0.2 verdict:** the planned practical compatibility slices are implemented with behavioral evidence. Complete native typing of the Slack event universe remains narrower, and deliberate PHP adaptations/exclusions remain. Literal API parity is neither achieved nor the right PHP target. No percentage is claimed. The dated baseline findings below are preserved for traceability; see the v0.2 follow-up and current matrix for their disposition.
+**Historical v0.2 verdict:** the planned practical compatibility slices are implemented with behavioral evidence. Complete native typing of the Slack event universe remains narrower, and deliberate PHP adaptations/exclusions remain. Literal API parity is neither achieved nor the right PHP target. No percentage is claimed. The dated baseline findings below are preserved for traceability; see the v0.2 follow-up and current matrix for their disposition.
 
 This audit compares PHP revision [`21192af`](https://github.com/HelgeSverre/slack-bolt-php/tree/21192afee5efbbd35f90bbcf3e6b07858f5227b2) (the v0.1.0 preview) with `@slack/bolt` **5.1.0**, pinned at [`ffbe0b6…`](https://github.com/slackapi/bolt-js/tree/ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d). It does not claim parity with a moving upstream release or every Slack API. The [upstream research](bolt-js-parity-upstream.md) cites the primary source contract; the [detailed matrix](bolt-js-parity-matrix.md) links PHP implementation and behavioral tests. The [machine-readable manifest](bolt-js-parity.json) is the reviewed assessment.
 
@@ -73,7 +79,7 @@ These probes used only a recording HTTP transport and literal fixture credential
 
 Existing tests separately prove bot-id self-filtering through an authorizer, regex capture isolation, retry propagation, tenant-scoped clients and function completion guards. The probe results therefore do not erase those implemented capabilities.
 
-## Recommended next slice and exit criteria
+## Historical recommended slice and exit criteria
 
 Implement **delivery context and failure context**, plus **explicit static-token identity resolution**. These share invocation/authorization seams and help real applications more than new demos. Then add the small function-policy/filter/SSL compatibility pieces, followed by typed OAuth install options. Keep the current PHP host/acknowledgement model unless a concrete async host requires a different one.
 

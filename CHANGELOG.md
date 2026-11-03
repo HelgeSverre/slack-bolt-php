@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Modern `make:assistant --agent-view` scaffolding with typed streaming and native Stop routing, retaining the legacy default and overwrite guards.
+- Agent View demo with separate durable focus-snapshot commands, typed task progress, cancellable model execution and unchanged legacy queued-job JSON.
+- Modern suggested prompts omit `thread_ts`, as required by Slack's current Agent View behavior.
+- Refreshed parity matrix, roadmap, setup/migration guides and narrow live acceptance evidence for DM intake, focus, streaming and Stop.
+
 ## v0.5.0 — 2026-11-02
 
 - Immutable typed streaming text, task, plan and Block Kit chunks, with native task statuses and source builders. Existing raw arrays remain supported.

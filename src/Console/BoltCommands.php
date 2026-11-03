@@ -167,11 +167,17 @@ final readonly class BoltCommands
     public function makeAssistant(
         #[ConsoleArgument(description: 'Assistant listener PHP class name')]
         string $name = 'AssistantListener',
+        #[ConsoleArgument(
+            name: 'agent-view',
+            description: 'Generate modern Agent View handlers instead of legacy assistant threads',
+        )]
+        bool $agentView = false,
     ): ExitCode {
         try {
             $paths = new ProjectScaffold(dirname(__DIR__, 2))->assistant(
                 getcwd() ?: throw new RuntimeException('Unable to resolve the current directory.'),
                 $name,
+                $agentView,
             );
         } catch (RuntimeException $exception) {
             $this->console->error($exception->getMessage());
@@ -182,8 +188,18 @@ final readonly class BoltCommands
         $this->console->instructions([
             'Add only the assistant capabilities you need to slack-manifest.yaml:',
             'bot scopes: assistant:write, chat:write, im:history',
-            'bot events: assistant_thread_started, assistant_thread_context_changed, message.im',
+            $agentView
+                ? 'bot events: app_home_opened, app_context_changed, message.im, agent_session_stopped'
+                : 'bot events: assistant_thread_started, assistant_thread_context_changed, message.im',
             'Enable Agents → Agent experience in Slack, then reinstall the app.',
+            ...(
+                $agentView
+                    ? [
+                        'Enable Agent View (features.agent_view) and App Home Messages.',
+                        'Handlers run inline. Use named durable jobs for slow work; Stop cancels thread-bound jobs when a queue is configured.',
+                    ]
+                    : []
+            ),
         ]);
 
         return ExitCode::SUCCESS;

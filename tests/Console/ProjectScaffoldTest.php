@@ -228,6 +228,38 @@ final class ProjectScaffoldTest extends TestCase
         $scaffold->assistant($project, 'GeneratedAssistant');
     }
 
+    public function test_agent_view_scaffold_runs_modern_root_messages_and_stop_without_a_queue(): void
+    {
+        $project = $this->workspace . '/agent';
+        mkdir($project, 0775, true);
+        $manifest = "features:\n  bot_user:\n    display_name: Test\n";
+        file_put_contents($project . '/slack-manifest.yaml', $manifest);
+        $scaffold = new ProjectScaffold(dirname(__DIR__, 2));
+        $paths = $scaffold->assistant($project, 'GeneratedAgentView', agentView: true);
+        require $paths['listener'];
+        $assistant = require $paths['config'];
+        self::assertTrue($assistant->agentView);
+        $test = \Thunder\Bolt\Testing\BoltTest::make()->listeners('App\\Listeners\\GeneratedAgentView');
+        $test->slack->respondsWith('agents.sessions.setStatus', ['ok' => true]);
+        $test->slack->respondsWith('agents.sessions.setStatus', ['ok' => true]);
+        $test->app->assistant($assistant);
+        $test
+            ->event('message', ['channel_type' => 'im', 'channel' => 'D1', 'user' => 'U1', 'ts' => '1.001'])
+            ->assertApiCalled('chat.startStream')
+            ->assertApiCalled('chat.stopStream');
+        $test->slack->respondsWith('agents.sessions.setStatus', ['ok' => true]);
+        $test->event('agent_session_stopped', [
+            'channel' => 'D1',
+            'user' => 'U1',
+            'thread_ts' => '1.001',
+            'event_ts' => '2.001',
+            'streaming_message_ts' => [],
+        ])->assertApiCalled('agents.sessions.setStatus');
+        self::assertSame($manifest, file_get_contents($project . '/slack-manifest.yaml'));
+        $this->expectException(RuntimeException::class);
+        $scaffold->assistant($project, 'AnotherAgent', agentView: true);
+    }
+
     private string $workspace;
 
     protected function setUp(): void

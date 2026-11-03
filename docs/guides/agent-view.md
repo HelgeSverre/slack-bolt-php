@@ -2,7 +2,9 @@
 
 Use `Assistant::forAgentView()` for Slack's current agent messaging experience. It receives human DM roots and replies, plus optional Messages-tab opening and focus-change handlers. `Assistant::make()` retains the legacy `assistant_thread_*` lifecycle and its context stores.
 
-Put this in `config/assistant.config.php`:
+The generator flag is available on unreleased `main`. Generate a listener with `php bolt make:assistant WorkspaceAgent --agent-view`. Without the flag, the generator retains the legacy assistant flow. It refuses to overwrite an existing listener or assistant config, and does not rewrite your manifest.
+
+The resulting `config/assistant.config.php` uses:
 
 ```php
 use App\Listeners\WorkspaceAgent;
@@ -71,6 +73,21 @@ Messages from bots, message edits/deletions, channel messages and other App Home
 
 In [your Slack app settings](https://api.slack.com/apps), enable the current Agents/Agent View feature for your app. Feature availability depends on workspace access and plan. In **OAuth & Permissions**, grant `assistant:write`, `chat:write` and `im:history`; reinstall after scope changes. In **Event Subscriptions → Subscribe to bot events**, add `message.im`, `app_home_opened` and `app_context_changed`. Add `agent_session_stopped` and `agent_session_title_changed` if your app implements cancellation/title tracking. Keep Socket Mode enabled or configure the verified HTTP request URL for your chosen transport.
 
-The existing `make:assistant` command generates a legacy assistant. To adopt Agent View, change its configuration and handlers as above; do not mix `threadStarted`, `threadContextChanged` or `contextStore` into the modern builder. This guide does not change your Slack settings automatically.
+The generated listener includes modern open/context/message handlers, typed streaming, and a native Stop handler. When durable jobs are configured, Stop calls the delivery's `cancelThread()` capability and settles session status. Its quick reply runs inline; move model/tool work into named jobs as demonstrated by `examples/hello-bolt`. Do not mix `threadStarted`, `threadContextChanged` or `contextStore` into the modern builder.
 
-Use [Slack's current agent guide](https://docs.slack.dev/ai/developing-agents/) for feature setup and focus-delivery rules, and [context management](https://docs.slack.dev/ai/agent-context-management/) for selecting what to pass to a model. This release verifies local payload and transport behavior; it does not claim a new live workspace acceptance run.
+In **Agents**, select dynamic suggested prompts. `Thread::setSuggestedPrompts()` omits `thread_ts` in Agent View mode; Slack's current method documentation says a legacy thread timestamp silently prevents prompts from being applied to a modern agent. Static prompts in app configuration prevent dynamic updates.
+
+A manifest fragment for the current view is:
+
+```yaml
+features:
+  agent_view:
+    agent_description: Ask questions and work with your Slack context.
+  app_home:
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: false
+```
+
+Merge this with your own manifest and the scopes/events above. `agent_description` is required; there is no `agent_view.enabled` setting. Slack documents migration from legacy Assistant View as one-way; review an installed app's configuration before migrating it. See the [suggested-prompts method](https://docs.slack.dev/reference/methods/assistant.threads.setSuggestedPrompts/) and [manifest reference](https://docs.slack.dev/reference/app-manifest/).
+
+Use [Slack's current agent guide](https://docs.slack.dev/ai/developing-agents/) for feature setup and focus-delivery rules, and [context management](https://docs.slack.dev/ai/agent-context-management/) for selecting what to pass to a model. The [acceptance record](../research/agent-view-starter-validation.md) distinguishes live DM/focus/stream/Stop checks from fixture-only variants.

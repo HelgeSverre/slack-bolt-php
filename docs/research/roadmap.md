@@ -13,7 +13,9 @@ Current ordering refreshed 3 November 2026 for the public package through v0.6.0
 
 1. Strengthen adoption coverage: keep generated modern/legacy starters, registry installs and both delivery transports in executable fresh-project checks. Extend live acceptance to additional eligible workspaces as access permits.
 2. Expand native DTOs and host/store adapters when real applications demonstrate a need. Preserve raw extension fields and explicit installation scoping.
-3. Publish a separate documentation site from the maintained guides, with verified examples and a clear release/upgrade policy. Add shared application composition only when concrete applications expose needs beyond Tempest and Bolt.
+3. Maintain the documentation as versioned Markdown in `docs/`, with a clear index, verified examples and release/upgrade notes. Improve the existing standalone framework as concrete applications expose needs beyond its current composition.
+
+Documentation direction — 3 November 2026: [docs/README.md](../README.md) is the documentation home. Guides, interface navigation and examples stay in this repository and follow its release tags.
 
 Keep Node host classes, early-ack callback emulation, classic workflow steps and exhaustive TypeScript union replicas outside the practical PHP target.
 
@@ -89,7 +91,7 @@ See the [client guide](../web-api-client.md), [builder guide](../sdk-and-block-k
 
 ## Socket Mode milestone
 
-`socket:serve` receives events, commands, and interactions through the same App dispatch pipeline. The runner handles Slack envelopes, hello/disconnect frames, bounded reconnect backoff, retry metadata, and shutdown. Amp provides TLS verification, WebSocket framing, message limits, and ping/pong health. Local tests cover lifecycle failures and installation/context isolation; live Slack conformance remains a release gate. See the [README](../../README.md#slack-configuration) for setup; deeper documentation is deferred to the separate docs site.
+`socket:serve` receives events, commands, and interactions through the same App dispatch pipeline. The runner handles Slack envelopes, hello/disconnect frames, bounded reconnect backoff, retry metadata, and shutdown. Amp provides TLS verification, WebSocket framing, message limits, and ping/pong health. Local tests cover lifecycle failures and installation/context isolation; live Slack conformance remains a release gate. See the [Slack setup guide](../guides/slack-app-setup.md) and [durable operations](../guides/durable-operations.md) for maintained instructions.
 
 ## Remaining implementation order
 

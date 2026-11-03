@@ -43,6 +43,10 @@ Linux/macOS CI checks PHP syntax and CLI startup, PHPUnit, Mago, and generator d
 
 ## Documentation and fresh-project checks
 
+Documentation is plain Markdown in `docs/`, edited and reviewed with the implementation. [docs/README.md](README.md) is the entry point; add new adopter guides there and update the [public interface map](reference.md) when a public seam changes. Keep current usage in guides and dated investigation/acceptance evidence in `research/`. Link to an existing canonical guide when another page needs the same explanation.
+
+Install commands should omit package version constraints so they resolve the latest compatible release. Keep exact versions where they identify historical evidence, a tested upstream baseline or an upgrade requirement. Use relative links between repository files; they follow the selected branch or release tag on GitHub. Documentation changes use the existing repository checks and release workflow.
+
 ```sh
 npm run verify:docs
 composer test:project

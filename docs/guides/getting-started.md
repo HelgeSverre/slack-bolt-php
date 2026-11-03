@@ -1,42 +1,35 @@
 # Getting started
 
-Thunder Bolt runs on PHP 8.5+ and Tempest 3. The public Composer package is `helgesverre/slack-bolt`; its PHP namespace remains `Thunder\Bolt`. Install the current experimental release with `composer require helgesverre/slack-bolt:^0.6`, or use the global CLI flow in the root [README](../../README.md#installation). The contributor workflow below uses this checkout as a Composer path repository.
+Thunder Bolt runs on PHP 8.5+ and Tempest 3. The public Composer package is `helgesverre/slack-bolt`; its PHP namespace is `Thunder\Bolt`. Install it in an existing project with `composer require helgesverre/slack-bolt`, or create a new application below.
+
+[Documentation home](../README.md) · [Public interface map](../reference.md)
 
 ## Create a project
 
-From the framework checkout:
+Install the CLI, then create an application from Packagist:
 
 ```sh
-composer install
-php bin/bolt new work/my-bot --source=path --no-interaction
-cd work/my-bot
+composer global require helgesverre/slack-bolt
+bolt new my-bot --no-interaction
+cd my-bot
 composer install
 cp .env.example .env
-php bolt doctor
 ```
+
+If `bolt` is not on your shell's `PATH`, find Composer's global bin directory with `composer global config bin-dir --absolute` and add it to `PATH`.
 
 The generated app has a PSR-4 `App\` namespace, an `app/Listeners` directory, `config/` files discovered by Tempest, `public/index.php`, a minimal `slack-manifest.yaml`, and a project-local `bolt` launcher. It deliberately starts with the smallest useful Slack surface: an `app_mention` listener, `app_mentions:read`, and `chat:write`.
 
 `new` creates a new directory and refuses to overwrite an existing one. Choose delivery and authorization while scaffolding when the defaults are not right:
 
 ```sh
-php bin/bolt new work/socket-app --source=path --transport=socket --auth=token --no-interaction
-php bin/bolt new work/oauth-app --source=path --transport=http --auth=oauth --no-interaction
+bolt new socket-app --transport=socket --auth=token --no-interaction
+bolt new oauth-app --transport=http --auth=oauth --no-interaction
 ```
 
 The generated `config/setup.config.php` records those onboarding defaults. Runtime configuration stays in `.env` and `BoltConfig`; it is not inferred from a command that happened to run first.
 
-The CLI defaults to Packagist (`helgesverre/slack-bolt:^0.6`), without a custom repository or dependency on the CLI installation. The contributor examples above explicitly use `--source=path` and the checkout’s `0.6.x-dev` alias. To scaffold from a Git repository instead, opt in explicitly:
-
-```sh
-php bin/bolt new work/team-bot \
-  --source=vcs \
-  --repository=https://github.com/HelgeSverre/slack-bolt-php.git \
-  --version=dev-main \
-  --no-interaction
-```
-
-`--repository` accepts an HTTPS URL, a `git@…` URL, or an absolute local Git repository. It is required with `--source=vcs`; `--repository` and `--version` are rejected for an explicit `path` source. `--repository` is also rejected for Packagist. Packagist defaults to `^0.6`; Git defaults to `dev-main`. Both accept valid Composer constraints requiring 0.3.0 or newer, or the explicit `dev-main` branch. Earlier versions are rejected because they predate the current scaffolding contract. Version validation does not contact a registry; Composer later resolves the selected constraint.
+Generated applications use the CLI's current release constraint and run independently of the CLI installation. Framework contributors can select [a checkout or Git source](#framework-checkouts-and-git-sources) explicitly.
 
 ## Configure the local app
 
@@ -116,6 +109,30 @@ final readonly class GreetMention
 ```
 
 Use `php bolt make:listener Greeting --event=app_mention` to produce the same starting shape. The [build handlers guide](building-apps.md) explains acknowledgement rules, interactions, context, middleware, errors, Block Kit, and the Web API client.
+
+## Framework checkouts and Git sources
+
+To develop against this framework checkout, create a path-backed application from its root:
+
+```sh
+composer install
+php bin/bolt new work/my-bot --source=path --no-interaction
+cd work/my-bot
+composer install
+cp .env.example .env
+```
+
+The path source selects the checkout's development alias and links the application to that directory. Keep the checkout available while using the app. For an explicit Git source:
+
+```sh
+bolt new team-bot \
+  --source=vcs \
+  --repository=https://github.com/HelgeSverre/slack-bolt-php.git \
+  --version=dev-main \
+  --no-interaction
+```
+
+`--repository` accepts an HTTPS URL, a `git@…` URL, or an absolute local Git repository. It is required for `vcs` and rejected for `packagist` and `path`. A path source also rejects `--version`. Packagist uses the CLI's release constraint; Git defaults to `dev-main`. Explicit version constraints must require a scaffolding-compatible release, starting at 0.3.0, or select `dev-main`. Version validation is local; Composer resolves the selected constraint during installation.
 
 ## Next choices
 

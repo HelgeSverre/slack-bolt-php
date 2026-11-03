@@ -893,13 +893,14 @@ Regenerate pinned sources with `npm run sync:references`, then `npm run generate
 | Start here | For |
 | --- | --- |
 | [Documentation index](docs/README.md) | All maintained adopter guides |
+| [Public interface map](docs/reference.md) | Classes, source links and the relevant usage guides |
 | [Getting started](docs/guides/getting-started.md) | Project layout, source choices, and first listener |
 | [Slack setup with screenshots](docs/guides/slack-app-setup.md) | Current app-settings UI and feature prerequisites |
 | [Building apps](docs/guides/building-apps.md) | Dispatch, acknowledgements, context, and errors |
 | [Durable operations](docs/guides/durable-operations.md) | Recovery, cancellation, workers, and deployment |
 | [Upgrading](UPGRADING.md) | Package migration and operator actions |
 
-The maintained guides live in `docs/` for a future separate docs site. Dated `docs/research/` notes record decisions and evidence; they are not current setup instructions. The parity audit distinguishes implemented capabilities, PHP adaptations, useful gaps, and Node-specific exclusions.
+The documentation lives in `docs/` as Markdown, versioned with the code and readable directly on GitHub. Start at the [documentation home](docs/README.md). Dated `docs/research/` notes record decisions and evidence; they are not current setup instructions. The parity audit distinguishes implemented capabilities, PHP adaptations, useful gaps, and Node-specific exclusions.
 
 ## License
 

@@ -1,6 +1,6 @@
 # Agent sessions and durable AI
 
-Implemented 24 October 2026. This is an integration note; longer guides belong on the future docs site.
+Implemented 24 October 2026. This is a dated integration note; maintained instructions live in the [Agent View](../guides/agent-view.md) and [streaming](../guides/streaming-progress.md) guides.
 
 ## Interface
 

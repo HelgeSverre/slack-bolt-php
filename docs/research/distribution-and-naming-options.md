@@ -1,5 +1,7 @@
 # Distribution, package naming, and docs-site options
 
+> Documentation update — 3 November 2026: documentation stays as versioned Markdown in this repository's [docs folder](../README.md). The separate-site recommendation below is historical and has been superseded.
+
 > Update — 2 November 2026: the repository is public. The logged-in Packagist submission found `thunder` owned by another account; Helge selected `helgesverre/slack-bolt`, retaining `Thunder\Bolt` imports. The observations and recommendation below are historical; use the root README for current installation instructions.
 
 Researched 30 October 2026. This is a decision memo, not a registration or

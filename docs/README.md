@@ -1,32 +1,50 @@
 # Thunder Bolt documentation
 
-Thunder Bolt is an experimental PHP 8.5+ Slack framework built on Tempest 3. The public Composer package is [`helgesverre/slack-bolt`](https://packagist.org/packages/helgesverre/slack-bolt), with the PHP namespace `Thunder\Bolt`. Install without a version constraint for the latest compatible release, or use `dev-main` explicitly for development. Start with the guides below; the older research material is deliberately kept separate so an adopter does not need to treat a dated audit as current operating guidance.
+The documentation lives here as ordinary Markdown, versioned with the framework. Start with the guides, use the reference map to find a public interface, and open the examples when you want a runnable application.
 
-## Start here
+Thunder Bolt requires PHP 8.5+ and Tempest 3. Install the public Composer package, [`helgesverre/slack-bolt`](https://packagist.org/packages/helgesverre/slack-bolt), without a version constraint for the latest compatible release. Application imports use `Thunder\Bolt`.
 
-1. [Getting started](guides/getting-started.md) — create a project, select HTTP or Socket Mode, configure local state, and run the first checks.
-2. [Slack app setup](guides/slack-app-setup.md) — the current Slack UI steps, manifest import, tokens, request URLs, and feature-specific capabilities.
-3. [Build handlers](guides/building-apps.md) — events, commands, interactions, acknowledgements, context, middleware, errors, Block Kit, and the Web API client.
-4. [Run durable work](guides/durable-operations.md) — conversation state, named SQLite jobs, cancellation, deployment, and operational checks.
+## Build your first app
 
-## Choose a feature
+1. [Getting started](guides/getting-started.md) — install, generate a project and run your first listener.
+2. [Slack app setup](guides/slack-app-setup.md) — configure the Slack UI, tokens, scopes and delivery URLs.
+3. [Building apps](guides/building-apps.md) — handlers, acknowledgements, replies, middleware and errors.
+4. [Testing your app](guides/testing-toolkit.md) — signed fixtures, fake Slack and durable-job intake assertions.
 
-| Need | Read |
+## Guides by topic
+
+| Topic | Guide |
 | --- | --- |
-| OAuth for multiple workspaces, installation storage, token refresh | [OAuth and authorization](oauth-and-authorization.md) |
-| Buttons, shortcuts, external selects, and modals | [HTTP interactivity](http-interactivity.md) |
-| Durable channel and thread state | [Conversation and thread storage](conversation-and-thread-storage.md) |
-| Typed methods, builders, uploads, pagination, and retries | [Web API client](web-api-client.md) and [Block Kit](sdk-and-block-kit.md) |
-| Streaming answers and tool progress | [Streaming progress](guides/streaming-progress.md) |
-| Modern agent focus and root DMs | [Agent View](guides/agent-view.md) |
-| Assistants, agent sessions, custom functions, or Work Objects | [Advanced Slack features](guides/advanced-slack-features.md) |
-| Testing application handlers with fake Slack and durable-intake assertions | [Public testing toolkit](guides/testing-toolkit.md) |
-| App Home, channel lifecycle, and message-metadata payloads | [Typed events](guides/typed-events.md) |
-| Tests, secrets, local diagnostics, or common setup failures | [Testing, security, and troubleshooting](guides/testing-security-troubleshooting.md) |
-| Deploying Socket Mode and durable workers with Compose | [Deployment example](../examples/deployment/README.md) |
+| Buttons, shortcuts, external selects and modals | [HTTP interactivity](http-interactivity.md) |
+| Message, attachment, view and Block Kit builders | [SDK and Block Kit](sdk-and-block-kit.md) |
+| Typed requests/responses, pagination, uploads and retries | [Web API client](web-api-client.md) |
+| Workspace installation, authorization and token rotation | [OAuth and authorization](oauth-and-authorization.md) |
+| Channel and thread state, storage adapters and expiry | [Conversation and thread storage](conversation-and-thread-storage.md) |
+| Named jobs, retries, recovery, cancellation and operations | [Durable operations](guides/durable-operations.md) |
+| Agent View setup, root DMs and current focus | [Agent View](guides/agent-view.md) |
+| Streaming text, tool progress, plans and blocks | [Streaming progress](guides/streaming-progress.md) |
+| Legacy assistants, session controls, custom functions and Work Objects | [Advanced Slack features](guides/advanced-slack-features.md) |
+| App Home, channel lifecycle and message metadata | [Typed events](guides/typed-events.md) |
+| Credentials, diagnostics and common failures | [Security and troubleshooting](guides/testing-security-troubleshooting.md) |
 
-## Maintainer material
+## Reference
 
-[Development](development.md) covers Mago, PHPUnit, and the reference generators. [Architecture](architecture.md) explains the framework seams and PHP-specific choices. `docs/research/` contains dated source audits, parity inventories, and captured upstream material. It is useful when maintaining the port, but it is not the canonical setup guide and may describe a historical milestone.
+- [Public interface map](reference.md) — find the relevant class, source and usage guide.
+- [CLI command overview](../README.md#cli-and-operations) — generators, diagnostics and workers; use `php bolt <command> --help` for the installed version's arguments.
+- [Upgrading](../UPGRADING.md) — changes that need an application or operator action.
+- [Changelog](../CHANGELOG.md) — release history.
 
-The root [README](../README.md) is the compact capability overview. [UPGRADING](../UPGRADING.md) is the migration record for changes that need an operator action.
+## Runnable examples
+
+| Example | What it demonstrates |
+| --- | --- |
+| [Playground](../examples/hello-bolt/README.md) | Agent View, durable AI, typed progress, native Stop, a shared pet, App Home and Work Objects |
+| [Deployment](../examples/deployment/README.md) | Socket Mode and durable workers in supervised containers with persistent state |
+
+## Framework development
+
+[Development](development.md) covers Mago, PHPUnit, generators and documentation checks. [Architecture](architecture.md) explains the framework's responsibilities and PHP interface decisions.
+
+The [parity audit](research/bolt-js-parity-audit.md) and [roadmap](research/roadmap.md) record compatibility and project direction. Other files under `research/` preserve dated decisions, experiments and upstream references; follow maintained guides for current setup instructions.
+
+When reading on GitHub, select a release tag to see the documentation shipped with that release. Changes to guides and implementation travel in the same commits and pull requests.

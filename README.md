@@ -9,7 +9,7 @@
 
 Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, and explicit durable jobs. Built on **PHP 8.5+** and **Tempest 3**, with inspiration from Bolt for JavaScript and Laravel's coding style.
 
-**Experimental v0.5.0.** Install `helgesverre/slack-bolt:^0.5` for the code shown here. The PHP namespace remains `Thunder\Bolt`. Tags before v0.3.0 predate the public package rename and current scaffolder. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
+**Experimental.** Install `helgesverre/slack-bolt` to get the latest compatible release. The PHP namespace is `Thunder\Bolt`. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
 
 ## Explore the framework
 
@@ -46,7 +46,7 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 ### Add the package
 
 ```sh
-composer require helgesverre/slack-bolt:^0.5
+composer require helgesverre/slack-bolt
 ```
 
 ### Create a new application
@@ -54,7 +54,7 @@ composer require helgesverre/slack-bolt:^0.5
 Install the CLI, then generate an application backed by Packagist:
 
 ```sh
-composer global require helgesverre/slack-bolt:^0.5
+composer global require helgesverre/slack-bolt
 
 bolt new my-bot --no-interaction
 
@@ -71,7 +71,7 @@ Put Composer's global vendor bin directory on `PATH` if needed: `composer global
 | `--auth` | `token`, `oauth` | `token` |
 | `--source` | `packagist`, `path`, `vcs` | `packagist` |
 | `--repository` | HTTPS/SSH URL or absolute local Git repository | Required for `vcs` |
-| `--version` | Composer constraint for 0.3.0+, or `dev-main` | `^0.5` for Packagist; `dev-main` for Git |
+| `--version` | Supported Composer constraint, or `dev-main` | CLI's release constraint for Packagist; `dev-main` for Git |
 
 Generated apps use Packagist without a custom Composer repository and run independently of your CLI installation. Use `--source=path` for framework development, or `--source=vcs --repository=…` for an explicit Git source. Existing directories are never overwritten. [Full getting-started guide](docs/guides/getting-started.md).
 

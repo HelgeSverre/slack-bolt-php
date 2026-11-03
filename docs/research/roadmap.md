@@ -1,12 +1,12 @@
 # Implementation plan
 
-Current ordering refreshed 3 November 2026 for the public package through v0.5.0 and the Agent View starter/durable demo. The [parity matrix](bolt-js-parity-matrix.md) tracks the pinned Bolt JS 5.1.0 contract. Historical milestone sections below describe their original scope and are not an outstanding task list.
+Current ordering refreshed 3 November 2026 for the public package through v0.6.0. The [parity matrix](bolt-js-parity-matrix.md) tracks the pinned Bolt JS 5.1.0 contract. Historical milestone sections below describe their original scope and are not an outstanding task list.
 
 ## Current position
 
 - Public Packagist installation, independent `bolt new` projects, typed everyday events and a public testing toolkit shipped in v0.3.0.
 - Opt-in Agent View routing and per-delivery focus shipped in v0.4.0; typed streaming progress and whole-stream limits shipped in v0.5.0.
-- The current starter adds `make:assistant --agent-view`. The demo queues separate `AgentAnswer` commands with focus snapshots, uses typed task progress, and handles native Stop through durable cancellation. Existing legacy command JSON remains compatible. [Validation](agent-view-starter-validation.md).
+- v0.6.0 adds `make:assistant --agent-view`. The demo queues separate `AgentAnswer` commands with focus snapshots, uses typed task progress, and handles native Stop through durable cancellation. Existing legacy command JSON remains compatible. [Validation](agent-view-starter-validation.md).
 - Production status, supervised deployment, process-failure coverage and the two-hour reliability run are complete. [Operations evidence](production-operations-plan.md).
 
 ## Next sensible work

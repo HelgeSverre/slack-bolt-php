@@ -1,6 +1,6 @@
 # Bolt JS parity audit
 
-**Current assessment — 3 November 2026:** refreshed for v0.5.0 and the Agent View starter/durable demo. The pinned Bolt JS baseline remains 5.1.0; this is not a new audit of moving upstream HEAD. Practical legacy contracts remain covered or explicitly adapted, broad inbound native typing remains partial, and Node-specific exclusions remain intentional. Modern Agent View is recorded as a PHP extension without extra baseline parity credit. See the [current matrix](bolt-js-parity-matrix.md) and [Agent View acceptance record](agent-view-starter-validation.md).
+**Current assessment — 3 November 2026:** refreshed for v0.6.0 and its Agent View starter/durable demo. The pinned Bolt JS baseline remains 5.1.0; this is not a new audit of moving upstream HEAD. Practical legacy contracts remain covered or explicitly adapted, broad inbound native typing remains partial, and Node-specific exclusions remain intentional. Modern Agent View is recorded as a PHP extension without extra baseline parity credit. See the [current matrix](bolt-js-parity-matrix.md) and [Agent View acceptance record](agent-view-starter-validation.md).
 
 The material below is the historical 26 October baseline and its follow-ups. Its P1/P2 recommendations have been implemented; they are not the current backlog.
 

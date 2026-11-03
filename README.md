@@ -692,7 +692,7 @@ $stream->append('Here is what it supports.')->stop();
 
 Typed chunks also cover markdown, plans and Block Kit. Raw arrays remain available. [Streaming guide and limits](docs/guides/streaming-progress.md).
 
-On the unreleased `main` branch, generate a modern listener with `php bolt make:assistant WorkspaceAgent --agent-view`. Modern configuration uses the same application config seam:
+Generate a modern listener with `php bolt make:assistant WorkspaceAgent --agent-view`. Modern configuration uses the same application config seam:
 
 ```php
 use App\Listeners\WorkspaceAgent;

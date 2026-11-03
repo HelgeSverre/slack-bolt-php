@@ -2,7 +2,7 @@
 
 Use `Assistant::forAgentView()` for Slack's current agent messaging experience. It receives human DM roots and replies, plus optional Messages-tab opening and focus-change handlers. `Assistant::make()` retains the legacy `assistant_thread_*` lifecycle and its context stores.
 
-The generator flag is available on unreleased `main`. Generate a listener with `php bolt make:assistant WorkspaceAgent --agent-view`. Without the flag, the generator retains the legacy assistant flow. It refuses to overwrite an existing listener or assistant config, and does not rewrite your manifest.
+Generate a listener with `php bolt make:assistant WorkspaceAgent --agent-view`. Without the flag, the generator retains the legacy assistant flow. It refuses to overwrite an existing listener or assistant config, and does not rewrite your manifest.
 
 The resulting `config/assistant.config.php` uses:
 

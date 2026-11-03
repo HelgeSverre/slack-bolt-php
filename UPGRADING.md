@@ -1,6 +1,8 @@
 # Upgrading
 
-## Unreleased Agent View starter
+## v0.6.0
+
+Contributor path installs now use `0.6.x-dev`; update both the requirement and path-repository version override, then update Composer. New Packagist projects use the current release constraint.
 
 `make:assistant` retains its legacy default; pass `--agent-view` for the modern starter. Existing listeners, assistant configuration and app manifests are preserved. Review the [Agent View guide](docs/guides/agent-view.md) for Slack settings and migration constraints.
 

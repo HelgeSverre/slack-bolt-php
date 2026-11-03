@@ -42,7 +42,7 @@ final class OnboardingBootstrapTest extends TestCase
             flags: JSON_THROW_ON_ERROR,
         );
         self::assertArrayNotHasKey('repositories', $composer);
-        self::assertSame('^0.5', $composer['require']['helgesverre/slack-bolt']);
+        self::assertSame('^0.6', $composer['require']['helgesverre/slack-bolt']);
         [$status] = $this->command(['new', 'invalid', '--transport=invalid']);
         self::assertSame(2, $status);
         self::assertDirectoryDoesNotExist($this->root . '/invalid');

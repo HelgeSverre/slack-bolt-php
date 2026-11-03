@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.6.0 — 2026-11-03
+
 - Modern `make:assistant --agent-view` scaffolding with typed streaming and native Stop routing, retaining the legacy default and overwrite guards.
 - Agent View demo with separate durable focus-snapshot commands, typed task progress, cancellable model execution and unchanged legacy queued-job JSON.
 - Modern suggested prompts omit `thread_ts`, as required by Slack's current Agent View behavior.

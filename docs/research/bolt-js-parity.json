@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "auditedAt": "2026-11-03",
-  "phpRevision": "v0.5.0 plus unreleased Agent View starter and durable demo, 3 November 2026",
+  "phpRevision": "v0.6.0 release preparation, 3 November 2026",
   "baseline": {
     "package": "@slack/bolt",
     "version": "5.1.0",

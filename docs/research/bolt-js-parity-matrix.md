@@ -2,7 +2,7 @@
 
 Generated from [the reviewed audit manifest](bolt-js-parity.json) by `node scripts/audit-bolt-parity.mjs`. The human verdict and priorities are in [the audit](bolt-js-parity-audit.md).
 
-Baseline: Bolt JS 5.1.0, commit `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. PHP revision: `v0.5.0 plus unreleased Agent View starter and durable demo, 3 November 2026`. Audited 2026-11-03.
+Baseline: Bolt JS 5.1.0, commit `ffbe0b6c03a6b1e16b3d5d3c5c9a8ab3effcbc1d`. PHP revision: `v0.6.0 release preparation, 3 November 2026`. Audited 2026-11-03.
 
 Mapping presence is a bookkeeping check, not proof of behavioral equality. No percentage is reported: features differ in importance, and excluded Node APIs/type aliases are not missing PHP capabilities.
 

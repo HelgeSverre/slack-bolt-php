@@ -342,6 +342,42 @@ final class ProjectScaffoldTest extends TestCase
         $scaffold->listener($project, 'DeployListener', 'slash-command', '/deploy');
     }
 
+    public function test_generators_refuse_dangling_symlink_targets(): void
+    {
+        $scaffold = new ProjectScaffold(dirname(__DIR__, 2));
+        $outside = $this->workspace . '/outside.php';
+
+        $listenerProject = $this->workspace . '/listener';
+        mkdir($listenerProject . '/app/Listeners', 0775, true);
+        symlink($outside, $listenerProject . '/app/Listeners/Generated.php');
+        try {
+            $scaffold->listener($listenerProject, 'Generated', 'event', 'app_mention');
+            self::fail('A dangling listener symlink must not be followed.');
+        } catch (RuntimeException) {
+            self::assertFileDoesNotExist($outside);
+        }
+
+        $jobProject = $this->workspace . '/job';
+        mkdir($jobProject . '/app/Jobs', 0775, true);
+        symlink($outside, $jobProject . '/app/Jobs/Generated.php');
+        try {
+            $scaffold->job($jobProject, 'Generated');
+            self::fail('A dangling job symlink must not be followed.');
+        } catch (RuntimeException) {
+            self::assertFileDoesNotExist($outside);
+        }
+
+        $assistantProject = $this->workspace . '/assistant';
+        mkdir($assistantProject . '/app/Listeners', 0775, true);
+        symlink($outside, $assistantProject . '/app/Listeners/Generated.php');
+        try {
+            $scaffold->assistant($assistantProject, 'Generated');
+            self::fail('A dangling assistant symlink must not be followed.');
+        } catch (RuntimeException) {
+            self::assertFileDoesNotExist($outside);
+        }
+    }
+
     public function test_listener_escapes_message_selector_as_valid_php(): void
     {
         $scaffold = new ProjectScaffold(dirname(__DIR__, 2));

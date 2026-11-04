@@ -97,6 +97,8 @@ final readonly class Receiver
                     ? null
                     : fn(Delivery $delivery) => $factory(new ContextInput($delivery, $headers, $rawBody, $contentType)),
             );
+            $acknowledgement = $ack?->toArray() ?? [];
+            $response = $acknowledgement === [] ? new Response(200) : Response::json($acknowledgement);
         } catch (InvalidPayload $exception) {
             return new Response(400, 'Malformed Slack delivery payload.');
         } catch (\Throwable $exception) {
@@ -132,7 +134,7 @@ final readonly class Receiver
             );
         }
 
-        return $ack === null || $ack->toArray() === [] ? new Response(200) : Response::json($ack->toArray());
+        return $response;
     }
 
     private function isSslCheck(string $rawBody, string $contentType): bool

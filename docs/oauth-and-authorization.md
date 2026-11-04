@@ -118,6 +118,10 @@ You can also rotate outside an incoming request by resolving `TokenRotator` from
 $rotator->refresh(new InstallationQuery(teamId: 'T123', userId: 'U123'));
 ```
 
+`refresh()` returns a current combined installation for the selected bot and user grants. A bot-only query, or a query with no matching user grant, returns bot credentials without another installer's user credential. Bot and user updates remain independently persisted; failure refreshing the user does not undo a completed bot refresh.
+
+Direct installation-store reads are low-level persisted snapshots, not delivery authorization results; a bot record can retain fields from its original installation response. Use `InstallationAuthorizer` for delivery-scoped credential selection rather than treating an arbitrary store snapshot as the requesting user's authorization.
+
 To migrate an existing stored long-lived credential after enabling Slack token rotation, explicitly call `migrateBot($query)` or `migrateUser($query->forUser('U123'))`. These use the actual `oauth.v2.exchange` endpoint, preserving the old token as a form field. Migration is an explicit operation; ordinary authorization refreshes credentials that already have refresh metadata. Configure rotation in Slack and follow its [token rotation guide](https://docs.slack.dev/authentication/using-token-rotation/).
 
 ## Custom authorization

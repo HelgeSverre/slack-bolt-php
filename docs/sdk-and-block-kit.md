@@ -30,8 +30,8 @@ The following table lists every dedicated block builder in Thunder Bolt. Source 
 | Slack `type` | PHP factory | Use it for |
 | --- | --- | --- |
 | `actions` | [`Actions::make($button, $select)`](../src/BlockKit/Actions.php) | A row of interactive controls |
-| `alert` | [`Alert::make('Check the configuration', 'warning')`](../src/BlockKit/Alert.php) | A notice with a severity level |
-| `card` | [`Card::make()->title('Release')->body('Ready to deploy')`](../src/BlockKit/Card.php) | A compact card with optional imagery and buttons |
+| `alert` | [`Alert::make('Check the configuration', 'warning')`](../src/BlockKit/Alert.php) | A notice with a severity level; text up to 200 characters |
+| `card` | [`Card::make()->title('Release')->body('Ready to deploy')`](../src/BlockKit/Card.php) | A compact card with optional imagery and up to three action buttons |
 | `carousel` | [`Carousel::make($firstCard, $secondCard)`](../src/BlockKit/Carousel.php) | A horizontally browsable set of cards |
 | `container` | [`Container::make('Summary', $section)`](../src/BlockKit/Container.php) | A titled wrapper with optional collapse controls |
 | `context` | [`Context::make(Text::plain('Updated just now'))`](../src/BlockKit/Context.php) | Small supporting text and images |
@@ -68,7 +68,7 @@ Slack's general limits are 50 blocks per message and 100 per modal or Home view.
 
 ## Containers and layouts
 
-`Container` accepts a plain-text or `RichText` title and up to ten supported child blocks. `richTextTitle()` adds a rich title alongside a plain fallback; Slack gives the rich title precedence. Subtitle, icon, width, collapse flags and header divider are immutable options. `collapsed()` sets the default state; pair it with `collapsible()` to make that state effective.
+`Container` accepts a plain-text or `RichText` title and one to ten supported child blocks. `richTextTitle()` adds a rich title alongside a plain fallback; Slack gives the rich title precedence. Subtitle, icon, width, collapse flags and header divider are immutable options. `collapsed()` requires `collapsible()`, and a collapsible container cannot have a header divider. The combined flags are checked on serialization, so either chaining order works.
 
 ```php
 use Thunder\Bolt\BlockKit\{Container, Section};

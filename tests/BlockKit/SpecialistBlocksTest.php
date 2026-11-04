@@ -7,6 +7,7 @@ namespace Thunder\Bolt\Tests\BlockKit;
 use PHPUnit\Framework\TestCase;
 use Thunder\Bolt\BlockKit\Alert;
 use Thunder\Bolt\BlockKit\Blocks;
+use Thunder\Bolt\BlockKit\Button;
 use Thunder\Bolt\BlockKit\Card;
 use Thunder\Bolt\BlockKit\Carousel;
 use Thunder\Bolt\BlockKit\ContextActions;
@@ -137,5 +138,17 @@ final class SpecialistBlocksTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         Video::make('Demo', 'http://example.test/video', 'https://example.test/thumb', 'Demo');
+    }
+
+    public function test_alert_and_card_limits_are_rejected_before_serialization(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        Alert::make(str_repeat('x', 201));
+    }
+
+    public function test_cards_reject_more_than_three_actions(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (void) Card::make()->actions(...array_fill(0, 4, Button::make('Open', 'open')));
     }
 }

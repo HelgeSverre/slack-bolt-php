@@ -12,6 +12,8 @@ Current ordering refreshed 4 November 2026 for v0.7.0. The [parity matrix](bolt-
 
 ## Next sensible work
 
+The [4 November bug hunt](bug-hunt-2026-11-04.md) records confirmed fixes and a ranked shortlist of small additions: typed outbound view/message operations, better interaction fixtures/assertions, and modern rich-text references. These are proposed follow-ups, not implemented APIs.
+
 1. Strengthen adoption coverage: keep generated modern/legacy starters, registry installs and both delivery transports in executable fresh-project checks. Extend live acceptance to additional eligible workspaces as access permits.
 2. Expand native DTOs and host/store adapters when real applications demonstrate a need. Preserve raw extension fields and explicit installation scoping.
 3. Maintain the documentation as versioned Markdown in `docs/`, with a clear index, verified examples and release/upgrade notes. Improve the existing standalone framework as concrete applications expose needs beyond its current composition.

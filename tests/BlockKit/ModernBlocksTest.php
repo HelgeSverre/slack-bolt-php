@@ -92,9 +92,10 @@ final class ModernBlocksTest extends TestCase
             ],
             $container->toArray(),
         );
-        self::assertArrayNotHasKey('title', Container::make($rich)->toArray());
-        self::assertSame($rich->toArray(), Container::make($rich)->toArray()['rich_text_title']);
+        self::assertArrayNotHasKey('title', Container::make($rich, Divider::make())->toArray());
+        self::assertSame($rich->toArray(), Container::make($rich, Divider::make())->toArray()['rich_text_title']);
         self::assertCount(10, Container::make('Ten', ...array_fill(0, 10, Divider::make()))->toArray()['child_blocks']);
+        self::assertTrue($base->collapsed()->collapsible()->toArray()['default_collapsed']);
     }
 
     public function test_layout_rows_widths_fallbacks_and_nested_containers_serialize_to_slack_shape(): void
@@ -288,8 +289,15 @@ final class ModernBlocksTest extends TestCase
         yield 'container child count' => [
             static fn() => Container::make('Too many', ...array_fill(0, 11, Divider::make())),
         ];
+        yield 'container without children' => [static fn() => Container::make('Empty')];
         yield 'container child type' => [static fn() => Container::make('No', Markdown::make('No'))];
-        yield 'container width' => [static fn() => Container::make('No')->width('huge')];
+        yield 'container width' => [static fn() => Container::make('No', Divider::make())->width('huge')];
+        yield 'collapsed container is not collapsible' => [
+            static fn() => Container::make('No', Divider::make())->collapsed()->toArray(),
+        ];
+        yield 'collapsible container header divider' => [
+            static fn() => Container::make('No', Divider::make())->collapsible()->headerDivider()->toArray(),
+        ];
         yield 'layout label' => [static fn() => Layout::make('', self::row())];
         yield 'layout rows empty' => [static fn() => Layout::make('No')];
         yield 'layout rows too many' => [static fn() => Layout::make('No', ...array_fill(0, 6, self::row()))];
@@ -309,7 +317,7 @@ final class ModernBlocksTest extends TestCase
         yield 'nesting' => [
             static fn() => Container::make('No', Layout::make(
                 'No',
-                LayoutRow::make(LayoutItem::make(Container::make('Third'))),
+                LayoutRow::make(LayoutItem::make(Container::make('Third', Divider::make()))),
             )),
         ];
         yield 'chart row width half' => [
@@ -421,7 +429,7 @@ final class ModernBlocksTest extends TestCase
         yield 'modal nested unsupported container' => [
             static fn() => Modal::make('No', Layout::make(
                 'No',
-                LayoutRow::make(LayoutItem::make(Container::make('No'))),
+                LayoutRow::make(LayoutItem::make(Container::make('No', Divider::make()))),
             ))->toArray(),
         ];
         yield 'chart too many series' => [

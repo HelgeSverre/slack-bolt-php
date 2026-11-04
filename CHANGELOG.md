@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Return coherent current bot/user credentials from combined token rotation without carrying an unselected user's grant.
+- Keep HTTP acknowledgement serialization inside receiver error handling.
+- Reject invalid container collapse states and empty children, alerts over 200 characters and cards with more than three actions.
+- Refuse dangling symlink file targets in generators and show an actionable diagnostic when project dependencies are missing.
+- Preserve uncertain AI message-delivery outcomes instead of automatically posting duplicate-prone fallbacks.
+- Recorded the [bug-hunt findings and ranked small additions](docs/research/bug-hunt-2026-11-04.md).
+
 ## v0.7.0 — 2026-11-04
 
 - Native immutable Container, Layout, DataTable and DataVisualization builders, with typed rows/items/cells, pie/bar/area/line chart values and `Blocks` convenience factories.

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Demo\Ai;
 
 use Thunder\Bolt\Assistant\Streaming\TaskUpdate;
+use Thunder\Bolt\Jobs\UncertainOutcome;
 use Thunder\Bolt\WebApi\Client;
+use Thunder\Bolt\WebApi\SlackApiException;
 
 /** One Slack stream per answer; a failed delivery never replays model tools. */
 final class SlackAnswerStream
@@ -77,8 +79,8 @@ final class SlackAnswerStream
                         ]);
                     return;
                 }
-            } catch (\Throwable) {
-                $this->failed = true;
+            } catch (\Throwable $exception) {
+                $this->throwUncertain($exception);
             }
         }
         if ($this->timestamp !== null) {
@@ -97,19 +99,23 @@ final class SlackAnswerStream
                             ],
                         ],
                     ]);
-            } catch (\Throwable) {
-                $this->failed = true;
+            } catch (\Throwable $exception) {
+                $this->throwUncertain($exception);
             }
         }
-        $this->client
-            ->chat()
-            ->postMessage([
-                'channel' => $this->channel,
-                'thread_ts' => $this->thread,
-                'text' => $answer->text,
-                'unfurl_links' => false,
-                'unfurl_media' => false,
-            ]);
+        try {
+            $this->client
+                ->chat()
+                ->postMessage([
+                    'channel' => $this->channel,
+                    'thread_ts' => $this->thread,
+                    'text' => $answer->text,
+                    'unfurl_links' => false,
+                    'unfurl_media' => false,
+                ]);
+        } catch (\Throwable $exception) {
+            $this->throwUncertain($exception);
+        }
     }
 
     /** Stop a live stream after the durable worker observes Slack's native Stop control. */
@@ -161,9 +167,25 @@ final class SlackAnswerStream
                     ->appendStream(['channel' => $this->channel, 'ts' => $this->timestamp, 'chunks' => $chunks]);
             }
             $this->lastFlush = microtime(true);
-        } catch (\Throwable) {
-            $this->failed = true;
+        } catch (\Throwable $exception) {
+            if ($exception instanceof SlackApiException && $exception->error === 'not_allowed_token_type') {
+                $this->failed = true;
+
+                return;
+            }
+
+            $this->throwUncertain($exception);
         }
+    }
+
+    /** A stream mutation might have reached Slack even when its result is unavailable. */
+    private function throwUncertain(\Throwable $exception): never
+    {
+        if ($exception instanceof UncertainOutcome) {
+            throw $exception;
+        }
+
+        throw new UncertainOutcome('The Slack streaming outcome is uncertain.', previous: $exception);
     }
 
     /** @return list<array> */

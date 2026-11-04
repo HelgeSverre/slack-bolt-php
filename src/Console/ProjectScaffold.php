@@ -110,7 +110,7 @@ final readonly class ProjectScaffold
         $directory = rtrim($root, DIRECTORY_SEPARATOR) . '/app/Listeners';
         $this->makeDirectory($directory);
         $target = "{$directory}/{$class}.php";
-        if (file_exists($target)) {
+        if (file_exists($target) || is_link($target)) {
             throw new RuntimeException("Refusing to overwrite existing listener {$target}.");
         }
         if ($kind === 'slash-command') {
@@ -169,7 +169,7 @@ final readonly class ProjectScaffold
         $job = "{$directory}/{$class}.php";
         $handler = "{$directory}/{$class}Handler.php";
         foreach ([$job, $handler] as $target) {
-            if (file_exists($target)) {
+            if (file_exists($target) || is_link($target)) {
                 throw new RuntimeException("Refusing to overwrite existing job scaffold {$target}.");
             }
         }
@@ -188,7 +188,7 @@ final readonly class ProjectScaffold
         $listener = "{$listenerDirectory}/{$class}.php";
         $config = "{$configDirectory}/assistant.config.php";
         foreach ([$listener, $config] as $target) {
-            if (file_exists($target)) {
+            if (file_exists($target) || is_link($target)) {
                 throw new RuntimeException("Refusing to overwrite existing assistant scaffold {$target}.");
             }
         }

@@ -122,6 +122,18 @@ final class OnboardingBootstrapTest extends TestCase
         self::assertStringContainsString('composer install', implode(' ', $report['failures']));
     }
 
+    public function test_project_commands_report_missing_composer_dependencies_without_a_trace(): void
+    {
+        $this->project("<?php return new \\Thunder\\Bolt\\BoltConfig(conversationStoreDriver: 'memory');");
+
+        [$status, $output, $error] = $this->command(['make:listener', 'MissingDependencies', '--event=app_mention']);
+
+        self::assertSame(1, $status);
+        self::assertStringContainsString('Composer dependencies are missing. Run composer install', $output . $error);
+        self::assertStringNotContainsString('DiscoveryLocationCouldNotBeLoaded', $output . $error);
+        self::assertStringNotContainsString($this->root, $output . $error);
+    }
+
     public function test_doctor_boot_errors_do_not_expose_exception_details(): void
     {
         $this->project("<?php throw new \\RuntimeException('private-canary-do-not-print');");

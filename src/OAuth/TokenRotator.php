@@ -48,10 +48,10 @@ final readonly class TokenRotator
     {
         $bot = $this->refreshBot($query);
         if ($query->userId === null) {
-            return $bot;
+            return $bot === null ? null : $this->botOnly($bot);
         }
 
-        return $this->refreshUser($query) ?? $bot;
+        return $this->combine($bot, $this->refreshUser($query));
     }
 
     /** Migrates a long-lived bot token through oauth.v2.exchange. */
@@ -133,6 +133,63 @@ final readonly class TokenRotator
     private function needsRefresh(?int $expiresAt): bool
     {
         return $expiresAt !== null && $expiresAt <= ($this->now() + $this->refreshWindowSeconds);
+    }
+
+    /** Returns the selected bot and user grants without changing their separate persistence. */
+    private function combine(?Installation $bot, ?Installation $user): ?Installation
+    {
+        if ($bot === null) {
+            return $user;
+        }
+        if ($user === null) {
+            return $this->botOnly($bot);
+        }
+
+        $bot = $this->botOnly($bot);
+
+        return new Installation(
+            teamId: $bot->teamId,
+            enterpriseId: $bot->enterpriseId,
+            isEnterpriseInstall: $bot->isEnterpriseInstall,
+            botToken: $bot->botToken,
+            botRefreshToken: $bot->botRefreshToken,
+            botTokenExpiresAt: $bot->botTokenExpiresAt,
+            botScopes: $bot->botScopes,
+            botId: $bot->botId,
+            botUserId: $bot->botUserId,
+            userId: $user->userId,
+            userToken: $user->userToken,
+            userRefreshToken: $user->userRefreshToken,
+            userTokenExpiresAt: $user->userTokenExpiresAt,
+            userScopes: $user->userScopes,
+            installedAt: $bot->installedAt,
+            raw: [...$user->raw, ...$bot->raw],
+        );
+    }
+
+    private function botOnly(Installation $installation): Installation
+    {
+        $raw = $installation->raw;
+        unset($raw['authed_user'], $raw['user_refresh']);
+
+        return new Installation(
+            teamId: $installation->teamId,
+            enterpriseId: $installation->enterpriseId,
+            isEnterpriseInstall: $installation->isEnterpriseInstall,
+            botToken: $installation->botToken,
+            botRefreshToken: $installation->botRefreshToken,
+            botTokenExpiresAt: $installation->botTokenExpiresAt,
+            botScopes: $installation->botScopes,
+            botId: $installation->botId,
+            botUserId: $installation->botUserId,
+            userId: null,
+            userToken: null,
+            userRefreshToken: null,
+            userTokenExpiresAt: null,
+            userScopes: [],
+            installedAt: $installation->installedAt,
+            raw: $raw,
+        );
     }
 
     private function now(): int

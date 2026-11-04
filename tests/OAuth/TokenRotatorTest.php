@@ -68,6 +68,55 @@ final class TokenRotatorTest extends TestCase
         self::assertSame('xoxp-old', $store->fetch($query)->userToken);
     }
 
+    public function test_refresh_returns_the_fresh_bot_and_user_grants_when_both_are_selected(): void
+    {
+        $store = new MemoryInstallationStore();
+        $store->save($this->installation());
+        $http = new RecordingHttpClient([
+            new Response(
+                200,
+                [],
+                '{"ok":true,"access_token":"xoxb-new","refresh_token":"bot-refresh-new","expires_in":600}',
+            ),
+            new Response(
+                200,
+                [],
+                '{"ok":true,"access_token":"xoxp-new","refresh_token":"user-refresh-new","expires_in":600}',
+            ),
+        ]);
+
+        $result = $this->rotator($store, $http)->refresh(new InstallationQuery(teamId: 'T1', userId: 'U1'));
+
+        self::assertSame('xoxb-new', $result?->botToken);
+        self::assertSame('bot-refresh-new', $result?->botRefreshToken);
+        self::assertSame('xoxp-new', $result?->userToken);
+        self::assertSame('user-refresh-new', $result?->userRefreshToken);
+        self::assertSame('xoxb-new', $result?->raw['bot_refresh']['access_token']);
+        self::assertSame('xoxp-new', $result?->raw['user_refresh']['access_token']);
+    }
+
+    public function test_refresh_with_no_matching_user_grant_returns_a_bot_only_result(): void
+    {
+        $store = new MemoryInstallationStore();
+        $store->save($this->installation());
+        $store->delete(new InstallationQuery(teamId: 'T1', userId: 'U1'));
+        $http = new RecordingHttpClient([new Response(
+            200,
+            [],
+            '{"ok":true,"access_token":"xoxb-new","refresh_token":"bot-refresh-new","expires_in":600}',
+        )]);
+
+        $result = $this->rotator($store, $http)->refresh(new InstallationQuery(teamId: 'T1', userId: 'U2'));
+
+        self::assertSame('xoxb-new', $result?->botToken);
+        self::assertNull($result?->userId);
+        self::assertNull($result?->userToken);
+        self::assertNull($result?->userRefreshToken);
+        self::assertSame([], $result?->userScopes);
+        self::assertArrayNotHasKey('authed_user', $result?->raw ?? []);
+        self::assertArrayNotHasKey('user_refresh', $result?->raw ?? []);
+    }
+
     public function test_expired_credentials_without_a_refresh_token_are_not_authorized(): void
     {
         $store = new MemoryInstallationStore();

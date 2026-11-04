@@ -54,6 +54,9 @@ final class BoltCli
 
             return 2;
         }
+        if (!self::isNewCommand($arguments) && !is_file($projectRoot . '/vendor/composer/installed.json')) {
+            return self::writeMissingDependenciesError($arguments);
+        }
         if (!self::loadAutoloaders($packageRoot, $projectRoot, $composerAutoload)) {
             return 1;
         }
@@ -217,13 +220,31 @@ final class BoltCli
         if (!in_array($arguments[0] ?? null, ['doctor', 'status'], true)) {
             throw $error;
         }
-        $message = is_file($projectRoot . '/vendor/composer/installed.json')
-            ? 'Application configuration could not be loaded. Check .env and config/; OAuth requires complete credentials and an HTTPS redirect URL.'
-            : 'Composer dependencies are missing. Run composer install in this project, then run doctor again.';
+        if (!is_file($projectRoot . '/vendor/composer/installed.json')) {
+            return self::writeMissingDependenciesError($arguments);
+        }
+        $message = 'Application configuration could not be loaded. Check .env and config/; OAuth requires complete credentials and an HTTPS redirect URL.';
+        return self::writeDiagnosticMessage($arguments, $message);
+    }
+
+    /** @param list<string> $arguments */
+    private static function writeMissingDependenciesError(array $arguments): int
+    {
+        $message = 'Composer dependencies are missing. Run composer install in this project, then run doctor again.';
+        return self::writeDiagnosticMessage($arguments, $message);
+    }
+
+    /** @param list<string> $arguments */
+    private static function writeDiagnosticMessage(array $arguments, string $message): int
+    {
         $formatIndex = array_search('--format', $arguments, true);
         $json =
-            in_array('--format=json', $arguments, true)
-            || $formatIndex !== false && ($arguments[$formatIndex + 1] ?? null) === 'json';
+            in_array($arguments[0] ?? null, ['doctor', 'status'], true)
+            && (
+                in_array('--format=json', $arguments, true)
+                || $formatIndex !== false
+                && ($arguments[$formatIndex + 1] ?? null) === 'json'
+            );
         if ($json) {
             fwrite(STDOUT, json_encode([
                 'ok' => false,

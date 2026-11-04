@@ -19,7 +19,12 @@ final readonly class Alert implements Block
             throw new \InvalidArgumentException('An alert level must be default, info, warning, error, or success.');
         }
 
-        return new self(is_string($text) ? Text::plain($text) : $text, $level);
+        $text = is_string($text) ? Text::plain($text) : $text;
+        if (mb_strlen($text->value) > 200) {
+            throw new \InvalidArgumentException('An alert message needs at most 200 characters.');
+        }
+
+        return new self($text, $level);
     }
 
     #[\NoDiscard]

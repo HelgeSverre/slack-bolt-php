@@ -46,8 +46,8 @@ final readonly class Container implements Block
             }
             BlockRules::text($title->value, 150, 'Container title');
         }
-        if (count($children) > 10) {
-            throw new \InvalidArgumentException('A container accepts at most 10 child blocks.');
+        if ($children === [] || count($children) > 10) {
+            throw new \InvalidArgumentException('A container accepts between 1 and 10 child blocks.');
         }
         BlockRules::children(array_values($children), self::CHILDREN);
         return new self($title, array_values($children));
@@ -111,6 +111,13 @@ final readonly class Container implements Block
 
     public function toArray(): array
     {
+        if ($this->defaultCollapsed === true && $this->isCollapsible !== true) {
+            throw new \InvalidArgumentException('A collapsed container must be collapsible.');
+        }
+        if ($this->hasHeaderDivider === true && $this->isCollapsible === true) {
+            throw new \InvalidArgumentException('A collapsible container cannot have a header divider.');
+        }
+
         return array_filter(
             [
                 'type' => 'container',

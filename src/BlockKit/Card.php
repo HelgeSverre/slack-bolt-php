@@ -62,6 +62,10 @@ final readonly class Card implements Block
     #[\NoDiscard]
     public function actions(Button ...$actions): self
     {
+        if (count($actions) > 3) {
+            throw new \InvalidArgumentException('A card supports at most three action buttons.');
+        }
+
         return clone($this, ['actions' => $actions]);
     }
 

@@ -1,10 +1,12 @@
 # Changelog
 
-## Unreleased
+## v0.7.0 — 2026-11-04
 
 - Native immutable Container, Layout, DataTable and DataVisualization builders, with typed rows/items/cells, pie/bar/area/line chart values and `Blocks` convenience factories.
 - Validation for nested block budgets, layout widths/fallbacks, table shape and character budgets, chart categories/series and unsupported modal placements. Message-wide chart/table checks include attachments; typed streaming chunks validate their own batch.
 - Expanded Block Kit catalogs and executable examples, distinguishing native coverage from Slack workspace/surface restrictions.
+- Explicit plain-text emoji settings fix Slack's `internal_error` for containers nested in streamed layouts; verified start, append, completion, rendering and interactions in the development workspace.
+- Hard live Slack acceptance gate before every release, with a reusable modern-block fixture and recorded results.
 
 ## v0.6.0 — 2026-11-03
 

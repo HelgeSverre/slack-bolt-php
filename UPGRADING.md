@@ -1,5 +1,13 @@
 # Upgrading
 
+## v0.7.0
+
+Container, layout, data-table and chart builders are additive; see the [Block Kit guide](docs/sdk-and-block-kit.md) for factories, surface restrictions and validation. Invalid nested budgets, chart/table combinations and unsupported modal placements now fail locally, including recognizable raw blocks. Review payloads that previously relied entirely on Slack-side validation.
+
+Plain-text `Text` values now serialize their existing `emoji` setting explicitly, including `true`. This fixes a Slack streaming parser failure for containers nested in layouts. Update exact wire-shape assertions accordingly; caller code and explicit `false` settings keep working. Raw payloads are preserved and need explicit settings where Slack requires them. No store migration or new Slack permissions are required.
+
+Contributor path installs use `0.7.x-dev`; update both the requirement and path-repository version override, then update Composer. New Packagist projects select the current compatible release.
+
 ## v0.6.0
 
 Contributor path installs now use `0.6.x-dev`; update both the requirement and path-repository version override, then update Composer. New Packagist projects use the current release constraint.

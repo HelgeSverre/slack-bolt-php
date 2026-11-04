@@ -1,8 +1,8 @@
 # Modern Block Kit live acceptance — 4 November 2026
 
-**Release status: blocked.** Slack returned `internal_error` for a container nested inside a streamed layout. No new version, tag or release was published.
+**Live blocker resolved.** The initial run found `internal_error` for a container nested inside a streamed layout. A controlled payload comparison identified omitted plain-text `emoji` settings; the serializer fix passed live start, append, completion, rendering and interaction checks. No release was published during diagnosis.
 
-Runtime revision: `f1b5fc6c7a1b7f2b7ae76f249f26a9733afa060f`. The local changes made during acceptance are the release gate, this record, documentation corrections and the reusable fixture; package runtime code is unchanged. The single-quoted newline mistake in the layout example was corrected and the existing message and test Home were updated and inspected again.
+Initial runtime revision: `f1b5fc6c7a1b7f2b7ae76f249f26a9733afa060f`. Fixed runtime revision: `a51e5600edf99ba0e7695f90f971336000fd2ac8`. The single-quoted newline mistake in the layout example was also corrected and the existing message and test Home were updated and inspected again.
 
 ## Environment and evidence
 
@@ -26,11 +26,11 @@ The [acceptance thread](https://helgesverre.slack.com/archives/D0CBLL7LF51/p1793
 | Stream: line chart | Start and stop succeeded; both plotted series, axes and legend visibly rendered. |
 | Stream: layout → section | Start and stop succeeded, both with and without an explicit fallback. Layout content visible in completed messages. |
 | Stream: container → layout → section | Start and stop succeeded; nested content rendered in the completed container. |
-| Stream: layout → container → section | **Failed:** Slack `internal_error`. See the controlled comparisons below. |
+| Stream: layout → container → section | Initially failed with `internal_error`; passed after the explicit text-setting fix. See diagnosis and retest below. |
 
 API inspection of the fixture thread confirmed successful streams were `completed`. It is separate evidence from the rendered UI and interaction checks above.
 
-## Unresolved streaming case
+## Initial failing case
 
 The minimal failing typed block is:
 
@@ -51,9 +51,32 @@ Sending this through `Assistant\Streaming\Blocks::make($layout)` to `chat.startS
 - Explicitly specifying the container's standard width and false values for collapse/header flags.
 - Starting a section-only stream successfully, then supplying the nested layout as final `chat.stopStream` blocks.
 
-The same composition passed in `chat.postMessage` and `views.publish`. Removing the container from the streamed layout passed, as did reversing the composition to container → layout → section. This suggests a Slack streaming-specific limitation, but does not establish the cause or prove a server defect. There is no verified runtime fix or automatic degradation in the library.
+The same composition passed in `chat.postMessage` and `views.publish`. Removing the container from the streamed layout passed, as did reversing the composition to container → layout → section. The initial inference was a streaming-specific nesting limitation. The follow-up below disproved that inference: the composition works with explicit text settings.
 
 No failed write was blindly retried. Failed finalization left one baseline stream open; it was explicitly stopped without replacement blocks. A final inspection/settle pass left no fixture streams in progress and reset the fixture session to active. Task-owned receivers/workers were stopped. Boltling Home was republished from the existing playground store and visibly verified with its existing level, XP and caretaker history.
+
+## Diagnosis and verified fix
+
+Hand-written JSON sent directly through Guzzle reproduced the same `internal_error`, as did form-encoded chunks. This bypassed native builders and the package transport. Explicit block IDs, item width and an empty layout fallback did not resolve it.
+
+Slack accepted the minimal block as an ordinary message. Reading that message back supplied Slack's normalized shape; streaming the normalized shape succeeded. Isolating the extra fields showed that explicitly adding `emoji: true` to **both** plain-text objects (container title and section text) resolved the error. Adding it to only one still failed. Slack documents [`emoji` as optional](https://docs.slack.dev/reference/block-kit/composition-objects/text-object/), so this is an observed parser compatibility requirement, not a new general Block Kit requirement.
+
+`Text::toArray()` now always emits its existing plain-text `emoji` setting. Explicit `false` is preserved; markdown output is unchanged. Public factory methods and raw-array output are unchanged. A regression test failed before the fix and passes after it, checking the actual nested streaming chunk and both default fields.
+
+The original live command, `stream layout_nested`, then passed. The richer original `stream combined`, rich-text child, explicit container settings, `stream append_layout` and `stream final_layout` also started and completed successfully. Successful message timestamps include:
+
+| Fixed case | Timestamp |
+| --- | --- |
+| Minimal nested layout | `1793816716.618209` |
+| Combined container/layout/table/chart | `1793816717.721099` |
+| Final blocks on stop | `1793816718.641469` |
+| Rich-text child | `1793816790.750409` |
+| Explicit container flags | `1793816791.690269` |
+| Nested layout appended to an existing stream | `1793816818.793029` |
+
+The actual web client rendered the fixed nested layout and children. In the combined stream, expanding the container revealed its content; table pagination displayed Gamma/Delta, numeric descending sorting placed Beta (10) before Alpha (2), and clicking Gamma delivered row_3. All ordinary fixture messages were updated using the fixed serializer. The nested modal was reopened and submitted successfully with an exact value match. The Home publication button delivered its event; Home visibly rendered all four new block types and its Alpha action delivered row_1. The normal Boltling dashboard was restored afterwards.
+
+The full suite passed with **1,181 tests and 6,608 assertions**. Mago format, lint and analysis passed their configured error checks; existing advisory counts remained 114 lint issues and 291 analysis issues. The throwaway raw-HTTP diagnostic was removed; the maintained live fixture retains the append case. No automatic nesting rewrite or failed-write retry was added.
 
 ## Repeating the check
 

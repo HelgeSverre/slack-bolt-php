@@ -1,6 +1,6 @@
 # Implementation plan
 
-Current ordering refreshed 3 November 2026 for the public package through v0.6.0. The [parity matrix](bolt-js-parity-matrix.md) tracks the pinned Bolt JS 5.1.0 contract. Historical milestone sections below describe their original scope and are not an outstanding task list.
+Current ordering refreshed 4 November 2026 for v0.7.0. The [parity matrix](bolt-js-parity-matrix.md) tracks the pinned Bolt JS 5.1.0 contract. Historical milestone sections below describe their original scope and are not an outstanding task list.
 
 ## Current position
 
@@ -8,6 +8,7 @@ Current ordering refreshed 3 November 2026 for the public package through v0.6.0
 - Opt-in Agent View routing and per-delivery focus shipped in v0.4.0; typed streaming progress and whole-stream limits shipped in v0.5.0.
 - v0.6.0 adds `make:assistant --agent-view`. The demo queues separate `AgentAnswer` commands with focus snapshots, uses typed task progress, and handles native Stop through durable cancellation. Existing legacy command JSON remains compatible. [Validation](agent-view-starter-validation.md).
 - Production status, supervised deployment, process-failure coverage and the two-hour reliability run are complete. [Operations evidence](production-operations-plan.md).
+- v0.7.0 adds dedicated container, layout, data-table and data-visualization builders, covering the 22 current block types. Live acceptance exercised native rendering, nested modal inputs, table interactions and streaming; it found and resolved the explicit plain-text setting required by Slack's nested stream parser. [Live evidence](modern-blocks-live-validation.md). Live verification is now a hard gate before every release.
 
 ## Next sensible work
 

@@ -28,7 +28,7 @@
     "autoload": {"psr-4": {"Thunder\\Bolt\\": "src/"}},
     "autoload-dev": {"psr-4": {"Thunder\\Bolt\\Tests\\": "tests/", "App\\": "examples/hello-bolt/app/"}},
     "bin": ["bin/bolt", "bin/bolt-complete"],
-    "extra": {"branch-alias": {"dev-main": "0.6.x-dev"}},
+    "extra": {"branch-alias": {"dev-main": "0.7.x-dev"}},
     "scripts": {
         "test": "@php vendor/bin/phpunit --exclude-group live",
         "test:live": "@php vendor/bin/phpunit tests/Live",

@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Thunder\Bolt\Messages;
 
 use Thunder\Bolt\BlockKit\Block;
+use Thunder\Bolt\BlockKit\Internal\BlockRules;
 use Thunder\Bolt\WorkObjects\Entity;
 use Thunder\Bolt\WorkObjects\EntityMetadata;
 
 final readonly class Message implements \JsonSerializable
 {
-    /** @param list<Block> $contentBlocks @param list<Attachment> $messageAttachments */
+    /**
+     * @param list<Block> $contentBlocks
+     * @param list<Attachment> $messageAttachments
+     */
     private function __construct(
         private ?string $textContent = null,
         private ?string $markdownContent = null,
@@ -237,6 +241,13 @@ final readonly class Message implements \JsonSerializable
                 static fn(Attachment $attachment): array => $attachment->toArray(),
                 $this->messageAttachments,
             );
+        if ($this->messageAttachments !== []) {
+            $allBlocks = array_map(static fn(Block $block): array => $block->toArray(), $this->contentBlocks);
+            foreach ($this->messageAttachments as $attachment) {
+                $allBlocks = [...$allBlocks, ...$attachment->blockArrays()];
+            }
+            BlockRules::message($allBlocks, countBlocks: false);
+        }
         if ($this->threadTs !== null)
             $data['thread_ts'] = $this->threadTs;
         if ($this->broadcastReply !== null)
@@ -283,6 +294,7 @@ final readonly class Message implements \JsonSerializable
         if (count($blocks) < 1 || count($blocks) > 50) {
             throw new \InvalidArgumentException('A message needs between 1 and 50 blocks.');
         }
+        BlockRules::message(array_map(static fn(Block $block): array => $block->toArray(), array_values($blocks)));
     }
 
     private static function validateTimestamp(string $timestamp): void

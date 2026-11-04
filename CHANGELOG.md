@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Native immutable Container, Layout, DataTable and DataVisualization builders, with typed rows/items/cells, pie/bar/area/line chart values and `Blocks` convenience factories.
+- Validation for nested block budgets, layout widths/fallbacks, table shape and character budgets, chart categories/series and unsupported modal placements. Message-wide chart/table checks include attachments; typed streaming chunks validate their own batch.
+- Expanded Block Kit catalogs and executable examples, distinguishing native coverage from Slack workspace/surface restrictions.
+
 ## v0.6.0 — 2026-11-03
 
 - Modern `make:assistant --agent-view` scaffolding with typed streaming and native Stop routing, retaining the legacy default and overwrite guards.

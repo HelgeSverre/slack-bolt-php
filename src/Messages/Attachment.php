@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thunder\Bolt\Messages;
 
 use Thunder\Bolt\BlockKit\Block;
+use Thunder\Bolt\BlockKit\Internal\BlockRules;
 
 final readonly class Attachment implements \JsonSerializable
 {
@@ -304,11 +305,21 @@ final readonly class Attachment implements \JsonSerializable
         }
     }
 
+    /**
+     * @internal
+     * @return list<array<string, mixed>>
+     */
+    public function blockArrays(): array
+    {
+        return array_map(static fn(Block $block): array => $block->toArray(), $this->contentBlocks);
+    }
+
     /** @param array<array-key, Block> $blocks */
     private static function validateBlocks(array $blocks): void
     {
         if ($blocks === [] || count($blocks) > 50) {
             throw new \InvalidArgumentException('An attachment needs between 1 and 50 blocks.');
         }
+        BlockRules::message(array_map(static fn(Block $block): array => $block->toArray(), array_values($blocks)));
     }
 }

@@ -248,12 +248,13 @@ $client->views()->publish([
 
 | Builder family | Examples |
 | --- | --- |
-| Layout | Sections, actions, context, dividers, tables, cards |
+| Layout | Sections, actions, context, dividers, containers and multi-column layouts |
+| Data | Tables, interactive data tables, pie/bar/area/line charts and cards |
 | Controls | Buttons, inputs, date/time pickers, selectors, workflow controls |
 | Rich content | Rich text, images, files, message metadata, legacy attachments |
 | Views | Modals and App Home |
 
-Raw arrays remain an escape hatch for newer Slack fields. [SDK and Block Kit reference](docs/sdk-and-block-kit.md).
+The [Block Kit catalog](docs/sdk-and-block-kit.md#block-catalog) lists all 22 native block builders, element factories and composition values, with examples for layouts, data tables and charts. Raw arrays remain an escape hatch for additional Slack fields.
 
 ## Interactions
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thunder\Bolt\Views;
 
 use Thunder\Bolt\BlockKit\Block;
+use Thunder\Bolt\BlockKit\Internal\BlockRules;
 
 final readonly class Home implements View
 { /** @param list<Block> $blocks */
@@ -49,6 +50,9 @@ final readonly class Home implements View
     public function toArray(): array
     {
         $d = ['type' => 'home', 'blocks' => array_map(static fn(Block $b) => $b->toArray(), $this->blocks)];
+        if (count(BlockRules::flatten($d['blocks'])) > 100) {
+            throw new \InvalidArgumentException('A home view accepts at most 100 blocks including nested blocks.');
+        }
         if ($this->privateMetadata !== null)
             $d['private_metadata'] = $this->privateMetadata;
         if ($this->callback !== null)

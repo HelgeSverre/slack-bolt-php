@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thunder\Bolt\Assistant\Streaming;
 
 use Thunder\Bolt\BlockKit\Block;
+use Thunder\Bolt\BlockKit\Internal\BlockRules;
 
 final readonly class Blocks implements Chunk
 {
@@ -18,6 +19,7 @@ final readonly class Blocks implements Chunk
         if ($blocks === [] || count($blocks) > 50) {
             throw new \InvalidArgumentException('A blocks chunk needs 1 to 50 blocks.');
         }
+        BlockRules::message(array_map(static fn(Block $block): array => $block->toArray(), array_values($blocks)));
         return new self(array_values($blocks));
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thunder\Bolt\Views;
 
 use Thunder\Bolt\BlockKit\Block;
+use Thunder\Bolt\BlockKit\Internal\BlockRules;
 use Thunder\Bolt\BlockKit\Text;
 
 final readonly class Modal implements View
@@ -78,8 +79,19 @@ final readonly class Modal implements View
     public function toArray(): array
     {
         $blocks = array_map(static fn(Block $block) => $block->toArray(), $this->blocks);
+        $flat = BlockRules::flatten($blocks);
+        if (count($flat) > 100) {
+            throw new \InvalidArgumentException('A modal accepts at most 100 blocks including nested blocks.');
+        }
+        foreach ($flat as $block) {
+            if (in_array($block['type'] ?? null, ['container', 'data_table', 'data_visualization'], true)) {
+                throw new \InvalidArgumentException(
+                    'Container, data table and data visualization blocks are not supported in modals.',
+                );
+            }
+        }
         if ($this->submitLabel === null) {
-            foreach ($blocks as $block) {
+            foreach ($flat as $block) {
                 if (($block['type'] ?? null) === 'input') {
                     throw new \LogicException('A modal containing input blocks requires a submit label.');
                 }

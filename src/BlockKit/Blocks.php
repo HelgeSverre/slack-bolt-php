@@ -7,6 +7,26 @@ namespace Thunder\Bolt\BlockKit;
 /** Discoverable factories for Slack's specialist block families. */
 final class Blocks
 {
+    public static function container(string|Text|RichText $title, Block ...$children): Container
+    {
+        return Container::make($title, ...$children);
+    }
+
+    public static function layout(string $label, LayoutRow ...$rows): Layout
+    {
+        return Layout::make($label, ...$rows);
+    }
+
+    public static function dataTable(string $caption, DataTableRow $header, DataTableRow ...$rows): DataTable
+    {
+        return DataTable::make($caption, $header, ...$rows);
+    }
+
+    public static function dataVisualization(string $title, Chart $chart): DataVisualization
+    {
+        return DataVisualization::make($title, $chart);
+    }
+
     public static function alert(string|Text $text, string $level = 'default'): Alert
     {
         return Alert::make($text, $level);

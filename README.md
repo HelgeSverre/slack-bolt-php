@@ -700,13 +700,13 @@ use Thunder\Bolt\Assistant;
 
 return Assistant::forAgentView()
     ->opened([WorkspaceAgent::class, 'opened'])
-    ->appContextChanged([WorkspaceAgent::class, 'focusChanged'])
+    ->appContextChanged([WorkspaceAgent::class, 'contextChanged'])
     ->userMessage([WorkspaceAgent::class, 'message']);
 ```
 
 `AppContext` is injectable per delivery. Missing focus becomes empty context; it is never restored from an older selection. Only messages have a rooted `Thread`. Legacy `Assistant::make()` remains available.
 
-Model execution belongs in application code. The demo uses OpenAI Responses; a configured Laravel application can integrate Laravel AI through the same thread/worker boundary. Neither provider is a core dependency. [Advanced Slack features](docs/guides/advanced-slack-features.md) · [AI playground](examples/hello-bolt/README.md#native-slack-assistant).
+Model execution belongs in application code. The demo uses OpenAI Responses through the thread/worker boundary; the framework does not require a model provider. [Advanced Slack features](docs/guides/advanced-slack-features.md) · [AI playground](examples/hello-bolt/README.md#native-slack-assistant).
 
 ## Workflow functions
 

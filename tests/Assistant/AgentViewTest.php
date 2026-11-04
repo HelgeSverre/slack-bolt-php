@@ -17,6 +17,19 @@ use Thunder\Bolt\Testing\BoltTest;
 
 final class AgentViewTest extends TestCase
 {
+    public function test_agent_view_rejects_an_unscoped_custom_container_during_registration(): void
+    {
+        $app = new \Thunder\Bolt\App(
+            $this->createStub(\Tempest\Container\Container::class),
+            new \Thunder\Bolt\WebApi\Client(new \Thunder\Bolt\Testing\FakeSlack(), 'test-token'),
+            new \Thunder\Bolt\BoltConfig(),
+        );
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Agent View requires Tempest GenericContainer');
+        $app->assistant(Assistant::forAgentView()->userMessage(static function (): void {}));
+    }
+
     public function test_modern_suggested_prompts_omit_the_legacy_thread_timestamp(): void
     {
         $test = BoltTest::make();

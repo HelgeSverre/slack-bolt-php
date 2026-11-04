@@ -12,7 +12,7 @@ use Thunder\Bolt\Assistant;
 
 return Assistant::forAgentView()
     ->opened([WorkspaceAgent::class, 'opened'])
-    ->appContextChanged([WorkspaceAgent::class, 'focusChanged'])
+    ->appContextChanged([WorkspaceAgent::class, 'contextChanged'])
     ->userMessage([WorkspaceAgent::class, 'message']);
 ```
 
@@ -31,7 +31,7 @@ final readonly class WorkspaceAgent
         // Send onboarding via the delivery's authorized client when appropriate.
     }
 
-    public function focusChanged(AppContextChanged $event, AppContext $context): void
+    public function contextChanged(AppContextChanged $event, AppContext $context): void
     {
         // Observe focus without fetching private content automatically.
     }
@@ -67,7 +67,7 @@ An entity's workspace/organization IDs describe focus. Authorization still comes
 
 In Agent View mode, `Thread::context()` returns null and `saveContext()` throws: legacy thread metadata is not the modern focus store. `say()` does not attach focus as public message metadata. Use application conversation/thread storage for your own durable state. Existing legacy assistants and their metadata stores are unchanged.
 
-Messages from bots, message edits/deletions, channel messages and other App Home tabs fall through to ordinary listeners. Missing optional lifecycle handlers also fall through. Registered modern handlers receive the normal authorized client, delivery context, jobs capability, middleware and error handling. `AppContext` is resolved in a fresh Tempest `GenericContainer` invocation scope, including constructor injection.
+Messages from bots, message edits/deletions, channel messages and other App Home tabs fall through to ordinary listeners. Missing optional lifecycle handlers also fall through. Registered modern handlers receive the normal authorized client, delivery context, jobs capability, middleware and error handling. `AppContext` is resolved in a fresh Tempest `GenericContainer` invocation scope, including constructor injection. Agent View requires that container even for static-token apps; registration rejects other container implementations. Generated apps already use it.
 
 ## Slack configuration
 
@@ -76,6 +76,8 @@ In [your Slack app settings](https://api.slack.com/apps), enable the current Age
 The generated listener includes modern open/context/message handlers, typed streaming, and a native Stop handler. When durable jobs are configured, Stop calls the delivery's `cancelThread()` capability and settles session status. Its quick reply runs inline; move model/tool work into named jobs as demonstrated by `examples/hello-bolt`. Do not mix `threadStarted`, `threadContextChanged` or `contextStore` into the modern builder.
 
 In **Agents**, select dynamic suggested prompts. `Thread::setSuggestedPrompts()` omits `thread_ts` in Agent View mode; Slack's current method documentation says a legacy thread timestamp silently prevents prompts from being applied to a modern agent. Static prompts in app configuration prevent dynamic updates.
+
+Suggested prompts appear at the top of the app's **Messages** tab in the modern experience. In a long DM history, scroll to the top to find them; they do not appear inside each thread. See the [method's usage notes](https://docs.slack.dev/reference/methods/assistant.threads.setSuggestedPrompts/).
 
 A manifest fragment for the current view is:
 

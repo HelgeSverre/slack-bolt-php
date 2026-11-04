@@ -1,6 +1,6 @@
 # Configure the Slack app
 
-Verified in Slack's app-settings UI and against Slack's official documentation on **2 November 2026**. The screenshots show the existing Thunder Bolt development app; its enabled features are broader than the generated starter. Use the minimum permissions your application needs. No app settings or credentials were changed while capturing these examples.
+Rechecked in Slack's app-settings UI and against Slack's official documentation on **4 November 2026**. The app-creation screenshot reflects that review; other settings screenshots were captured on 2 November. The existing Thunder Bolt development app has broader features than the generated starter. Use the minimum permissions your application needs. No app settings or credentials were changed during this review. See the [live verification record](../research/docs-live-verification.md) for rechecked surfaces, tested interactions and remaining limits.
 
 Start with [Getting started](getting-started.md) to generate the PHP project. `bolt new` creates local code, environment examples and a manifest. It does not create a Slack app, install it, grant scopes or generate tokens.
 
@@ -20,13 +20,13 @@ The app-level `xapp` token opens a WebSocket. It does not authorize bot messages
 ## Create or configure an app
 
 1. Open [Your Apps](https://api.slack.com/apps) and select **Create New App**.
-2. Select **From a manifest**, then **Continue**. The current dialog also offers **AI agent**, **Starter app** and **Blank app**; those are Slack templates, separate from the PHP `bolt new` command.
-3. Select your development workspace and import the generated `slack-manifest.yaml` using Slack's JSON/YAML editor.
+2. Under **From scratch**, select **Paste a manifest**, then **Continue**. The current dialog also offers **AI agent**, **Starter app** and **Pick features**; those are Slack setup choices, separate from the PHP `bolt new` command. Older UI versions label the manifest option **From a manifest**.
+3. In **Create from a manifest**, select **YAML**, paste the generated `slack-manifest.yaml`, select your development **Workspace**, then choose **Next**. The manifest editor and workspace selector are on the same step.
 4. Review the requested capabilities before completing creation. Replace placeholder HTTPS URLs before using HTTP delivery. In an existing app, use **App Manifest** to review or update the equivalent configuration.
 
-![Current Slack app-creation options, with From a manifest selected](../images/slack/create-from-manifest.jpg)
+![Slack app-creation options with Paste a manifest selected](../images/slack/create-paste-manifest.png)
 
-The generated starter only needs `app_mentions:read`, `chat:write` and the `app_mention` event. The large [playground manifest](../../examples/hello-bolt/slack-manifest.yaml) is a development reference, not a production permission baseline or a fully configured current Agent View/custom-function installation. [Slack app manifests](https://docs.slack.dev/app-manifests/)
+The generated starter only needs `app_mentions:read`, `chat:write` and the `app_mention` event. The large [playground manifest](../../examples/hello-bolt/slack-manifest.yaml) is a development reference with Agent View configuration. It still requires workspace-specific setup, installation and separate custom-function prerequisites; it is not a production permission baseline. [Slack app manifests](https://docs.slack.dev/app-manifests/)
 
 Slack currently mixes `api.slack.com/apps/...` pages with `app.slack.com/app-settings/...` pages. Navigate by the sidebar names below rather than constructing URLs containing your workspace and app IDs.
 
@@ -151,7 +151,7 @@ The current sidebar entry is **Agents**. Its **Agent experience** control gives 
 
 ![Current Agent experience settings](../images/slack/agents.jpg)
 
-Thunder Bolt supports the retained `assistant_thread_started` / `assistant_thread_context_changed` lifecycle, DM handlers and session status/title/stop helpers. Slack's newer Agent guidance also uses Agent View configuration and `app_context_changed`. The generic event router can receive that event, but the assistant lifecycle does not automatically interpret it. The playground manifest does not provide a complete current Agent View configuration.
+Thunder Bolt supports both the retained `Assistant::make()` lifecycle (`assistant_thread_started` / `assistant_thread_context_changed`) and opt-in `Assistant::forAgentView()` routing for human DM messages, Messages-tab opening and `app_context_changed`. Both can use session status/title/stop helpers. The playground uses Agent View with durable jobs and includes its manifest configuration; complete the workspace-specific setup described in the [Agent View guide](agent-view.md) and [playground instructions](../../examples/hello-bolt/README.md#native-slack-assistant).
 
 For a current Agent integration, use the event/capability requirements in [Slack's developing-agents guide](https://docs.slack.dev/ai/developing-agents/) and validate the target workspace's availability. Typical events include `message.im`, `app_home_opened`, `app_context_changed`, `agent_session_stopped` and `agent_session_title_changed`, with scopes such as `assistant:write`, `chat:write` and `im:history`. Do not assume the **Slack MCP Server** toggle is required for the framework's ordinary Web API tools; that is a separate integration.
 

@@ -46,7 +46,7 @@ Slow model or tool work belongs in a named job. A Stop event does not cancel arb
 
 The opt-in [Agent View runtime](agent-view.md) handles typed `app_context_changed`, current message focus and root DMs. The demo now uses it with durable named jobs and per-turn focus snapshots. Enable the modern runtime explicitly and check feature availability in your workspace; importing the manifest alone does not complete setup. See the [playground notes](../../examples/hello-bolt/README.md#native-slack-assistant) and [live acceptance record](../research/agent-view-starter-validation.md) for verified behavior and limits. The legacy `Assistant::make()` contract remains available for existing applications.
 
-Thunder Bolt does not bundle an AI model provider. Laravel AI, OpenAI, or another provider belongs in application code. Persist the provider's conversation identity in application state; do not confuse assistant focus context with conversation history or permission to read the viewed channel.
+Thunder Bolt does not bundle an AI model provider. Provider integration belongs in application code. Persist the provider's conversation identity in application state; do not confuse assistant focus context with conversation history or permission to read the viewed channel.
 
 ## Custom workflow functions
 

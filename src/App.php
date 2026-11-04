@@ -150,6 +150,11 @@ final class App
             throw new \LogicException('An application can register one assistant.');
         }
         $assistant->validate();
+        if ($assistant->agentView && !$this->container instanceof GenericContainer) {
+            throw new \InvalidArgumentException(
+                'Agent View requires Tempest GenericContainer for delivery-local context.',
+            );
+        }
         foreach ([
             'assistant_thread_started' => $assistant->started,
             'assistant_thread_context_changed' => $assistant->contextChanged,

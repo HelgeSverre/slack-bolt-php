@@ -51,7 +51,7 @@ Keep existing `App::dispatch`, capture/retry metadata and function terminal guar
 | Start the package-owned SDK | 259 direct method bindings across 34 root groups and 94 typed resources; JSON/OAuth-form transport, errors, token overrides, and lazy cursor pagination | `src/WebApi/`, `src/Generated/WebApi/`, `tests/WebApi/ClientTest.php` |
 | Make projects easy to start | `new`, `make:listener`, `listener:list`, `doctor`, `serve`, discovery commands, and project-local completions | `src/Console/`, `stubs/`, `tests/Console/`, `examples/hello-bolt/` |
 | Explain the PHP deviations with examples | Small typed handler methods, explicit reply destinations, returned command responses, immutable builders, constructor injection, and generators | [Architecture](../architecture.md), [design decisions](php-design-decisions.md), [README](../../README.md) |
-| Establish local checks | PHPUnit, PHPStan level 6, Pint, strict Composer validation, generator consistency and ownership checks | `composer.json`, `tests/`, `test/tooling/` |
+| Establish local checks | Initially PHPUnit, PHPStan level 6 and Pint; Mago replaced PHPStan/Pint in the SDK milestone. Current checks include strict Composer validation, generator consistency and ownership checks | `composer.json`, `tests/`, `test/tooling/` |
 
 The generated declarations are migration scaffolds, excluded from Tempest discovery. At this initial milestone, generated SDK methods accepted arrays or `RequestPayload`; endpoint-specific models were added in the later SDK milestone. Local fixture tests do not prove full upstream conformance or a successful real-workspace installation.
 
@@ -93,7 +93,7 @@ See the [client guide](../web-api-client.md), [builder guide](../sdk-and-block-k
 
 `socket:serve` receives events, commands, and interactions through the same App dispatch pipeline. The runner handles Slack envelopes, hello/disconnect frames, bounded reconnect backoff, retry metadata, and shutdown. Amp provides TLS verification, WebSocket framing, message limits, and ping/pong health. Local tests cover lifecycle failures and installation/context isolation; live Slack conformance remains a release gate. See the [Slack setup guide](../guides/slack-app-setup.md) and [durable operations](../guides/durable-operations.md) for maintained instructions.
 
-## Remaining implementation order
+## Durable execution and operations milestones
 
 Durable named jobs are implemented: SQLite intake/deduplication, atomic claims/leases, bounded opt-in retries, uncertain recovery, cooperative cancellation, current authorization/state scopes and worker/operations scaffolds. See the [implementation audit](durable-execution-audit.md).
 
@@ -104,6 +104,6 @@ The first opt-in live transport slice is complete: five conversation read method
 1. **Compatibility and release validation.** Maintain a behavior matrix, targeted live-workspace checks and package installation/release verification. Linux/macOS CI already passes; paid-plan custom-function validation still needs an eligible workspace. Triage Mago advisories explicitly. Fresh named-job project installation is verified, but publishing/release automation and CLI startup optimization remain open.
 2. **Demand-led adapters and operational growth.** Add deployment/shared-store adapters when needed. SQLite retention, schema migrations and operator history are implemented in the [operations milestone](job-operations.md). Deduplication receipts deliberately remain indefinite; any future key-expiry policy needs an explicit replay horizon.
 
-Each milestone updates the [parity map](api-parity.md) with implemented behavior and its evidence. Full parity requires behavior coverage for every retained feature family; generated symbol counts alone cannot close a milestone. Remote Linux/macOS CI is verified in the current inventory. v0.1.0 is already published as a GitHub prerelease; v0.2.0 passed the explicit release gate above. Packagist publication remains separate.
+Each milestone updates the [parity map](api-parity.md) with implemented behavior and its evidence. Full parity requires behavior coverage for every retained feature family; generated symbol counts alone cannot close a milestone. Remote Linux/macOS CI is verified in the current inventory. The initial v0.1.0 and v0.2.0 prereleases preceded public Packagist distribution, which shipped in v0.3.0; the current release is v0.6.0.
 
 The [application and async investigation](durable-execution-explained.md) led to the user's explicit-jobs/SQLite choice and the current implementation. Execution storage remains separate from conversation storage, and Tempest owns composition. A broad application superclass is not implemented. Earlier per-system interface sketches remain research; the README documents shipped methods.

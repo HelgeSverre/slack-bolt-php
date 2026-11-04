@@ -131,7 +131,7 @@ Start a new harness per test. Intake snapshots are bounded: reaching 200 stored 
 | `assertThreadReply($text)` | Text, channel, and the fixture's known thread root |
 | `assertEphemeralReply($text)` | Text, channel, and user |
 | `assertApiCalled($method, $predicate = null, times: null)` | Matching calls, optionally an exact count |
-| `assertNoMessagesSent()` | No message posts, edits, deletes, ephemeral, or response-URL calls |
+| `assertNoMessagesSent()` | No message posts, edits, deletes, ephemeral, streaming, or response-URL calls |
 | `assertNoApiCalls()` | No outgoing Slack calls |
 | `assertJobQueued($class, $predicate = null)` | A newly accepted job and optional record predicate |
 | `assertNoJobsQueued()` | No newly accepted jobs |

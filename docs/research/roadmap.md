@@ -12,6 +12,8 @@ Current ordering refreshed 4 November 2026 for v0.7.0. The [parity matrix](bolt-
 
 ## Next sensible work
 
+The new UI/testing slice has [live acceptance evidence](typed-ui-live-validation.md) and remains unreleased on `main`.
+
 The [4 November bug hunt](bug-hunt-2026-11-04.md) led to typed outbound view/message requests, immutable interaction fixtures with structured assertions, and modern rich-text references. These are implemented on the development branch; see the [UI request and rich-text guide](../sdk-and-block-kit.md) and [testing toolkit](../guides/testing-toolkit.md). Opt-in test-ready scaffolding, ordinary link unfurls, typed streaming options and channel-level assistant prompts remain possible follow-ups.
 
 1. Strengthen adoption coverage: keep generated modern/legacy starters, registry installs and both delivery transports in executable fresh-project checks. Extend live acceptance to additional eligible workspaces as access permits.

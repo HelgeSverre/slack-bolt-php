@@ -2,6 +2,8 @@
 
 ## Unreleased fixes
 
+Typed UI requests, interaction fixtures and modern rich-text references are additive. Existing generated requests, arrays and raw rich-text shapes remain supported. `assertAcknowledged($fields)` now matches nested subsets; its default `[]` remains status-only, while an explicit empty array inside a nested expectation requires an actually empty array. `assertApiCalledWith($method, [])` expects a call with no arguments; use `assertApiCalled($method)` when any arguments should match.
+
 Container builders now require at least one child; collapsed containers must also be collapsible, and collapsible containers cannot request a header divider. Alerts reject text over 200 characters and cards reject more than three actions. These checks reject invalid payloads locally. Generator file targets that are dangling symlinks are treated as existing files and preserved.
 
 `TokenRotator::refresh()` returns the current combined bot/selected-user grants; a bot-only result omits embedded user credentials. Its underlying store snapshots and independently committed refresh operations are unchanged. AI demo jobs with ambiguous Slack message writes now settle as uncertain instead of posting a second answer. Inspect these jobs before manually retrying. No queue or installation-store migration is required.

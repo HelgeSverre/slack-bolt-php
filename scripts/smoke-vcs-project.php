@@ -233,6 +233,34 @@ try {
             if ($received !== 'home') {
                 throw new RuntimeException('The installed toolkit did not deliver the typed App Home event.');
             }
+            $bolt->app->action('proof_ui', static function (\Thunder\Bolt\WebApi\Client $client): \Thunder\Bolt\Responses\ActionResponse {
+                $rich = \Thunder\Bolt\BlockKit\RichText::make(\Thunder\Bolt\BlockKit\RichTextSection::make(
+                    \Thunder\Bolt\BlockKit\RichTextTag::make('In progress')->blue(),
+                    \Thunder\Bolt\BlockKit\RichTextMessageMention::for('C_TEST', '1700000000.000001'),
+                    \Thunder\Bolt\BlockKit\RichTextWorkObjectMention::for('entity-42', 'A_TEST', 'Deployment', 'https://example.test/deployments/42'),
+                ));
+                $client->views()->open(\Thunder\Bolt\WebApi\Requests\ViewRequest::open('TRIGGER_TEST', \Thunder\Bolt\Views\Modal::make('Proof', $rich)));
+                $client->chat()->update(new \Thunder\Bolt\WebApi\Requests\ChatUpdate('C_TEST', '1700000000.000001', 'Updated.'));
+                $client->chat()->postEphemeral(new \Thunder\Bolt\WebApi\Requests\ChatPostEphemeral('C_TEST', 'U_TEST', 'Private.'));
+                return \Thunder\Bolt\Responses\ActionResponse::empty();
+            });
+            $bolt->interaction(\Thunder\Bolt\Testing\InteractionFixture::action('proof_ui'))
+                ->assertAcknowledged()
+                ->assertApiCalledWith('views.open', [
+                    'view' => [
+                        'blocks' => [[
+                            'elements' => [[
+                                'elements' => [
+                                    ['type' => 'tag', 'color' => 'blue'],
+                                    ['type' => 'message_mention'],
+                                    ['type' => 'work_object_mention'],
+                                ],
+                            ]],
+                        ]],
+                    ],
+                ], times: 1)
+                ->assertApiCalledWith('chat.update', ['text' => 'Updated.'], times: 1)
+                ->assertApiCalledWith('chat.postEphemeral', ['user' => 'U_TEST', 'text' => 'Private.'], times: 1);
             PHP], $project, $environment);
 
     fwrite(STDOUT, "VCS project smoke test passed, including the public testing toolkit without PHPUnit.\n");

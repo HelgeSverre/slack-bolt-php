@@ -19,6 +19,42 @@ $modal = Modal::make('Deploy',
 
 Pass a `Modal` directly to `ViewResponse::update()` or `ViewResponse::push()`. `RawBlock::fromArray()` and `RawElement::fromArray()` preserve raw Slack Block Kit additions through explicit extension points; discriminator checks do not establish full Slack schema validation. `RichText::fromElements()` validates the rich-text container while retaining Slack's nested rich-text element shape.
 
+## Typed UI requests
+
+Use handwritten request values when passing native messages and views to the Web API. They select compatible surfaces and wire fields; generated request classes and arrays remain available for additional Slack fields.
+
+```php
+use Thunder\Bolt\BlockKit\Section;
+use Thunder\Bolt\Messages\Message;
+use Thunder\Bolt\Views\{Home, Modal};
+use Thunder\Bolt\WebApi\Requests\{ChatPostEphemeral, ChatUpdate, ViewRequest};
+
+$modal = Modal::make('Deployment', Section::text('Ready for review.'))->close('Close');
+$client->views()->open(ViewRequest::open($action->triggerId, $modal));
+
+$client->views()->publish(ViewRequest::publish($userId,
+    Home::make(Section::text('Your deployment dashboard.')),
+));
+
+$client->chat()->update(new ChatUpdate($channelId, $messageTs, Message::text('Deployment complete.')));
+$client->chat()->postEphemeral(new ChatPostEphemeral($channelId, $userId, 'Visible only to you.'));
+```
+
+| Request | Destination and behavior |
+| --- | --- |
+| `ViewRequest::open($triggerId, $modal)` | Open a modal from a current interaction trigger |
+| `ViewRequest::push($triggerId, $modal)` | Push onto an existing modal stack using its interaction trigger |
+| `ViewRequest::update($viewId, $modal)` | Update one modal by Slack view ID |
+| `ViewRequest::updateByExternalId($externalId, $modal)` | Update a modal by its developer-assigned external ID |
+| `ViewRequest::publish($userId, $home)` | Publish that user's Home view |
+| `->withHash($hash)` | Immutable optimistic concurrency check for view update or Home publish; unavailable for open/push |
+| `new ChatUpdate($channelId, $messageTs, $message)` | Update an existing message; accepts `string\|Message` and ignores the message builder's thread destination |
+| `new ChatPostEphemeral($channelId, $userId, $message, threadTs: $rootTs)` | Post privately to an explicit user, optionally in a thread |
+
+Capture view IDs and hashes from Slack's response or interaction payload. Keep stable input `block_id`/`action_id` pairs to preserve state during modal updates. `withHash()` passes Slack's hash unchanged; it does not retry conflicts. Message update/ephemeral requests retain only their endpoint's supported content fields. Ephemeral thread placement uses the request's explicit `threadTs`, not a thread inherited from a reusable `Message`.
+
+These values do not invoke endpoints themselves. Pass each request to its corresponding method. An existing generated `ViewsOpenRequest(view: $modal, triggerId: $triggerId)` also serializes native views; the handwritten helpers add surface types and validation. See Slack's [view updates](https://docs.slack.dev/reference/methods/views.update/), [Home publishing](https://docs.slack.dev/reference/methods/views.publish/), [message updates](https://docs.slack.dev/reference/methods/chat.update/) and [ephemeral delivery](https://docs.slack.dev/reference/methods/chat.postEphemeral/) contracts.
+
 Use the [block catalog](#block-catalog) to choose a layout, the [element catalog](#element-catalog) for controls, and [composition objects](#composition-objects) for their shared values. All builders below live in `Thunder\Bolt\BlockKit` unless noted otherwise.
 
 ## Block catalog
@@ -202,7 +238,7 @@ $modal = Modal::make('Create task',
 
 External selects need an [options listener](http-interactivity.md); their builder does not fetch choices. `Picker` modifiers are type-specific: for example, `allowDecimals()` applies to number inputs and `fileTypes()` to file inputs. Unsupported combinations throw rather than silently emitting a different control.
 
-This is the native PHP element catalog, not every entry in [Slack's evolving element reference](https://docs.slack.dev/reference/block-kit/block-elements/). Additional families such as citations, tags and canvas/work-object mentions do not have dedicated builders here. `RawElement` covers compatible element placements; use `RichText::fromElements()` for nested rich-text wire shapes without typed builders.
+This is the native PHP element catalog, not every entry in [Slack's evolving element reference](https://docs.slack.dev/reference/block-kit/block-elements/). Additional families such as citations and canvas-specific mentions do not have dedicated builders here. Tags, message mentions and Work Object mentions have native rich-text leaves listed below. `RawElement` covers compatible element placements; use `RichText::fromElements()` for nested rich-text wire shapes without typed builders.
 
 ## Composition objects
 
@@ -270,8 +306,33 @@ Dedicated builders cover the pinned rich-text leaves and containers, selectors a
 | Channel mention | [`RichTextChannelMention::for($channelId)`](../src/BlockKit/RichTextChannelMention.php) |
 | Team mention | [`RichTextTeamMention::for($teamId)`](../src/BlockKit/RichTextTeamMention.php) |
 | Broadcast mention | [`RichTextBroadcastMention::here()` / `channel()` / `everyone()`](../src/BlockKit/RichTextBroadcastMention.php) |
+| Tag | [`RichTextTag::make('In progress')->blue()`](../src/BlockKit/RichTextTag.php) |
+| Message reference | [`RichTextMessageMention::for($channelId, $messageTs)`](../src/BlockKit/RichTextMessageMention.php) |
+| Work Object reference | [`RichTextWorkObjectMention::for($entityId, $appId, $text, $url)`](../src/BlockKit/RichTextWorkObjectMention.php) |
 
 [`RichTextStyle`](../src/BlockKit/RichTextStyle.php) supplies reusable leaf styles. Keep raw nested data in `RichText::fromElements()` when Slack adds a shape that these leaf/container builders do not yet model.
+
+### Tags and rich-text references
+
+```php
+use Thunder\Bolt\BlockKit\{RichText, RichTextMessageMention, RichTextSection, RichTextTag, RichTextText, RichTextWorkObjectMention};
+
+$references = RichText::make(
+    RichTextSection::make(
+        RichTextTag::make('In progress')->blue()->bold(),
+        RichTextText::make(' '),
+        RichTextMessageMention::for('C123', '1700000000.000001')->text('Deployment note'),
+        RichTextText::make(' '),
+        RichTextWorkObjectMention::for(
+            'entity-42', 'A123', 'Deployment #42', 'https://example.com/deployments/42',
+        )->product('Deployments')->fullSizePreview(false),
+    ),
+);
+```
+
+These values are rich-text leaves: place them in a rich-text section, quote or list, not directly in a message's block array or an action row. Tag colors are gray, brown, purple, indigo, blue, green, yellow, orange and red; use named methods or `color(RichTextTagColor::Blue)`. The new leaves support `bold()`, `italic()`, `strike()`, `underline()`, `highlight()`, `clientHighlight()` and `unlink()`. They reject `code()`, which Slack does not support on these three types. Highlight rendering remains client-dependent.
+
+Message references accept optional `author()`, `thread()`, `text()` and `url()`. Work Object references require the entity ID, owning app ID, display text and URL; optional `icon()`, `product()` and `fullSizePreview()` preserve explicit false values. A reference does not register a Work Object, fetch its details, or grant access to its target. Supply the appropriate existing entity identity rather than assuming an external reference ID is interchangeable. Slack's [tag](https://docs.slack.dev/reference/block-kit/block-elements/tag-element/), [message mention](https://docs.slack.dev/reference/block-kit/block-elements/message-mention-element/) and [Work Object mention](https://docs.slack.dev/reference/block-kit/block-elements/work-object-mention-element/) contracts define these fields.
 
 ### A small table
 

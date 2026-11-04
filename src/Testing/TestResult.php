@@ -51,11 +51,9 @@ final readonly class TestResult
         $this->assertStatus(200);
         if ($expected !== []) {
             $body = json_decode($this->response->body, true);
-            foreach ($expected as $key => $value) {
-                self::expect(
-                    is_array($body) && array_key_exists($key, $body) && $body[$key] === $value,
-                    'The acknowledgement did not contain the expected field: ' . $key,
-                );
+            $mismatch = self::subsetMismatch($expected, $body, '$');
+            if ($mismatch !== null) {
+                self::expect(false, 'The acknowledgement did not contain the expected fields: ' . $mismatch);
             }
         }
         return $this;
@@ -72,6 +70,39 @@ final readonly class TestResult
             $times === null ? count($matches) > 0 : count($matches) === $times,
             "Expected matching Slack calls for {$method}. Found " . count($matches) . '.',
         );
+        return $this;
+    }
+
+    /**
+     * Asserts a strict recursive subset of one or more captured Slack calls.
+     * Empty expected arrays require an exactly empty array at that path. At
+     * the top level, [] therefore means a call with no arguments.
+     *
+     * @param array<string, mixed> $expected
+     */
+    public function assertApiCalledWith(string $method, array $expected, ?int $times = null): self
+    {
+        $calls = array_values(array_filter(
+            $this->calls,
+            static fn(SlackCall $call): bool => $call->method === $method,
+        ));
+        $matches = [];
+        $mismatch = null;
+        foreach ($calls as $call) {
+            $candidate = self::subsetMismatch($expected, $call->arguments, '$');
+            if ($candidate === null) {
+                $matches[] = $call;
+                continue;
+            }
+            $mismatch ??= $candidate;
+        }
+        $count = count($matches);
+        $satisfied = $times === null ? $count > 0 : $count === $times;
+        $detail = $calls === []
+            ? "No {$method} calls were captured."
+            : $mismatch ?? 'No call matched the expected payload.';
+        self::expect($satisfied, "Expected matching Slack calls for {$method}. Found {$count}. {$detail}");
+
         return $this;
     }
 
@@ -170,5 +201,61 @@ final readonly class TestResult
             // Count assertions under PHPUnit/Pest without making them runtime dependencies.
             \PHPUnit\Framework\Assert::assertTrue(true);
         }
+    }
+
+    private static function subsetMismatch(mixed $expected, mixed $actual, string $path): ?string
+    {
+        if (is_array($expected)) {
+            if (!is_array($actual)) {
+                return "{$path} expected an array but received " . self::describe($actual, $path) . '.';
+            }
+            if ($expected === [] && $actual !== []) {
+                return "{$path} expected an empty array but received " . self::describe($actual, $path) . '.';
+            }
+            foreach ($expected as $key => $value) {
+                $child = self::path($path, $key);
+                if (!array_key_exists($key, $actual)) {
+                    return "{$child} was missing.";
+                }
+                $mismatch = self::subsetMismatch($value, $actual[$key], $child);
+                if ($mismatch !== null) {
+                    return $mismatch;
+                }
+            }
+
+            return null;
+        }
+
+        if ($expected === $actual) {
+            return null;
+        }
+
+        return (
+            "{$path} expected "
+            . self::describe($expected, $path)
+            . ' but received '
+            . self::describe($actual, $path)
+            . '.'
+        );
+    }
+
+    private static function path(string $parent, int|string $key): string
+    {
+        return is_int($key) ? "{$parent}[{$key}]" : "{$parent}.{$key}";
+    }
+
+    private static function describe(mixed $value, string $path): string
+    {
+        if (preg_match('/(?:token|secret|authorization|response_url|password|code)(?:$|[.\[])/i', $path) === 1) {
+            return '[redacted]';
+        }
+        return match (true) {
+            $value === null => 'null',
+            is_bool($value) => $value ? 'true' : 'false',
+            is_int($value), is_float($value) => get_debug_type($value) . "({$value})",
+            is_string($value) => "string('" . substr($value, 0, 80) . (strlen($value) > 80 ? '…' : '') . "')",
+            is_array($value) => 'array(' . count($value) . ')',
+            default => get_debug_type($value),
+        };
     }
 }

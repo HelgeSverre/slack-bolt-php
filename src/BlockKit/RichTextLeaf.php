@@ -20,6 +20,10 @@ abstract readonly class RichTextLeaf implements RichTextElement
     #[\NoDiscard]
     final public function code(): static
     {
+        if (!$this->supportsCode()) {
+            throw new \LogicException('This rich-text element does not support the code style.');
+        }
+
         return $this->withStyle($this->currentStyle()->code());
     }
 
@@ -39,6 +43,29 @@ abstract readonly class RichTextLeaf implements RichTextElement
     final public function underline(): static
     {
         return $this->withStyle($this->currentStyle()->underline());
+    }
+
+    #[\NoDiscard]
+    final protected function withHighlight(): static
+    {
+        return $this->withStyle($this->currentStyle()->highlight());
+    }
+
+    #[\NoDiscard]
+    final protected function withClientHighlight(): static
+    {
+        return $this->withStyle($this->currentStyle()->clientHighlight());
+    }
+
+    #[\NoDiscard]
+    final protected function withUnlink(): static
+    {
+        return $this->withStyle($this->currentStyle()->unlink());
+    }
+
+    protected function supportsCode(): bool
+    {
+        return true;
     }
 
     /** @param array<string, mixed> $data */

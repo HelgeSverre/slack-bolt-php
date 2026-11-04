@@ -184,8 +184,9 @@ final class BoltTest
         ], form: true)->assertStatus(200);
     }
 
-    public function interaction(array $payload): TestResult
+    public function interaction(array|InteractionFixture $payload): TestResult
     {
+        $payload = $payload instanceof InteractionFixture ? $payload->toArray() : $payload;
         return $this->send($payload, form: true)->assertStatus(200);
     }
 

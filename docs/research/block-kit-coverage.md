@@ -10,6 +10,9 @@ Current catalog check — 4 November 2026: all 22 top-level types in Slack's liv
 | [Layout](https://docs.slack.dev/reference/block-kit/blocks/layout-block/) | `Layout`, `LayoutRow`, `LayoutItem`; child/fallback types, row sizes, width rules and nesting |
 | [Data table](https://docs.slack.dev/reference/block-kit/blocks/data-table-block/) | `DataTable`, `DataTableRow`, `DataTableCell`; rectangular rows, header rules, text/number/rich/action cells and pagination |
 | [Data visualization](https://docs.slack.dev/reference/block-kit/blocks/data-visualization-block/) | `DataVisualization`, `Chart`, `ChartAxis`, `ChartSeries`, `ChartPoint`; pie/bar/area/line, finite numbers, exact category coverage and series uniqueness |
+| [Tag](https://docs.slack.dev/reference/block-kit/block-elements/tag-element/) | `RichTextTag`, `RichTextTagColor`; rich-text-only tag leaves, enum/named colors and supported modern styles |
+| [Message mention](https://docs.slack.dev/reference/block-kit/block-elements/message-mention-element/) | `RichTextMessageMention`; explicit source channel/timestamp with optional display/author/thread/URL fields |
+| [Work Object mention](https://docs.slack.dev/reference/block-kit/block-elements/work-object-mention-element/) | `RichTextWorkObjectMention`; explicit entity/app identity, display text/URL and optional product/preview fields |
 
 `Blocks::{container,layout,dataTable,dataVisualization}` are convenience factories. Tests in `tests/BlockKit/ModernBlocksTest.php` cover wire shapes, immutability, boundaries, invalid nesting, chart/table composition budgets and message/view/streaming integration. The existing pinned reference archive and generated models are unchanged; these additions are native implementations checked against the current official contracts. Live rendering in eligible workspaces remains separate from serialization/validation coverage.
 

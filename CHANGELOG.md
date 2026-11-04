@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Typed view-operation, message-update and ephemeral request values accepting native builders, explicit destinations and optimistic view hashes.
+- Immutable interaction fixtures, strict nested API/acknowledgement assertions and end-to-end composition tests through the real receiver.
+- Native rich-text tags, message references and Work Object references, with supported modern styles and enum/named tag colors.
 - Return coherent current bot/user credentials from combined token rotation without carrying an unselected user's grant.
 - Keep HTTP acknowledgement serialization inside receiver error handling.
 - Reject invalid container collapse states and empty children, alerts over 200 characters and cards with more than three actions.

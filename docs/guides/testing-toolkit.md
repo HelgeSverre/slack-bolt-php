@@ -47,7 +47,46 @@ BoltTest::make()->listeners(Ping::class)
 
 Convenience fixtures require HTTP 200 before returning a result. A missing acknowledgement or failing handler therefore cannot quietly pass a “no messages” assertion. For negative tests, use `send(...)->assertStatus(400)` or another expected status. Results expose `response` and the captured `error`; a failed status assertion retains the original processing error as its previous exception.
 
-Interactions accept complete Slack-shaped payloads so tests remain explicit about action IDs, view state, team/user objects, response URLs, and missing context. Use `assertApiCalled('response_url', ...)` for response-URL updates. Captured calls omit request headers and destination URLs; their debug output contains only the method name.
+Interactions accept either complete Slack-shaped arrays or immutable `InteractionFixture` values. Use `assertApiCalled('response_url', ...)` for response-URL updates. Captured calls omit request headers and destination URLs; their debug output contains only the method name.
+
+### Interaction fixtures
+
+```php
+use Thunder\Bolt\Testing\InteractionFixture;
+
+$bolt->interaction(
+    InteractionFixture::action('approve', 'deployment')
+        ->fromUser('U123')
+        ->forTeam('T123')
+        ->inChannel('C123', '1700000000.000002', '1700000000.000001')
+        ->value('approved'),
+)->assertAcknowledged();
+
+$bolt->interaction(
+    InteractionFixture::viewSubmission('submit_request')
+        ->view('V123')
+        ->state('summary', 'title', 'Deploy the change'),
+)->assertAcknowledged();
+```
+
+Register the corresponding listeners before sending the fixture. Factories seed a complete synthetic payload with `T_TEST`/`U_TEST` identities. `action()` includes a message destination; `shortcut()` represents a global shortcut; `options($actionId, $query, $blockId)` seeds an external-select query; `viewSubmission($callbackId)` seeds a modal submission. These are handler test inputs, not a simulation of Slack's view stack.
+
+`state($blockId, $actionId, $value)` creates one plain-text input cell from a string or null; pass a control-shaped array for selects/files. `values($values)` replaces the entire state-values map. On block actions, `view($viewId)` switches to a modal origin and removes the seeded message/channel/response URL; `inChannel()` restores explicit message context. `value()` sets an action's value or an options query, and rejects unsupported fixture kinds. Modifiers return new fixtures. `with($fields)` preserves unknown fields and overlays associative maps recursively; lists and explicit empty arrays replace existing values. For malformed-input tests, pass `->toArray()` to `send()` instead of `interaction()`, which requires success.
+
+### Structured assertions
+
+```php
+$result->assertApiCalledWith('views.open', [
+    'view' => [
+        'type' => 'modal',
+        'blocks' => [['type' => 'input', 'block_id' => 'summary']],
+    ],
+], times: 1);
+```
+
+`assertApiCalledWith()` matches a strict recursive subset of each call's arguments. Extra keys are allowed, list positions are preserved, missing fields do not match explicit null, and `0` does not match `false`. Explicit empty arrays require an actually empty array at that path, including the root: use `assertApiCalled($method)` when any payload should match. `times:` counts matching calls from this delivery only. Failure messages identify the mismatch path and redact sensitive-keyed values.
+
+`assertAcknowledged($fields)` uses the same nested matching, while its default empty argument remains HTTP-status-only for compatibility. These assertions inspect wire payloads; they do not establish that Slack renders a view or a rich-text element correctly.
 
 ## Stub Web API responses
 
@@ -126,11 +165,12 @@ Start a new harness per test. Intake snapshots are bounded: reaching 200 stored 
 | Assertion | Checks |
 | --- | --- |
 | `assertStatus($status)` | Receiver HTTP status |
-| `assertAcknowledged($fields = [])` | HTTP 200 and matching acknowledgement fields |
+| `assertAcknowledged($fields = [])` | HTTP 200 and recursively matching acknowledgement fields |
 | `assertMessageSent($text, channel: null)` | A matching `chat.postMessage` call |
 | `assertThreadReply($text)` | Text, channel, and the fixture's known thread root |
 | `assertEphemeralReply($text)` | Text, channel, and user |
 | `assertApiCalled($method, $predicate = null, times: null)` | Matching calls, optionally an exact count |
+| `assertApiCalledWith($method, $fields, times: null)` | Strict recursive payload subset and optional matching count |
 | `assertNoMessagesSent()` | No message posts, edits, deletes, ephemeral, streaming, or response-URL calls |
 | `assertNoApiCalls()` | No outgoing Slack calls |
 | `assertJobQueued($class, $predicate = null)` | A newly accepted job and optional record predicate |

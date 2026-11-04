@@ -220,11 +220,9 @@ In a shortcut handler, use its short-lived `triggerId` to open the modal and ret
 
 ```php
 use Thunder\Bolt\Responses\ShortcutResponse;
+use Thunder\Bolt\WebApi\Requests\ViewRequest;
 
-$client->views()->open([
-    'trigger_id' => $shortcut->triggerId,
-    'view' => $modal->toArray(),
-]);
+$client->views()->open(ViewRequest::open($shortcut->triggerId, $modal));
 
 return ShortcutResponse::empty();
 ```
@@ -234,16 +232,14 @@ return ShortcutResponse::empty();
 ```php
 use Thunder\Bolt\BlockKit\Section;
 use Thunder\Bolt\Views\Home;
+use Thunder\Bolt\WebApi\Requests\ViewRequest;
 
 $home = Home::make(
     Section::markdown('*Workspace dashboard*'),
     Section::markdown('No pending approvals.'),
 );
 
-$client->views()->publish([
-    'user_id' => 'U123',
-    'view' => $home->toArray(),
-]);
+$client->views()->publish(ViewRequest::publish('U123', $home));
 ```
 
 | Builder family | Examples |
@@ -255,6 +251,20 @@ $client->views()->publish([
 | Views | Modals and App Home |
 
 The [Block Kit catalog](docs/sdk-and-block-kit.md#block-catalog) lists all 22 native block builders, element factories and composition values, with examples for layouts, data tables and charts. Raw arrays remain an escape hatch for additional Slack fields.
+
+Tags and references compose as rich-text leaves:
+
+```php
+use Thunder\Bolt\BlockKit\{RichText, RichTextMessageMention, RichTextSection, RichTextTag, RichTextText};
+
+$status = RichText::make(RichTextSection::make(
+    RichTextTag::make('In progress')->blue(),
+    RichTextText::make(' '),
+    RichTextMessageMention::for('C123', '1700000000.000001'),
+));
+```
+
+Work Object references, tag colors and supported styles are covered in the [rich-text guide](docs/sdk-and-block-kit.md#tags-and-rich-text-references).
 
 ## Interactions
 
@@ -351,6 +361,24 @@ $result = $client->chat()->postMessage(
 
 $messageTimestamp = $result->ts;
 ```
+
+Native messages and views also work with focused UI requests:
+
+```php
+use Thunder\Bolt\BlockKit\Section;
+use Thunder\Bolt\Messages\Message;
+use Thunder\Bolt\Views\Modal;
+use Thunder\Bolt\WebApi\Requests\{ChatPostEphemeral, ChatUpdate, ViewRequest};
+
+$client->views()->open(ViewRequest::open(
+    $action->triggerId,
+    Modal::make('Deployment', Section::text('Ready for review.'))->close('Close'),
+));
+$client->chat()->update(new ChatUpdate('C123', $messageTimestamp, Message::text('Complete.')));
+$client->chat()->postEphemeral(new ChatPostEphemeral('C123', 'U123', 'Saved for you.'));
+```
+
+View helpers cover open, push, update by ID or external ID, and Home publishing with optional optimistic hashes. [Typed UI request guide](docs/sdk-and-block-kit.md#typed-ui-requests).
 
 ### Arrays and Slack's method hierarchy
 
@@ -790,10 +818,12 @@ $bolt->mention('hello', user: 'U123', channel: 'C123')
 | Test capability | Interface |
 | --- | --- |
 | Commands and interactions | `command()`, `interaction()` |
+| Typed interaction inputs | `InteractionFixture::action()`, `shortcut()`, `options()`, `viewSubmission()` |
 | Web API responses | `$bolt->slack->respondsWith('users.info', $response)` |
 | Application dependencies | `bind($fake, as: Reports::class)` |
 | Real SQLite intake | `BoltTest::make(jobs: true)->jobHandlers(PublishNoteHandler::class)` |
 | Assertions | Thread/channel/ephemeral replies, acknowledgements, API calls, queued jobs |
+| Nested payload assertions | `assertApiCalledWith('views.open', ['view' => ['type' => 'modal']])` |
 
 Results are scoped to one delivery. The harness uses the real HTTP receiver, memory conversation state, and optional in-memory SQLite; it does not load `.env`, boot the application kernel, or execute queued jobs. It has no PHPUnit/Pest dependency. [Public testing toolkit](docs/guides/testing-toolkit.md).
 

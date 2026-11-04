@@ -13,6 +13,9 @@ final readonly class RichTextStyle
         private bool $italic = false,
         private bool $strike = false,
         private bool $underline = false,
+        private bool $highlight = false,
+        private bool $clientHighlight = false,
+        private bool $unlink = false,
     ) {}
 
     public static function none(): self
@@ -50,6 +53,24 @@ final readonly class RichTextStyle
         return clone($this, ['underline' => true]);
     }
 
+    #[\NoDiscard]
+    public function highlight(): self
+    {
+        return clone($this, ['highlight' => true]);
+    }
+
+    #[\NoDiscard]
+    public function clientHighlight(): self
+    {
+        return clone($this, ['clientHighlight' => true]);
+    }
+
+    #[\NoDiscard]
+    public function unlink(): self
+    {
+        return clone($this, ['unlink' => true]);
+    }
+
     /** @return array<string, true> */
     public function toArray(): array
     {
@@ -59,6 +80,9 @@ final readonly class RichTextStyle
             'italic' => $this->italic,
             'strike' => $this->strike,
             'underline' => $this->underline,
+            'highlight' => $this->highlight,
+            'client_highlight' => $this->clientHighlight,
+            'unlink' => $this->unlink,
         ]);
     }
 }

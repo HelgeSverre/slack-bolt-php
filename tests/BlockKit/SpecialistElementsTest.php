@@ -39,12 +39,12 @@ final class SpecialistElementsTest extends TestCase
                 'type' => 'feedback_buttons',
                 'action_id' => 'feedback',
                 'positive_button' => [
-                    'text' => ['type' => 'plain_text', 'text' => 'Helpful'],
+                    'text' => ['type' => 'plain_text', 'text' => 'Helpful', 'emoji' => true],
                     'value' => 'yes',
                     'accessibility_label' => 'This helped',
                 ],
                 'negative_button' => [
-                    'text' => ['type' => 'plain_text', 'text' => 'Not helpful'],
+                    'text' => ['type' => 'plain_text', 'text' => 'Not helpful', 'emoji' => true],
                     'value' => 'no',
                     'accessibility_label' => 'This did not help',
                 ],
@@ -61,7 +61,7 @@ final class SpecialistElementsTest extends TestCase
             [
                 'type' => 'icon_button',
                 'icon' => 'trash',
-                'text' => ['type' => 'plain_text', 'text' => 'Delete'],
+                'text' => ['type' => 'plain_text', 'text' => 'Delete', 'emoji' => true],
                 'action_id' => 'delete',
                 'accessibility_label' => 'Delete this item',
                 'value' => 'item-1',
@@ -79,7 +79,7 @@ final class SpecialistElementsTest extends TestCase
         self::assertSame(
             [
                 'type' => 'workflow_button',
-                'text' => ['type' => 'plain_text', 'text' => 'Start request'],
+                'text' => ['type' => 'plain_text', 'text' => 'Start request', 'emoji' => true],
                 'workflow' => [
                     'trigger' => [
                         'url' => 'https://slack.com/trigger/T123',

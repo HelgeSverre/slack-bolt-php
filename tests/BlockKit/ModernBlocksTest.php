@@ -39,6 +39,28 @@ use Thunder\Bolt\Views\Modal;
 
 final class ModernBlocksTest extends TestCase
 {
+    public function test_nested_stream_plain_text_serializes_explicit_emoji_defaults(): void
+    {
+        $layout = Layout::make(
+            'Nested stream',
+            LayoutRow::make(LayoutItem::make(Container::make('Nested', Section::text('Content')))),
+        );
+        $chunk = \Thunder\Bolt\Assistant\Streaming\Blocks::make($layout)->toArray();
+        $container = $chunk['blocks'][0]['rows'][0]['items'][0]['block'];
+
+        // Slack's streaming parser rejects this composition if either default is omitted.
+        self::assertSame(['type' => 'plain_text', 'text' => 'Nested', 'emoji' => true], $container['title']);
+        self::assertSame(
+            ['type' => 'plain_text', 'text' => 'Content', 'emoji' => true],
+            $container['child_blocks'][0]['text'],
+        );
+        self::assertSame(
+            ['type' => 'plain_text', 'text' => ':wave:', 'emoji' => false],
+            Text::plain(':wave:', false)->toArray(),
+        );
+        self::assertArrayNotHasKey('emoji', Text::markdown('*Ready*')->toArray());
+    }
+
     public function test_container_preserves_plain_and_rich_titles_optional_false_flags_and_immutability(): void
     {
         $base = Container::make('Release', Section::text('Ready'));

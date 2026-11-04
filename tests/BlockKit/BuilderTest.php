@@ -29,7 +29,7 @@ final class BuilderTest extends TestCase
         self::assertSame('input', $block->toArray()['type']);
         self::assertSame('plain_text_input', $block->toArray()['element']['type']);
         self::assertSame(
-            ['type' => 'header', 'text' => ['type' => 'plain_text', 'text' => 'Request']],
+            ['type' => 'header', 'text' => ['type' => 'plain_text', 'text' => 'Request', 'emoji' => true]],
             Header::make('Request')->toArray(),
         );
         self::assertSame(['type' => 'divider'], Divider::make()->toArray());

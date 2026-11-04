@@ -28,8 +28,9 @@ final readonly class Text implements \JsonSerializable
     /** @return array<string,mixed> */ public function toArray(): array
     {
         $data = ['type' => $this->type, 'text' => $this->value];
-        if ($this->type === 'plain_text' && !$this->emoji)
-            $data['emoji'] = false;
+        // Explicit defaults also work in Slack's nested streaming block parser.
+        if ($this->type === 'plain_text')
+            $data['emoji'] = $this->emoji;
         if ($this->type === 'mrkdwn' && $this->verbatim)
             $data['verbatim'] = true;
         return $data;

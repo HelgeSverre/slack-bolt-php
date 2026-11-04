@@ -40,12 +40,12 @@ final class SpecialistBlocksTest extends TestCase
                 'video_url' => 'https://example.test/demo',
                 'thumbnail_url' => 'https://example.test/thumb.png',
                 'alt_text' => 'Demo video',
-                'title' => ['type' => 'plain_text', 'text' => 'Demo'],
+                'title' => ['type' => 'plain_text', 'text' => 'Demo', 'emoji' => true],
                 'title_url' => 'https://example.test/watch',
                 'author_name' => 'Thunder',
                 'provider_name' => 'Example',
                 'provider_icon_url' => 'https://example.test/icon.png',
-                'description' => ['type' => 'plain_text', 'text' => 'A short demo.'],
+                'description' => ['type' => 'plain_text', 'text' => 'A short demo.', 'emoji' => true],
             ],
             $video->toArray(),
         );
@@ -59,7 +59,11 @@ final class SpecialistBlocksTest extends TestCase
         );
         self::assertSame(['type' => 'markdown', 'text' => '# A response'], Markdown::make('# A response')->toArray());
         self::assertSame(
-            ['type' => 'alert', 'text' => ['type' => 'plain_text', 'text' => 'Watch out'], 'level' => 'warning'],
+            [
+                'type' => 'alert',
+                'text' => ['type' => 'plain_text', 'text' => 'Watch out', 'emoji' => true],
+                'level' => 'warning',
+            ],
             Alert::make('Watch out')->warning()->toArray(),
         );
     }

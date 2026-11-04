@@ -53,9 +53,9 @@ final class ControlsTest extends TestCase
             [
                 'type' => 'input',
                 'block_id' => 'details',
-                'label' => ['type' => 'plain_text', 'text' => 'Details'],
+                'label' => ['type' => 'plain_text', 'text' => 'Details', 'emoji' => true],
                 'element' => ['type' => 'plain_text_input', 'action_id' => 'details'],
-                'hint' => ['type' => 'plain_text', 'text' => 'Visible only to your team'],
+                'hint' => ['type' => 'plain_text', 'text' => 'Visible only to your team', 'emoji' => true],
                 'optional' => true,
                 'dispatch_action' => true,
             ],
@@ -79,7 +79,7 @@ final class ControlsTest extends TestCase
                 'type' => 'static_select',
                 'action_id' => 'priority',
                 'option_groups' => [OptionGroup::make('Choices', $one, $two)->toArray()],
-                'placeholder' => ['type' => 'plain_text', 'text' => 'Choose'],
+                'placeholder' => ['type' => 'plain_text', 'text' => 'Choose', 'emoji' => true],
                 'initial_option' => $one->toArray(),
                 'confirm' => $confirm->toArray(),
                 'focus_on_load' => true,
@@ -96,7 +96,7 @@ final class ControlsTest extends TestCase
             [
                 'type' => 'external_select',
                 'action_id' => 'owner',
-                'placeholder' => ['type' => 'plain_text', 'text' => 'Find a person'],
+                'placeholder' => ['type' => 'plain_text', 'text' => 'Find a person', 'emoji' => true],
                 'min_query_length' => 2,
                 'initial_option' => $one->toArray(),
                 'confirm' => $confirm->toArray(),
@@ -119,7 +119,7 @@ final class ControlsTest extends TestCase
             [
                 'type' => 'multi_conversations_select',
                 'action_id' => 'rooms',
-                'placeholder' => ['type' => 'plain_text', 'text' => 'Choose rooms'],
+                'placeholder' => ['type' => 'plain_text', 'text' => 'Choose rooms', 'emoji' => true],
                 'confirm' => $confirm->toArray(),
                 'focus_on_load' => true,
                 'initial_conversations' => ['C1', 'C2'],

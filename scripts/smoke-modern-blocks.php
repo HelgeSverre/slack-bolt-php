@@ -323,7 +323,7 @@ try {
             'container_nested' => [Container::make('Nested layout stream', $minimalLayout)],
             'data_table' => [$table],
             'chart' => [$line],
-            'baseline', 'final_layout' => [Section::text('Streaming baseline verified.')],
+            'baseline', 'final_layout', 'append_layout' => [Section::text('Streaming baseline verified.')],
             'combined' => [$container, $layout, $table, $line],
             default => throw new RuntimeException('Unknown streaming fixture case.'),
         };
@@ -340,6 +340,15 @@ try {
         $timestamp = $stream->get('ts');
         $record['streams'][$case] = ['api' => 'started', 'ts' => $timestamp];
         liveRecord($path, $record);
+        if ($case === 'append_layout') {
+            $client
+                ->chat()
+                ->appendStream([
+                    'channel' => $channel,
+                    'ts' => $timestamp,
+                    'chunks' => [\Thunder\Bolt\Assistant\Streaming\Blocks::make($layout)->toArray()],
+                ]);
+        }
         $client
             ->chat()
             ->stopStream([

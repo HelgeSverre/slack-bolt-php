@@ -62,6 +62,8 @@ Call `stop()` to finalize and leave the session active. Use `finish(AgentSession
 
 After a failed Slack request or successful completion, a stream instance cannot be reused. Streaming writes may have reached Slack even when their response is lost; replaying model tools or appends can duplicate effects. Application-level fallback and cancellation stay explicit. The AI demo retains its batching and final-message fallback while using typed task values.
 
+The [4 November modern-block acceptance](../research/modern-blocks-live-validation.md) found an unresolved `internal_error` when streaming a `Layout` containing a `Container`, including final blocks passed to `chat.stopStream`. The same composition rendered in ordinary messages and Home. Simple streamed layouts and the reverse composition (container → layout → section) succeeded. Do not assume serialization or ordinary-message acceptance establishes streaming compatibility, and do not replay a failed streaming write automatically.
+
 ## Testing
 
 The [public testing toolkit](testing-toolkit.md) supplies minimal successful responses for `chat.startStream`, `chat.appendStream` and `chat.stopStream`; start returns a synthetic timestamp. It captures wire arguments without simulating Slack's full streaming protocol. Assert the recorded calls with `assertApiCalled()` and a `SlackCall` predicate, or stub failures with `respondsWith()`.

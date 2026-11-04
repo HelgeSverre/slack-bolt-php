@@ -85,8 +85,8 @@ use Thunder\Bolt\BlockKit\{Layout, LayoutItem, LayoutRow, Section};
 
 $layout = Layout::make('Release overview',
     LayoutRow::make(
-        LayoutItem::make(Section::markdown('*Service*\nPayments'))->width('wide'),
-        LayoutItem::make(Section::markdown('*Status*\nHealthy'))->width('narrow'),
+        LayoutItem::make(Section::markdown("*Service*\nPayments"))->width('wide'),
+        LayoutItem::make(Section::markdown("*Status*\nHealthy"))->width('narrow'),
     ),
 )->labelVisible()->gridLines('rows')
     ->fallback(Section::markdown('*Payments*: healthy.'));
@@ -148,6 +148,8 @@ $pie = DataVisualization::make('Request sources',
 Use `Chart::bar()`, `area()` or `line()` with the same axis/series interface. Series names must be unique and each series must contain exactly one point for every axis category. Axis category order controls display order. Cartesian values may be zero or negative; pie values must be positive. All numeric values must be finite.
 
 Titles and axis titles allow 50 characters; category/point labels and series names allow 20. Charts accept up to twelve segments or series, and a series has at most twenty points. Message builders enforce at most two data visualizations, including nested blocks and attachments. Typed streaming block chunks check their own batch; Slack enforces limits across the complete stream. See the [data visualization contract](https://docs.slack.dev/reference/block-kit/blocks/data-visualization-block/).
+
+Live acceptance on 4 November found that Slack accepted and rendered these new blocks in ordinary messages and Home, but returned `internal_error` for a container nested inside a streamed layout. Standalone streamed containers, tables, charts and simple layouts succeeded. This remains an unresolved release blocker; see the [live validation record](research/modern-blocks-live-validation.md) for the tested combinations and limits of that result.
 
 Container, data table and data visualization blocks are supported in messages and Home, not modals; modal serialization rejects them, including nested occurrences. Layout supports modals too, with surface-compatible children. A modal with an input nested inside a layout still needs `submit()`. Workspace feature access and the remaining Slack-side restrictions apply independently of builder validation.
 

@@ -58,3 +58,15 @@ composer test:vcs-project
 The project smoke checks install dependencies into disposable applications. `test:project` covers the local path source. `test:vcs-project` snapshots the current package inputs into a disposable Git repository, installs through Composer's VCS resolver, then detaches that source to prove the generated application works without a path symlink. Neither check publishes a package or contacts Slack. Composer may download dependencies. The VCS smoke explicitly targets `dev-main` in its disposable repository; ordinary Packagist scaffolding selects the compatible stable minor. Consumers can also select compatible Git tags/constraints from 0.3.0 onward. The VCS smoke exercises the public testing toolkit and typed App Home delivery with production dependencies only.
 
 CI runs the documentation and fresh-project checks on Linux and macOS, a focused CLI suite on Windows, generated-reference checks, and the disposable Docker deployment smoke test.
+
+## Live release verification
+
+Live Slack verification is a hard requirement before **every release**. Use the established Thunder Bolt Dev app in the Helge Sverre smoke-test workspace. Passing automated checks, successful serialization or a successful Slack API response does not establish that users can see and use the feature.
+
+1. Inventory all new or changed features and documented workflows since the previous release. Give each user-visible behavior a live test case, including affected message, Home, modal, delivery and interaction paths. Repeat the existing critical smoke journeys where the changes can affect them.
+2. Run the actual library against Slack. Inspect rendered UI, operate the controls and verify the resulting event/handler/state changes. For charts, inspect each supported chart variant; for interactive tables, exercise their button actions. Test the release candidate revision and repeat affected checks after fixes.
+3. Keep dated evidence under `docs/research/`: revision, workspace/app identity, cases, results, sanitized receipts and useful screenshots. Keep credentials and unrelated workspace content out of committed evidence. Label API acceptance separately from verified rendering and interactions.
+4. Complete the relevant automated checks and review CI. Record limitations honestly. An unavailable workspace feature or blocked live case is a release blocker, not a passed check. Resolve it before publishing; do not tag or publish an unverified release.
+5. After verification, stop task-owned workers and preserve inspection links to the test results. Only then prepare the release, publish it and verify the exact tag/source through Packagist and a fresh installation. Version-only preparation changes can reuse the verified runtime revision; any runtime fix needs affected live cases rerun.
+
+The [4 November live review](research/docs-live-verification.md) and [Agent View acceptance](research/agent-view-starter-validation.md) show the evidence format. Previous runs provide context, but do not replace live acceptance of new or changed behavior in a later release.

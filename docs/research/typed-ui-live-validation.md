@@ -1,5 +1,7 @@
 # Typed UI and rich-text live acceptance
 
+**5 November follow-up:** the remaining bug-hunt live cases and demo OAuth migration are covered by [v0.8.0 verification](v0.8-release-verification.md). The original scope and limits below describe this UI run.
+
 Verified on 4 November 2026 in the established **Helge Sverre** Slack workspace (`T02DB4YSA`), using **Thunder Bolt Dev** (`A0CCM894C64`). This covers the typed UI requests, interaction fixtures and modern rich-text references implemented in commit `2a1582a`. The live run used the same runtime files before that commit was created, based on `00cc1c5`.
 
 The fixture recorded runtime digest `563275910bc227fde18c6ce55df186a60efd6cbc9f573f2aceab1e85ddb0350a`. This covers the request helpers and rich-text runtime files selected by the fixture, not the whole repository. Run ID: `20261104-ui-1`.

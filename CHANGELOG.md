@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## v0.8.0 — 2026-11-05
+
+- Update locked Symfony Filesystem and YAML dependencies to patched v8.1.11 releases.
 - Resolve current workspace credentials for playground spool jobs and terminal screen updates; keep Agent View replies in owner-guarded terminal threads out of the model.
 - Typed view-operation, message-update and ephemeral request values accepting native builders, explicit destinations and optimistic view hashes.
 - Immutable interaction fixtures, strict nested API/acknowledgement assertions and end-to-end composition tests through the real receiver.

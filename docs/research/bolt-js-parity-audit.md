@@ -1,5 +1,7 @@
 # Bolt JS parity audit
 
+**5 November 2026 update:** v0.8.0 adds typed outbound UI helpers, interaction fixtures/structured assertions and modern rich-text leaves, alongside the bug-hunt corrections. [Live release evidence](v0.8-release-verification.md) records OAuth rotation and corrected demo paths. These deepen PHP ergonomics and reliability; they do not expand the pinned Bolt JS baseline or imply exhaustive inbound event typing.
+
 **Current assessment — 4 November 2026:** refreshed for v0.7.0 and its native modern Block Kit builders. The pinned Bolt JS baseline remains 5.1.0; this is not a new audit of moving upstream HEAD. Practical legacy contracts remain covered or explicitly adapted, broad inbound native typing remains partial, and Node-specific exclusions remain intentional. Modern Agent View and newer native blocks are PHP extensions without extra baseline parity credit. See the [current matrix](bolt-js-parity-matrix.md), [Agent View acceptance](agent-view-starter-validation.md) and [modern-block live validation](modern-blocks-live-validation.md).
 
 The material below is the historical 26 October baseline and its follow-ups. Its P1/P2 recommendations have been implemented; they are not the current backlog.

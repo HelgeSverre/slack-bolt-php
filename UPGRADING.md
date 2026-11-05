@@ -1,6 +1,8 @@
 # Upgrading
 
-## Unreleased fixes
+## v0.8.0
+
+Contributor path installs now use `0.8.x-dev`; update both the requirement and path-repository version override, then update Composer. New Packagist projects use the compatible stable minor. The playground resolves current OAuth credentials for spool jobs and terminal updates; terminal-thread replies retain the terminal owner's access checks when Agent View is enabled.
 
 Typed UI requests, interaction fixtures and modern rich-text references are additive. Existing generated requests, arrays and raw rich-text shapes remain supported. `assertAcknowledged($fields)` now matches nested subsets; its default `[]` remains status-only, while an explicit empty array inside a nested expectation requires an actually empty array. `assertApiCalledWith($method, [])` expects a call with no arguments; use `assertApiCalled($method)` when any arguments should match.
 

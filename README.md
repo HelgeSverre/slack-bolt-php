@@ -11,7 +11,7 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 
 **Experimental.** Install `helgesverre/slack-bolt` to get the latest compatible release. The PHP namespace is `Thunder\Bolt`. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
 
-The typed UI request helpers, interaction fixtures and modern rich-text references shown below are currently unreleased on `main`. See the [live acceptance record](docs/research/typed-ui-live-validation.md).
+Typed UI requests, interaction fixtures and modern rich-text references are covered by the [live acceptance record](docs/research/typed-ui-live-validation.md) and [v0.8.0 verification](docs/research/v0.8-release-verification.md).
 
 ## Explore the framework
 

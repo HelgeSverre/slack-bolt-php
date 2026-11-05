@@ -87,7 +87,7 @@ final class BoltCli
 
     private static function writeVersion(string $packageRoot, ?string $composerAutoload): void
     {
-        $version = '0.7.x-dev';
+        $version = '0.8.x-dev';
         if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('helgesverre/slack-bolt')) {
             $version = InstalledVersions::getPrettyVersion('helgesverre/slack-bolt') ?? $version;
         } else {

@@ -1,6 +1,6 @@
 # Implementation plan
 
-Current ordering refreshed 4 November 2026 for v0.7.0. The [parity matrix](bolt-js-parity-matrix.md) tracks the pinned Bolt JS 5.1.0 contract. Historical milestone sections below describe their original scope and are not an outstanding task list.
+Current ordering refreshed 5 November 2026 for v0.8.0. The [parity matrix](bolt-js-parity-matrix.md) tracks the pinned Bolt JS 5.1.0 contract. Historical milestone sections below describe their original scope and are not an outstanding task list.
 
 ## Current position
 
@@ -12,9 +12,9 @@ Current ordering refreshed 4 November 2026 for v0.7.0. The [parity matrix](bolt-
 
 ## Next sensible work
 
-The new UI/testing slice has [live acceptance evidence](typed-ui-live-validation.md) and remains unreleased on `main`.
+The new UI/testing slice and bug-hunt corrections are included in the v0.8.0 candidate with [live release evidence](v0.8-release-verification.md).
 
-The [4 November bug hunt](bug-hunt-2026-11-04.md) led to typed outbound view/message requests, immutable interaction fixtures with structured assertions, and modern rich-text references. These are implemented on the development branch; see the [UI request and rich-text guide](../sdk-and-block-kit.md) and [testing toolkit](../guides/testing-toolkit.md). Opt-in test-ready scaffolding, ordinary link unfurls, typed streaming options and channel-level assistant prompts remain possible follow-ups.
+The [4 November bug hunt](bug-hunt-2026-11-04.md) led to typed outbound view/message requests, immutable interaction fixtures with structured assertions, and modern rich-text references, included in v0.8.0. See the [UI request and rich-text guide](../sdk-and-block-kit.md) and [testing toolkit](../guides/testing-toolkit.md). Opt-in test-ready scaffolding, ordinary link unfurls, typed streaming options and channel-level assistant prompts remain possible follow-ups.
 
 1. Strengthen adoption coverage: keep generated modern/legacy starters, registry installs and both delivery transports in executable fresh-project checks. Extend live acceptance to additional eligible workspaces as access permits.
 2. Expand native DTOs and host/store adapters when real applications demonstrate a need. Preserve raw extension fields and explicit installation scoping.

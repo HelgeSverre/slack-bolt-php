@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.5",
-        "helgesverre/slack-bolt": "0.7.x-dev"
+        "helgesverre/slack-bolt": "0.8.x-dev"
     },
     "repositories": [
         {
@@ -14,7 +14,7 @@
             "options": {
                 "symlink": true,
                 "versions": {
-                    "helgesverre/slack-bolt": "0.7.x-dev"
+                    "helgesverre/slack-bolt": "0.8.x-dev"
                 }
             }
         }

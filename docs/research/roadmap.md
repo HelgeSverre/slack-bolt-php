@@ -12,7 +12,7 @@ Current ordering refreshed 5 November 2026 for v0.8.0. The [parity matrix](bolt-
 
 ## Next sensible work
 
-The new UI/testing slice and bug-hunt corrections are included in the v0.8.0 candidate with [live release evidence](v0.8-release-verification.md).
+The UI/testing slice and bug-hunt corrections shipped in v0.8.0 after live Slack acceptance, release CI and exact-source Packagist installation checks. See [release evidence](v0.8-release-verification.md).
 
 The [4 November bug hunt](bug-hunt-2026-11-04.md) led to typed outbound view/message requests, immutable interaction fixtures with structured assertions, and modern rich-text references, included in v0.8.0. See the [UI request and rich-text guide](../sdk-and-block-kit.md) and [testing toolkit](../guides/testing-toolkit.md). Opt-in test-ready scaffolding, ordinary link unfurls, typed streaming options and channel-level assistant prompts remain possible follow-ups.
 

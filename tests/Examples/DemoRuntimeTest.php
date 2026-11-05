@@ -11,6 +11,12 @@ use App\Demo\Pet\PetStore;
 use App\Demo\ThreadState;
 use PHPUnit\Framework\TestCase;
 use Tempest\Console\Console;
+use Tempest\Container\GenericContainer;
+use Thunder\Bolt\App;
+use Thunder\Bolt\Authorization\Authorization;
+use Thunder\Bolt\Authorization\AuthorizationSource;
+use Thunder\Bolt\Authorization\CallbackAuthorizer;
+use Thunder\Bolt\BoltConfig;
 use Thunder\Bolt\Tests\Support\RecordingHttpClient;
 use Thunder\Bolt\WebApi\Client;
 
@@ -65,7 +71,13 @@ final class DemoRuntimeTest extends TestCase
                 $reported = true;
                 return $console;
             });
-        $runtime = new DemoRuntime($config, new Client($http, 'test-bot'), $console);
+        $client = new Client($http, 'test-bot');
+        $runtime = new DemoRuntime(
+            $config,
+            $client,
+            $console,
+            new App(new GenericContainer(), $client, new BoltConfig(token: 'test-bot')),
+        );
         $config->queue()->enqueue(new DemoJob('ai', 'hello', 'T1', 'UOWNER', 'C1', '1.001')->toArray(), 'hello-one');
         $runtime->run(static function () use (&$reported): bool {
             return $reported;
@@ -139,6 +151,51 @@ final class DemoRuntimeTest extends TestCase
         $http = new RecordingHttpClient();
         $console = $this->createMock(Console::class);
         $console->expects(self::never())->method('error');
-        return [$config, $http, new DemoRuntime($config, new Client($http, 'test-bot'), $console)];
+        $client = new Client($http, 'test-bot');
+        return [
+            $config,
+            $http,
+            new DemoRuntime(
+                $config,
+                $client,
+                $console,
+                new App(new GenericContainer(), $client, new BoltConfig(token: 'test-bot')),
+            ),
+        ];
+    }
+
+    public function test_spool_work_resolves_current_scoped_grants_instead_of_the_boot_client(): void
+    {
+        $config = new DemoConfig($this->directory, ['UOWNER']);
+        $http = new RecordingHttpClient();
+        $client = new Client($http, 'stale-boot-token');
+        $seen = [];
+        $app = new App(
+            new GenericContainer(),
+            $client,
+            new BoltConfig(),
+            authorizer: CallbackAuthorizer::from(static function (AuthorizationSource $source) use (
+                &$seen,
+            ): Authorization {
+                $seen[] = [$source->teamId, $source->userId, $source->conversationId];
+                return new Authorization(botToken: 'current-' . count($seen), teamId: $source->teamId);
+            }),
+        );
+        $console = $this->createMock(Console::class);
+        $console->expects(self::never())->method('error');
+        $runtime = new DemoRuntime($config, $client, $console, $app);
+        $config->queue()->enqueue(new DemoJob('pet', '', 'T1', 'UOWNER', 'C1')->toArray(), 'first');
+        $config->queue()->enqueue(new DemoJob('pet_home', 'refresh', 'T2', 'UOTHER', '')->toArray(), 'second');
+        $runtime->run(static fn(): bool => count($http->requests) >= 2);
+
+        self::assertSame(
+            [
+                ['T1', 'UOWNER', 'C1'],
+                ['T2', 'UOTHER', null],
+            ],
+            $seen,
+        );
+        self::assertSame('Bearer current-1', $http->requests[0]->getHeaderLine('Authorization'));
+        self::assertSame('Bearer current-2', $http->requests[1]->getHeaderLine('Authorization'));
     }
 }

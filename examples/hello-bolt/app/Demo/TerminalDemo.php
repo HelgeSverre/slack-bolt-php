@@ -20,11 +20,13 @@ final class TerminalDemo
     /** @var array<string, \App\Demo\Terminal\TerminalSnapshot> */
     private array $screenUpdates = [];
 
+    /** @param null|\Closure(DemoJob): Client $clientForJob */
     public function __construct(
         private readonly DemoConfig $config,
         private readonly Client $client,
         private readonly ThreadState $threads,
         private readonly Console $console,
+        private readonly ?\Closure $clientForJob = null,
     ) {
         $workspace = $config->directory . '/terminal-workspace';
         if (!is_dir($workspace) && !mkdir($workspace, 0700, true) && !is_dir($workspace)) {
@@ -109,7 +111,8 @@ final class TerminalDemo
                 ),
             )->fallbackText('Slack terminal · ' . $snapshot->status);
             try {
-                $this->client
+                $this
+                    ->clientFor($target->job)
                     ->chat()
                     ->update(['channel' => $target->job->channel, 'ts' => $target->message, ...$message->toArray()]);
                 $this->screens[$id]->updated = microtime(true);
@@ -141,6 +144,11 @@ final class TerminalDemo
         if (is_string($job->thread ?? null) && $job->thread !== '') {
             $body['thread_ts'] = $job->thread;
         }
-        return $this->client->call('chat.postMessage', $body);
+        return $this->clientFor($job)->call('chat.postMessage', $body);
+    }
+
+    private function clientFor(DemoJob $job): Client
+    {
+        return $this->clientForJob === null ? $this->client : ($this->clientForJob)($job);
     }
 }

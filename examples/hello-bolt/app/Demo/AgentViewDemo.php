@@ -36,8 +36,25 @@ final readonly class AgentViewDemo
             ]);
     }
 
-    public function message(Message $message, Thread $thread, AppContext $context, Delivery $delivery, Jobs $jobs): void
-    {
+    public function message(
+        Message $message,
+        Thread $thread,
+        AppContext $context,
+        Delivery $delivery,
+        Jobs $jobs,
+        DemoConfig $config,
+    ): void {
+        $team = $delivery->authorizationSource?->teamId ?? '';
+        if (
+            $message->threadTs !== null
+            && (
+                new ThreadState($config->directory)->get($team, $message->channelId, $message->threadTs)['mode'] ?? null
+            )
+                === 'terminal'
+        ) {
+            new \App\Listeners\Playground($config)->thread($message, $delivery, $jobs);
+            return;
+        }
         $event = $delivery->metadata['eventId'] ?? null;
         if (!is_string($event) || $event === '') {
             throw new \InvalidArgumentException('An agent turn needs Slack delivery identity.');

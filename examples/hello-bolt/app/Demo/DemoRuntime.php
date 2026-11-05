@@ -9,6 +9,8 @@ use App\Demo\Pet\PetStore;
 use App\Demo\Pet\PetView;
 use App\Demo\Work\WorkObjectsDemo;
 use Tempest\Console\Console;
+use Thunder\Bolt\App;
+use Thunder\Bolt\Authorization\AuthorizationSource;
 use Thunder\Bolt\Messages\Message;
 use Thunder\Bolt\WebApi\Client;
 
@@ -26,11 +28,18 @@ final class DemoRuntime
         private readonly DemoConfig $config,
         private readonly Client $client,
         private readonly Console $console,
+        private readonly App $app,
     ) {
         $this->queue = $config->queue();
         $this->threads = new ThreadState($config->directory);
         $this->pet = new PetStore($config->directory . '/pet.json');
-        $this->terminal = new TerminalDemo($config, $this->client, $this->threads, $this->console);
+        $this->terminal = new TerminalDemo(
+            $config,
+            $this->client,
+            $this->threads,
+            $this->console,
+            $this->clientFor(...),
+        );
     }
 
     /** @param null|callable(): bool $shouldStop */
@@ -84,7 +93,7 @@ final class DemoRuntime
             match ($job->mode) {
                 'pet' => $this->pet($job, $id),
                 'pet_home' => $this->petHome($job, $id),
-                'work' => new WorkObjectsDemo($this->config, $this->client)->handle($job, $id),
+                'work' => new WorkObjectsDemo($this->config, $this->clientFor($job))->handle($job, $id),
                 'assistant', 'ai' => throw new \LogicException(
                     'AI jobs moved to the durable named-job worker. Run `bolt jobs:work` for new requests.',
                 ),
@@ -104,7 +113,8 @@ final class DemoRuntime
                     return;
                 }
                 if ($job->mode === 'pet_home') {
-                    $this->client
+                    $this
+                        ->clientFor($job)
                         ->views()
                         ->publish(['user_id' => $job->user, 'view' => PetHomeView::unavailable()->toArray()]);
                     return;
@@ -128,7 +138,10 @@ final class DemoRuntime
             : $this->pet->snapshot($job->team);
         $message = PetView::message($state);
         if (is_string($job->message ?? null)) {
-            $this->client->chat()->update(['channel' => $job->channel, 'ts' => $job->message, ...$message->toArray()]);
+            $this
+                ->clientFor($job)
+                ->chat()
+                ->update(['channel' => $job->channel, 'ts' => $job->message, ...$message->toArray()]);
         } else {
             $this->reply($job, $message);
         }
@@ -139,7 +152,8 @@ final class DemoRuntime
         $state = in_array($job->text, ['feed', 'play', 'clean', 'rest'], true)
             ? $this->pet->care($job->team, $job->user, $job->text, $id)
             : $this->pet->snapshot($job->team);
-        $this->client
+        $this
+            ->clientFor($job)
             ->views()
             ->publish([
                 'user_id' => $job->user,
@@ -156,6 +170,19 @@ final class DemoRuntime
         if (is_string($job->thread ?? null) && $job->thread !== '') {
             $body['thread_ts'] = $job->thread;
         }
-        return $this->client->call('chat.postMessage', $body);
+        return $this->clientFor($job)->call('chat.postMessage', $body);
+    }
+
+    private function clientFor(DemoJob $job): Client
+    {
+        $authorization = $this->app->authorizeSource(new AuthorizationSource(
+            teamId: $job->team,
+            userId: $job->user,
+            conversationId: $job->channel === '' ? null : $job->channel,
+        ));
+
+        return $this->client->withToken(
+            $authorization->botToken ?? throw new \RuntimeException('The demo requires a bot grant.'),
+        );
     }
 }

@@ -66,7 +66,7 @@ The following table lists every dedicated block builder in Thunder Bolt. Source 
 | Slack `type` | PHP factory | Use it for |
 | --- | --- | --- |
 | `actions` | [`Actions::make($button, $select)`](../src/BlockKit/Actions.php) | A row of interactive controls |
-| `alert` | [`Alert::make('Check the configuration', 'warning')`](../src/BlockKit/Alert.php) | A notice with a severity level; text up to 200 characters |
+| `alert` | [`Alert::make('Check the configuration', 'warning')`](../src/BlockKit/Alert.php) | Modal-only notice with a severity level; text up to 200 characters |
 | `card` | [`Card::make()->title('Release')->body('Ready to deploy')`](../src/BlockKit/Card.php) | A compact card with optional imagery and up to three action buttons |
 | `carousel` | [`Carousel::make($firstCard, $secondCard)`](../src/BlockKit/Carousel.php) | A horizontally browsable set of cards |
 | `container` | [`Container::make('Summary', $section)`](../src/BlockKit/Container.php) | A titled wrapper with optional collapse controls |

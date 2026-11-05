@@ -20,6 +20,8 @@ php bolt jobs:work
 
 Set `SLACK_APP_TOKEN` and `SLACK_BOT_TOKEN` in `.env`. Set `SLACK_TERMINAL_ALLOWED_USERS` to the comma-separated Slack member IDs allowed to use the terminal, and `OPENAI_API_KEY` to enable AI. `OPENAI_MODEL` defaults to `gpt-5.5` and can be changed to a model available to your API project.
 
+For an OAuth installation, configure `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`, `SLACK_OAUTH_REDIRECT_URI` and the durable installation store instead of a static bot token. Both workers resolve current workspace grants; terminal screen updates resolve them again when sending. Keep the app-level Socket Mode token in `SLACK_APP_TOKEN`. See [OAuth configuration and migration](../../docs/oauth-and-authorization.md) before enabling irreversible token rotation.
+
 ## Try it in Slack
 
 - `/kickensink` — open the interactive tour: a real durable session with streamed task progress, Stop, AI, Boltling, work items and a framework-details modal. `/kitchensink` is an alias. The tour itself uses no model; Ask AI runs a real Responses request.

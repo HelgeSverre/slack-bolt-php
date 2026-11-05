@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Resolve current workspace credentials for playground spool jobs and terminal screen updates; keep Agent View replies in owner-guarded terminal threads out of the model.
 - Typed view-operation, message-update and ephemeral request values accepting native builders, explicit destinations and optimistic view hashes.
 - Immutable interaction fixtures, strict nested API/acknowledgement assertions and end-to-end composition tests through the real receiver.
 - Native rich-text tags, message references and Work Object references, with supported modern styles and enum/named tag colors.

@@ -4,6 +4,8 @@ Thunder Bolt discovers listener methods in `app/` and resolves typed method argu
 
 ## Events and commands
 
+The unreleased typed `SlashCommand::$triggerId` can be passed to `ViewRequest::open()` for command-driven modals. It is nullable for incomplete or manually constructed payloads; validate it before opening a view. The interactive starter includes a complete command/Home/button/form example, and the public testing toolkit's command fixture supplies a synthetic trigger ID.
+
 An event does not need an initial Slack response. A slash command does:
 
 ```php

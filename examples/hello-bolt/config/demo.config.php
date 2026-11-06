@@ -7,7 +7,7 @@ use App\Demo\DemoConfig;
 use function Tempest\env;
 
 return new DemoConfig(
-    directory: getcwd() . '/.thunder-bolt/demo',
+    directory: \Tempest\Container\get(\Tempest\Core\Kernel::class)->internalStorage . '/demo',
     terminalUsers: array_values(array_filter(array_map('trim', explode(
         ',',
         (string) env('SLACK_TERMINAL_ALLOWED_USERS', ''),

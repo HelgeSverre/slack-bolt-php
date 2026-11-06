@@ -16,13 +16,15 @@ final readonly class ProjectDoctor
         private ProjectSetup $setup,
         private string $root,
         private JobConfig $jobs = new JobConfig(),
+        private ?string $runtimePath = null,
+        private ?\Tempest\Cryptography\Encryption\EncryptionConfig $encryption = null,
     ) {}
 
     /**
      * @param array<string, string> $oauthValues Values are consumed only to report redacted presence.
-     * @return array{ok: bool, ready: bool, php: string, transport: string, authorization: string, httpReady: bool, socketReady: bool, workerReady: bool, contextStore: string, socketTokenConfigured: bool, socketAuthorizationConfigured: bool, configuration: array<string, string>, storage: array<string, array{writable: bool, public: bool}>, failures: list<string>, warnings: list<string>, nextSteps: list<string>, networkChecked: bool, installationVerified: bool, workerProcessChecked: bool}
+     * @return array{ok: bool, ready: bool, php: string, transport: string, authorization: string, httpReady: bool, socketReady: bool, workerReady: bool, sessionsReady: bool|null, contextStore: string, socketTokenConfigured: bool, socketAuthorizationConfigured: bool, configuration: array<string, string>, storage: array<string, array{writable: bool, public: bool}>, failures: list<string>, warnings: list<string>, nextSteps: list<string>, networkChecked: bool, installationVerified: bool, workerProcessChecked: bool}
      */
-    public function report(array $oauthValues = [], bool $workers = false): array
+    public function report(array $oauthValues = [], bool $workers = false, bool $sessions = false): array
     {
         $failures = [];
         $warnings = [];
@@ -60,9 +62,13 @@ final readonly class ProjectDoctor
                 static fn(string $status): bool => $status !== 'configured',
             )
             && (!$oauth || $configuredOAuth !== null);
-        $storage = [];
+        $runtimePath = $this->runtimePath ?? $this->root . '/.thunder-bolt';
+        $storage = ['runtime' => $this->storage($runtimePath, true)];
+        if (!$storage['runtime']['writable'] || $storage['runtime']['public']) {
+            $failures[] = 'Use a writable runtime directory outside public/ (BOLT_RUNTIME_PATH).';
+        }
         if ($oauth) {
-            $storage['oauth'] = $this->storage($this->config->installationStorePath ?? '.thunder-bolt/oauth', true);
+            $storage['oauth'] = $this->storage($this->config->installationStorePath ?? $runtimePath . '/oauth', true);
             if (!$storage['oauth']['writable'] || $storage['oauth']['public'])
                 $failures[] = 'Use a writable OAuth store outside public/ (SLACK_INSTALLATION_STORE_PATH).';
         }
@@ -70,7 +76,7 @@ final readonly class ProjectDoctor
             $sqlite = $this->config->conversationStoreDriver === 'sqlite';
             $storage['context'] = $this->storage(
                 $this->config->conversationStorePath
-                ?? ($sqlite ? '.thunder-bolt/conversations.sqlite' : '.thunder-bolt/conversations'),
+                ?? $runtimePath . ($sqlite ? '/conversations.sqlite' : '/conversations'),
                 !$sqlite,
             );
             if ($sqlite && !extension_loaded('pdo_sqlite'))
@@ -78,7 +84,7 @@ final readonly class ProjectDoctor
             if (!$storage['context']['writable'] || $storage['context']['public'])
                 $failures[] = 'Use writable context storage outside public/ (SLACK_CONTEXT_STORE_PATH).';
         }
-        $storage['jobs'] = $this->storage($this->jobs->path ?? '.thunder-bolt/jobs/queue.sqlite', false);
+        $storage['jobs'] = $this->storage($this->jobs->path ?? $runtimePath . '/jobs/queue.sqlite', false);
         $jobProblems = [];
         if (!extension_loaded('pdo_sqlite'))
             $jobProblems[] = 'Durable jobs require the PHP pdo_sqlite extension.';
@@ -89,11 +95,32 @@ final readonly class ProjectDoctor
         $workerReady = $failures === [] && $authReady && $jobProblems === [];
         $httpReady = $failures === [] && $authReady && self::configured($http, 'SLACK_SIGNING_SECRET');
         $socketReady = $failures === [] && $authReady && self::configured($socketValues, 'SLACK_APP_TOKEN');
+        $sessionsReady = null;
+        if ($sessions) {
+            $key = $this->encryption?->key;
+            $configuration['SIGNING_KEY'] = $key === null || trim($key) === '' ? 'missing' : 'configured';
+            try {
+                \Tempest\Cryptography\Encryption\EncryptionKey::fromString(
+                    $key,
+                    $this->encryption?->algorithm ?? \Tempest\Cryptography\Encryption\EncryptionAlgorithm::AES_256_GCM,
+                );
+                $sessionsReady = true;
+            } catch (\Tempest\Cryptography\Encryption\Exceptions\EncryptionKeyWasInvalid) {
+                $sessionsReady = false;
+                if ($configuration['SIGNING_KEY'] !== 'missing') {
+                    $configuration['SIGNING_KEY'] = 'invalid';
+                }
+                $failures[] = 'Browser sessions require a valid SIGNING_KEY. Run php bolt key:generate locally (--force only for intentional replacement), or configure a key through your production secret provider.';
+            }
+        }
         if ($workers)
             $failures = [...$failures, ...$jobProblems];
         else
             $warnings = [...$warnings, ...$jobProblems];
-        $ready = ($this->setup->transport === 'socket' ? $socketReady : $httpReady) && (!$workers || $workerReady);
+        $ready =
+            ($this->setup->transport === 'socket' ? $socketReady : $httpReady)
+            && (!$workers || $workerReady)
+            && (!$sessions || $sessionsReady === true);
         $steps = [];
         foreach ($configuration as $name => $status) {
             if ($status !== 'configured')
@@ -116,6 +143,7 @@ final readonly class ProjectDoctor
             'httpReady' => $httpReady,
             'socketReady' => $socketReady,
             'workerReady' => $workerReady,
+            'sessionsReady' => $sessionsReady,
             'contextStore' => $this->config->conversationStoreDriver,
             'socketTokenConfigured' => self::configured($socketValues, 'SLACK_APP_TOKEN'),
             'socketAuthorizationConfigured' => $authReady,
@@ -161,49 +189,6 @@ final readonly class ProjectDoctor
     /** @return array{writable: bool, public: bool} */
     private function storage(string $path, bool $directory): array
     {
-        $absolute = str_starts_with($path, '/') || preg_match('/\A[A-Za-z]:[\\\\\/]/', $path) === 1;
-        $path = $absolute ? $path : $this->root . '/' . $path;
-        $probe = $path;
-        $suffix = [];
-        while (!file_exists($probe) && dirname($probe) !== $probe) {
-            array_unshift($suffix, basename($probe));
-            $probe = dirname($probe);
-        }
-        $resolved =
-            str_replace('\\', '/', realpath($probe) ?: $probe) . ($suffix === [] ? '' : '/' . implode('/', $suffix));
-        $public = self::normalize($this->root . '/public');
-        $resolvedPublic = self::normalize(realpath($this->root . '/public') ?: $this->root . '/public');
-        $exposed = false;
-        foreach ([self::normalize($path), self::normalize($resolved)] as $candidate) {
-            foreach ([$public, $resolvedPublic] as $webRoot) {
-                if ($candidate === $webRoot || str_starts_with($candidate, rtrim($webRoot, '/') . '/'))
-                    $exposed = true;
-            }
-        }
-        $wrongKind = file_exists($path) && ($directory ? !is_dir($path) : !is_file($path));
-        return [
-            'writable' =>
-                !$wrongKind
-                    && is_writable($probe)
-                    && ($probe === $path || is_dir($probe))
-                    && ($directory || !is_file($path) || is_writable(dirname($path))),
-            'public' => $exposed,
-        ];
-    }
-
-    private static function normalize(string $path): string
-    {
-        $path = str_replace('\\', '/', $path);
-        if (PHP_OS_FAMILY === 'Windows')
-            $path = strtolower($path);
-        $parts = [];
-        foreach (explode('/', $path) as $part) {
-            if ($part === '..') {
-                if ($parts !== [] && !str_ends_with(end($parts), ':'))
-                    array_pop($parts);
-            } elseif ($part !== '' && $part !== '.')
-                $parts[] = $part;
-        }
-        return (str_starts_with($path, '//') ? '//' : (str_starts_with($path, '/') ? '/' : '')) . implode('/', $parts);
+        return new \Thunder\Bolt\Runtime\StoragePath($this->root, $path)->inspect($directory);
     }
 }

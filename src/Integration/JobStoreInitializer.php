@@ -19,6 +19,7 @@ final class JobStoreInitializer implements Initializer
         $path =
             $container->get(JobConfig::class)->path
             ?? $container->get(Kernel::class)->internalStorage . '/jobs/queue.sqlite';
+        $path = new \Thunder\Bolt\Runtime\StoragePath($container->get(Kernel::class)->root, $path)->absolute();
         return SqliteJobStore::open(
             $path,
             $container->has(ClockInterface::class) ? $container->get(ClockInterface::class) : null,

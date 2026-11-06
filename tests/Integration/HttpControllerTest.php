@@ -58,12 +58,28 @@ final class HttpControllerTest extends TestCase
         self::assertSame($response, $result);
     }
 
-    public function test_other_routes_retain_tempest_failure_handling(): void
+    public function test_custom_routes_keep_deliberate_error_status_body_and_headers(): void
     {
-        $this->expectException(HttpRequestFailed::class);
+        foreach ([400, 401, 404, 410, 422, 503] as $code) {
+            $response = new GenericResponse(Status::fromCode($code), 'Deliberate application response', [
+                'Cache-Control' => 'no-store',
+            ]);
+            self::assertSame($response, (new SlackHttpFailurePassthroughMiddleware())(
+                new GenericRequest(Method::GET, 'https://example.test/connect/expired'),
+                $this->next($response),
+            ));
+        }
+    }
+
+    public function test_thrown_exceptions_still_reach_tempest_error_handling(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unhandled application exception');
         (new SlackHttpFailurePassthroughMiddleware())(
             new GenericRequest(Method::GET, 'https://example.test/another-route'),
-            $this->next(new GenericResponse(Status::fromCode(404), 'Missing')),
+            new HttpMiddlewareCallable(static function (): never {
+                throw new \RuntimeException('Unhandled application exception');
+            }),
         );
     }
 

@@ -21,6 +21,7 @@ final class CommandCatalog
         'auth:verify',
         'listener:list',
         'doctor',
+        'key:generate',
         'status',
         'routes',
         'about',
@@ -57,6 +58,14 @@ final class CommandCatalog
             static fn(ConsoleCommand $command): bool => (
                 in_array($command->getName(), self::FRAMEWORK_COMMANDS, true)
                 || str_starts_with($command->handler->getDeclaringClass()->getName(), 'App\\')
+            ),
+        );
+        // Prefer Bolt's non-rotating key command over Tempest's default override.
+        $config->commands = array_filter(
+            $config->commands,
+            static fn(ConsoleCommand $command): bool => (
+                $command->getName() !== 'key:generate'
+                || $command->handler->getDeclaringClass()->getName() === SigningKeyCommand::class
             ),
         );
         foreach (['generate', 'show', 'install', 'uninstall'] as $method) {

@@ -18,7 +18,24 @@ cp .env.example .env
 
 If `bolt` is not on your shell's `PATH`, find Composer's global bin directory with `composer global config bin-dir --absolute` and add it to `PATH`.
 
-The generated app has a PSR-4 `App\` namespace, an `app/Listeners` directory, `config/` files discovered by Tempest, `public/index.php`, a minimal `slack-manifest.yaml`, and a project-local `bolt` launcher. It deliberately starts with the smallest useful Slack surface: an `app_mention` listener, `app_mentions:read`, and `chat:write`.
+The generated app has a PSR-4 `App\` namespace, an `app/Listeners` directory, `config/` files discovered by Tempest, `public/index.php`, a matching `slack-manifest.yaml`, and a project-local `bolt` launcher. The default `mentions` starter uses an `app_mention` listener, `app_mentions:read`, and `chat:write`.
+
+The unreleased CLI adds `--profile`, independently of transport and authorization:
+
+| Profile | Generated experience | Bot scopes |
+| --- | --- | --- |
+| `mentions` (default) | Mention the app and get a reply | `app_mentions:read`, `chat:write` |
+| `interactive` | App Home button and `/bolt` → modal → validated private confirmation | `commands`, `chat:write` |
+| `agent` | Agent View messages, typed streaming and native Stop handler | `assistant:write`, `chat:write`, `im:history` |
+
+```sh
+bolt new office-app --profile=interactive --transport=socket --no-interaction
+bolt new workspace-agent --profile=agent --auth=oauth --no-interaction
+```
+
+Use `--source=path` from a framework checkout to try unreleased additions. Each profile generates its own listener/configuration, scopes, events and feature settings. Agent View requires workspace support; this profile targets a new app and does not migrate an existing Slack app. The example reply requires no AI account. Replace or extend the generated PHP classes as the application grows.
+
+Interactive and agent starters require dependency constraints that exclude versions before 0.8.0; older pins are rejected before creating a directory. The mention starter remains available for older supported releases. Runtime relocation and session-key commands require the newer shared bootstrap described below.
 
 `new` creates a new directory and refuses to overwrite an existing one. Choose delivery and authorization while scaffolding when the defaults are not right:
 
@@ -53,6 +70,8 @@ SLACK_APP_TOKEN=xapp-replace-me
 For OAuth, set `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`, and an exact HTTPS `SLACK_OAUTH_REDIRECT_URI`; then follow [OAuth and authorization](../oauth-and-authorization.md). OAuth authorization and a static bot token are alternatives for ordinary deliveries. Socket Mode can use either authorization choice, but OAuth installation and callback routes still use HTTP.
 
 The generated `.gitignore` excludes `.env` and `.thunder-bolt/`. Keep credentials and state outside `public/`, never commit them, and do not paste them into issue reports or logs.
+
+The shared bootstrap supports `BOLT_RUNTIME_PATH` for state outside a read-only release. Custom browser forms can use `php bolt key:generate` and `php bolt doctor --sessions`. These unreleased additions are covered in [runtime storage and browser routes](runtime-and-browser-routes.md), including how to upgrade an existing HTTP entry point.
 
 ## Configure Slack
 

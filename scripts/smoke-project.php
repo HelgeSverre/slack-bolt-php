@@ -10,6 +10,7 @@ $root = dirname(__DIR__);
 $workspace = sys_get_temp_dir() . '/bolt-project-smoke-' . bin2hex(random_bytes(6));
 mkdir($workspace, 0700);
 $project = $workspace . '/app';
+$runtime = $workspace . '/runtime';
 $environment = [];
 // Keep executable/runtime paths, not ambient application keys or tokens.
 foreach ([
@@ -36,6 +37,7 @@ foreach ([
     }
 }
 $environment += [
+    'BOLT_RUNTIME_PATH' => $runtime,
     'SLACK_BOT_TOKEN' => 'smoke-token',
     'SLACK_SIGNING_SECRET' => 'smoke-secret',
     'SLACK_BOT_USER_ID' => 'U-smoke-bot',
@@ -84,7 +86,7 @@ try {
         throw new RuntimeException('Fresh application readiness check failed.');
     }
     $status = json_decode($command([PHP_BINARY, 'bolt', 'status', '--format=json', '--require=jobs'], $project, expectedExit: 1), true, flags: JSON_THROW_ON_ERROR);
-    if (($status['healthy'] ?? true) !== false || ($status['active']['jobs'] ?? -1) !== 0 || is_file($project . '/.thunder-bolt/jobs/queue.sqlite'))
+    if (($status['healthy'] ?? true) !== false || ($status['active']['jobs'] ?? -1) !== 0 || is_file($runtime . '/jobs/queue.sqlite'))
         throw new RuntimeException('Status must not invent a running worker or initialize its queue.');
     $badConfig = $project . '/config/doctor-failure.config.php';
     file_put_contents($badConfig, '<?php throw new RuntimeException("doctor-private-canary");');

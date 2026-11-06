@@ -10,7 +10,6 @@ use Tempest\Console\Console;
 use Tempest\Console\ConsoleConfig;
 use Tempest\Console\Input\ConsoleArgumentBag;
 use Tempest\Core\Kernel;
-use Tempest\Discovery\DiscoveryLocation;
 use Tempest\Highlight\Highlighter;
 
 /**
@@ -21,7 +20,7 @@ use Tempest\Highlight\Highlighter;
  */
 final class BoltCli
 {
-    public const string NEW_USAGE = 'Usage: php /path/to/bolt new <directory> [--transport=http|socket] [--auth=token|oauth] [--source=packagist|path|vcs] [--repository=<url-or-local-git-repository>] [--version=<constraint>] [--no-interaction]';
+    public const string NEW_USAGE = 'Usage: php /path/to/bolt new <directory> [--profile=mentions|interactive|agent] [--transport=http|socket] [--auth=token|oauth] [--source=packagist|path|vcs] [--repository=<url-or-local-git-repository>] [--version=<constraint>] [--no-interaction]';
 
     /** @param list<string> $arguments */
     public static function run(array $arguments, string $packageRoot, ?string $composerAutoload = null): int
@@ -187,13 +186,7 @@ final class BoltCli
     private static function dispatchProjectCommand(array $arguments, string $projectRoot): int
     {
         try {
-            $container = \Tempest\Core\Tempest::boot(
-                root: $projectRoot,
-                discoveryLocations: is_dir($projectRoot . '/config')
-                    ? [new DiscoveryLocation('', $projectRoot . '/config')]
-                    : [],
-                internalStorage: $projectRoot . '/.thunder-bolt',
-            );
+            $container = \Thunder\Bolt\Bootstrap::boot($projectRoot);
         } catch (\Throwable $error) {
             return self::writeDiagnosticError($arguments, $projectRoot, $error);
         }
@@ -223,7 +216,7 @@ final class BoltCli
         if (!is_file($projectRoot . '/vendor/composer/installed.json')) {
             return self::writeMissingDependenciesError($arguments);
         }
-        $message = 'Application configuration could not be loaded. Check .env and config/; OAuth requires complete credentials and an HTTPS redirect URL.';
+        $message = 'Application configuration could not be loaded. Check .env, config/ and BOLT_RUNTIME_PATH (writable and outside public/); OAuth requires complete credentials and an HTTPS redirect URL.';
         return self::writeDiagnosticMessage($arguments, $message);
     }
 

@@ -28,6 +28,19 @@ final readonly class ProjectSource
         return new self(self::PATH, $packageRoot, self::DEVELOPMENT_VERSION);
     }
 
+    public function supports(string $minimumVersion): bool
+    {
+        if ($this->type === self::PATH || $this->version === 'dev-main') {
+            return true;
+        }
+        $parser = new VersionParser();
+
+        return Intervals::isSubsetOf(
+            $parser->parseConstraints($this->version),
+            $parser->parseConstraints('>=' . $minimumVersion),
+        );
+    }
+
     public static function fromOptions(?string $type, ?string $repository, ?string $version, string $packageRoot): self
     {
         $type ??= self::PACKAGIST;

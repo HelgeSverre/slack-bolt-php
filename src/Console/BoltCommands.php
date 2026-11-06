@@ -36,13 +36,15 @@ final readonly class BoltCommands
         ?string $repository = null,
         #[ConsoleArgument(description: 'Composer constraint (0.3.0+) or dev-main')]
         ?string $version = null,
+        #[ConsoleArgument(description: 'Starter profile: mentions, interactive or agent')]
+        string $profile = 'mentions',
     ): ExitCode {
         try {
             $packageRoot = dirname(__DIR__, 2);
             $projectSource = ProjectSource::fromOptions($source, $repository, $version, $packageRoot);
             $project = new ProjectScaffold(dirname(__DIR__, 2))->create(
                 $directory,
-                new ProjectSetup($transport, $authorization),
+                new ProjectSetup($transport, $authorization, $profile),
                 $projectSource,
             );
         } catch (RuntimeException|JsonException|\InvalidArgumentException $exception) {
@@ -253,6 +255,8 @@ final readonly class BoltCommands
         ?string $authorization = null,
         #[ConsoleArgument(description: 'Also require durable job worker prerequisites')]
         bool $workers = false,
+        #[ConsoleArgument(description: 'Also validate the key used by custom browser sessions and encrypted cookies')]
+        bool $sessions = false,
     ): ExitCode {
         if (!in_array($format, ['table', 'json'], true)) {
             $this->console->error('Format must be table or json.');
@@ -267,7 +271,11 @@ final readonly class BoltCommands
                 $config->oauth !== null ? 'oauth' : 'token',
             );
         try {
-            $setup = new ProjectSetup($transport ?? $defaults->transport, $authorization ?? $defaults->authorization);
+            $setup = new ProjectSetup(
+                $transport ?? $defaults->transport,
+                $authorization ?? $defaults->authorization,
+                $defaults->profile,
+            );
         } catch (\InvalidArgumentException $error) {
             $this->console->error($error->getMessage());
             return ExitCode::INVALID;
@@ -277,11 +285,17 @@ final readonly class BoltCommands
             $setup,
             getcwd() ?: '.',
             $container->get(\Thunder\Bolt\Jobs\JobConfig::class),
-        )->report([
-            'SLACK_CLIENT_ID' => (string) \Tempest\env('SLACK_CLIENT_ID', ''),
-            'SLACK_CLIENT_SECRET' => (string) \Tempest\env('SLACK_CLIENT_SECRET', ''),
-            'SLACK_OAUTH_REDIRECT_URI' => (string) \Tempest\env('SLACK_OAUTH_REDIRECT_URI', ''),
-        ], $workers);
+            runtimePath: $container->get(\Tempest\Core\Kernel::class)->internalStorage,
+            encryption: $sessions ? $container->get(\Tempest\Cryptography\Encryption\EncryptionConfig::class) : null,
+        )->report(
+            [
+                'SLACK_CLIENT_ID' => (string) \Tempest\env('SLACK_CLIENT_ID', ''),
+                'SLACK_CLIENT_SECRET' => (string) \Tempest\env('SLACK_CLIENT_SECRET', ''),
+                'SLACK_OAUTH_REDIRECT_URI' => (string) \Tempest\env('SLACK_OAUTH_REDIRECT_URI', ''),
+            ],
+            $workers,
+            $sessions,
+        );
         if ($format === 'json') {
             $this->console->writeRaw(
                 json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL,

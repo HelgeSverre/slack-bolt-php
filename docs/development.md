@@ -57,7 +57,7 @@ composer test:vcs-project
 
 The project smoke checks install dependencies into disposable applications. `test:project` covers the local path source. `test:vcs-project` snapshots the current package inputs into a disposable Git repository, installs through Composer's VCS resolver, then detaches that source to prove the generated application works without a path symlink. Neither check publishes a package or contacts Slack. Composer may download dependencies. The VCS smoke explicitly targets `dev-main` in its disposable repository; ordinary Packagist scaffolding selects the compatible stable minor. Consumers can also select compatible Git tags/constraints from 0.3.0 onward. The VCS smoke exercises the public testing toolkit and typed App Home delivery with production dependencies only.
 
-CI runs the documentation and fresh-project checks on Linux and macOS, a focused CLI suite on Windows, generated-reference checks, and the disposable Docker deployment smoke test.
+CI runs the documentation and fresh-project checks on Linux and macOS, a focused CLI suite on Windows, generated-reference checks, and the disposable Docker deployment smoke test. `composer test:onboarding` installs a disposable interactive starter and verifies shared external HTTP/CLI runtime storage, process-environment precedence, intentional HTTP errors, safe key generation and encrypted browser sessions against a real loopback HTTP server. It never contacts Slack or uses workspace credentials.
 
 ## Live release verification
 

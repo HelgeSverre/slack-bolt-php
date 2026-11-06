@@ -15,6 +15,7 @@ Thunder Bolt requires PHP 8.5+ and Tempest 3. Install the public Composer packag
 
 | Topic | Guide |
 | --- | --- |
+| Shared HTTP/CLI storage, custom browser responses and session keys | [Runtime and browser routes](guides/runtime-and-browser-routes.md) |
 | Buttons, shortcuts, external selects and modals | [HTTP interactivity](http-interactivity.md) |
 | Message, attachment, view and Block Kit builders | [SDK and Block Kit](sdk-and-block-kit.md) |
 | Typed requests/responses, pagination, uploads and retries | [Web API client](web-api-client.md) |

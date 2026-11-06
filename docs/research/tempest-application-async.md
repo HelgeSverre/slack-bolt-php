@@ -74,8 +74,8 @@ Thunder already fits this composition: its `AppInitializer` resolves config and
 dependencies and registers an `App` in Tempest's container
 ([`AppInitializer.php:43-133`](../../src/Integration/AppInitializer.php#L43-L133)); `BoltDiscovery` turns Slack listener attributes into descriptors after
 Tempest discovery has run ([`BoltDiscovery.php:25-29`](../../src/Integration/BoltDiscovery.php#L25-L29),
-[`BoltDiscovery.php:136-153`](../../src/Integration/BoltDiscovery.php#L136-L153)). The hello-bolt HTTP entry point simply boots Tempest and runs its `HttpApplication`
-([`public/index.php:5-17`](../../examples/hello-bolt/public/index.php#L5-L17)).
+[`BoltDiscovery.php:136-153`](../../src/Integration/BoltDiscovery.php#L136-L153)). The hello-bolt HTTP entry point now uses the narrow shared `Bootstrap` and runs Tempest's `HttpApplication`
+([`public/index.php`](../../examples/hello-bolt/public/index.php), [runtime configuration](../guides/runtime-and-browser-routes.md)).
 
 **Recommendation:** keep `Thunder\Bolt\App` a container-managed Slack
 component. If ergonomics need improving, add a narrow Bolt bootstrap/factory or

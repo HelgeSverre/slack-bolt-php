@@ -33,6 +33,7 @@ jobs:
       - run: php bin/bolt --version
       - run: composer test
       - run: composer test:project
+      - run: composer test:onboarding
       - run: composer test:vcs-project
       - run: mago format --check
       - run: mago lint
@@ -66,7 +67,7 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: php bin/bolt --version
       - run: php bin/bolt new --help
-      - run: php vendor/bin/phpunit tests/Console/NewProjectInputTest.php tests/Console/ProjectDoctorTest.php tests/Console/ScaffoldSetupTest.php tests/Console/OnboardingBootstrapTest.php tests/Runtime/Operations/RuntimeStatusTest.php tests/Console/CommandCatalogTest.php tests/Console/ProjectSourceTest.php tests/Payloads/EverydayEventsTest.php tests/Assistant/AgentViewTest.php tests/Assistant/StreamingChunksTest.php tests/Testing
+      - run: php vendor/bin/phpunit tests/Console/NewProjectInputTest.php tests/Console/ProjectDoctorTest.php tests/Console/ScaffoldSetupTest.php tests/Console/InteractiveStarterTest.php tests/Console/OnboardingBootstrapTest.php tests/Runtime/StoragePathTest.php tests/Runtime/SigningKeyFileTest.php tests/Runtime/Operations/RuntimeStatusTest.php tests/Console/CommandCatalogTest.php tests/Console/ProjectSourceTest.php tests/Payloads/EverydayEventsTest.php tests/Assistant/AgentViewTest.php tests/Assistant/StreamingChunksTest.php tests/Testing
 
   deployment:
     runs-on: ubuntu-latest

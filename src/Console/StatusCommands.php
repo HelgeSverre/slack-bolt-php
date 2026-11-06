@@ -54,7 +54,10 @@ final class StatusCommands
             $roles = $required === 'none' ? [] : explode(',', $required);
             $report = new RuntimeStatus(
                 $container->get(RuntimeMonitor::class),
-                $container->get(JobConfig::class)->path ?? $kernel->internalStorage . '/jobs/queue.sqlite',
+                new \Thunder\Bolt\Runtime\StoragePath(
+                    $kernel->root,
+                    $container->get(JobConfig::class)->path ?? $kernel->internalStorage . '/jobs/queue.sqlite',
+                )->absolute(),
                 $container->has(ClockInterface::class) ? $container->get(ClockInterface::class) : new SystemClock(),
             )->report($roles, $staleAfter);
         } catch (\Throwable) {

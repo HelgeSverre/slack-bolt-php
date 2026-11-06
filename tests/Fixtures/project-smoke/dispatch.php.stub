@@ -19,11 +19,7 @@ use Thunder\Bolt\SocketMode\Transport\Connection;
 use Thunder\Bolt\SocketMode\Transport\Connector;
 
 require getcwd() . '/vendor/autoload.php';
-$container = Tempest\Core\Tempest::boot(
-    root: getcwd(),
-    discoveryLocations: [new Tempest\Discovery\DiscoveryLocation('', getcwd() . '/config')],
-    internalStorage: getcwd() . '/.thunder-bolt',
-);
+$container = Thunder\Bolt\Bootstrap::boot(getcwd());
 $http = $container->get(ClientInterface::class);
 $app = $container->get(App::class);
 $install = new OAuthHttpHandler($container->get(Installer::class));
@@ -159,7 +155,7 @@ if ($claim === null) {
 }
 // Simulate a process dying after claim, before its handler executes. Only this
 // disposable fixture's lease is expired; the next process must recover it.
-$pdo = new PDO('sqlite:' . getcwd() . '/.thunder-bolt/jobs/queue.sqlite');
+$pdo = new PDO('sqlite:' . $container->get(Tempest\Core\Kernel::class)->internalStorage . '/jobs/queue.sqlite');
 $pdo->prepare('UPDATE thunder_bolt_jobs SET lease_expires_at = :expired WHERE id = :id')->execute([
     'expired' => time() - 1,
     'id' => $claim->id,

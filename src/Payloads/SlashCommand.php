@@ -13,6 +13,7 @@ final readonly class SlashCommand
         public string $command,
         public string $responseUrl,
         public array $raw,
+        public ?string $triggerId = null,
     ) {}
 
     public static function fromArray(array $body): self
@@ -24,6 +25,7 @@ final readonly class SlashCommand
             command: (string) ($body['command'] ?? ''),
             responseUrl: (string) ($body['response_url'] ?? ''),
             raw: $body,
+            triggerId: is_string($body['trigger_id'] ?? null) ? $body['trigger_id'] : null,
         );
     }
 }

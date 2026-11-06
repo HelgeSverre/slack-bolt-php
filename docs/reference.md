@@ -8,6 +8,7 @@ Use this map to find the public PHP interface behind a feature. The linked guide
 
 | Interface | Responsibility | Usage |
 | --- | --- | --- |
+| [`Bootstrap`](../src/Bootstrap.php) | Shared project boot and private HTTP/CLI runtime storage (unreleased) | [Runtime and browser routes](guides/runtime-and-browser-routes.md) |
 | [`App`](../src/App.php) | Registration, middleware, dispatch and error policy | [Building apps](guides/building-apps.md) |
 | [`BoltConfig`](../src/BoltConfig.php) | Runtime credentials and configuration | [Getting started](guides/getting-started.md#configure-the-local-app) |
 | [`Delivery`](../src/Invocation/Delivery.php) | Selected listener, authorization, destination and capabilities | [Building apps](guides/building-apps.md) |

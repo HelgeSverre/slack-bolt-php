@@ -6,11 +6,7 @@ use Psr\Http\Client\ClientInterface;
 use Thunder\Bolt\App;
 
 require getcwd() . '/vendor/autoload.php';
-$container = Tempest\Core\Tempest::boot(
-    root: getcwd(),
-    discoveryLocations: [new Tempest\Discovery\DiscoveryLocation('', getcwd() . '/config')],
-    internalStorage: getcwd() . '/.thunder-bolt',
-);
+$container = Thunder\Bolt\Bootstrap::boot(getcwd());
 $app = $container->get(App::class);
 $http = $container->get(ClientInterface::class);
 $http->requests = [];

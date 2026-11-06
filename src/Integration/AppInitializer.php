@@ -80,6 +80,10 @@ final class AppInitializer implements Initializer
         if ($config->oauth !== null) {
             $container->singleton(OAuthConfig::class, $config->oauth);
             $directory = $config->installationStorePath ?? $container->get(Kernel::class)->internalStorage . '/oauth';
+            $directory = new \Thunder\Bolt\Runtime\StoragePath(
+                $container->get(Kernel::class)->root,
+                $directory,
+            )->absolute();
             $store = $container->has(InstallationStore::class)
                 ? $container->get(InstallationStore::class)
                 : new FileInstallationStore($directory . '/installations');
@@ -113,6 +117,7 @@ final class AppInitializer implements Initializer
                     $config->conversationStorePath
                     ?? $container->get(Kernel::class)->internalStorage
                         . ($config->conversationStoreDriver === 'sqlite' ? '/conversations.sqlite' : '/conversations');
+                $path = new \Thunder\Bolt\Runtime\StoragePath($container->get(Kernel::class)->root, $path)->absolute();
                 $contextStore = match ($config->conversationStoreDriver) {
                     'memory' => new MemoryConversationStore($clock),
                     'sqlite' => new SqliteConversationStore($this->sqlite($path), $clock),

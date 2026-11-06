@@ -27,7 +27,7 @@ final readonly class NewProjectInput
             if (str_starts_with($argument, '--')) {
                 [$key, $value] = array_pad(explode('=', substr($argument, 2), 2), 2, null);
                 if (
-                    !in_array($key, ['transport', 'auth', 'source', 'repository', 'version'], true)
+                    !in_array($key, ['transport', 'auth', 'profile', 'source', 'repository', 'version'], true)
                     || array_key_exists($key, $options)
                 ) {
                     throw new \InvalidArgumentException('Use each supported option once. ' . self::USAGE);
@@ -48,7 +48,11 @@ final readonly class NewProjectInput
         }
         return new self(
             $directory,
-            new ProjectSetup($options['transport'] ?? 'http', $options['auth'] ?? 'token'),
+            new ProjectSetup(
+                $options['transport'] ?? 'http',
+                $options['auth'] ?? 'token',
+                $options['profile'] ?? 'mentions',
+            ),
             ProjectSource::fromOptions(
                 $options['source'] ?? null,
                 $options['repository'] ?? null,

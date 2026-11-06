@@ -13,13 +13,14 @@ final class NewProjectInputTest extends TestCase
     public function test_flags_work_before_or_after_the_directory_without_prompting(): void
     {
         foreach ([
-            ['my-app', '--transport=socket', '--auth=oauth', '--no-interaction'],
-            ['--transport', 'socket', 'my-app', '--auth', 'oauth'],
+            ['my-app', '--transport=socket', '--auth=oauth', '--profile=interactive', '--no-interaction'],
+            ['--transport', 'socket', 'my-app', '--auth', 'oauth', '--profile', 'interactive'],
         ] as $arguments) {
             $input = NewProjectInput::fromArguments($arguments);
             self::assertSame('my-app', $input->directory);
             self::assertSame('socket', $input->setup->transport);
             self::assertSame('oauth', $input->setup->authorization);
+            self::assertSame('interactive', $input->setup->profile);
             self::assertSame('packagist', $input->source->type);
         }
         $input = NewProjectInput::fromArguments(['my-app']);
@@ -87,6 +88,9 @@ final class NewProjectInputTest extends TestCase
             ['x', '--auth', '--no-interaction'],
             ['x', '--auth=invalid'],
             ['x', '--transport=invalid'],
+            ['x', '--profile=invalid'],
+            ['x', '--profile=agent', '--profile=interactive'],
+            ['x', '--profile'],
             ['x', 'y'],
             ['x', '--auth=oauth', '--auth=token'],
             ['x', '--source=vcs'],

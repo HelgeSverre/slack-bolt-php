@@ -179,4 +179,52 @@ final class ProjectDoctorTest extends TestCase
         self::assertFalse($report['ready']);
         self::assertStringContainsString('BoltConfig has no OAuthConfig', implode(' ', $report['failures']));
     }
+
+    public function test_runtime_overrides_apply_to_all_default_storage_and_are_inspected_without_creation(): void
+    {
+        $report = new ProjectDoctor(
+            new BoltConfig(token: 'token', signingSecret: 'signing'),
+            new ProjectSetup(),
+            $this->root,
+            runtimePath: $this->root . '/private-runtime',
+        )->report(workers: true);
+        self::assertTrue($report['ready']);
+        self::assertSame(['writable' => true, 'public' => false], $report['storage']['runtime']);
+        self::assertDirectoryDoesNotExist($this->root . '/private-runtime');
+        $bad = new ProjectDoctor(
+            new BoltConfig(token: 'token', signingSecret: 'signing'),
+            new ProjectSetup(),
+            $this->root,
+            runtimePath: 'public/runtime',
+        )->report();
+        self::assertFalse($bad['ready']);
+        self::assertTrue($bad['storage']['runtime']['public']);
+    }
+
+    public function test_sessions_are_optional_and_keys_are_validated_without_disclosure(): void
+    {
+        $config = new BoltConfig(token: 'token', signingSecret: 'signing');
+        $doctor = new ProjectDoctor($config, new ProjectSetup(), $this->root);
+        self::assertTrue($doctor->report()['ready']);
+        self::assertNull($doctor->report()['sessionsReady']);
+        $missing = $doctor->report(sessions: true);
+        self::assertFalse($missing['ready']);
+        self::assertTrue($missing['httpReady']);
+        self::assertSame('missing', $missing['configuration']['SIGNING_KEY']);
+        foreach (['invalid-private-canary' => false, base64_encode(random_bytes(32)) => true] as $key => $valid) {
+            $report = new ProjectDoctor(
+                $config,
+                new ProjectSetup(),
+                $this->root,
+                encryption: new \Tempest\Cryptography\Encryption\EncryptionConfig(
+                    \Tempest\Cryptography\Encryption\EncryptionAlgorithm::AES_256_GCM,
+                    $key,
+                ),
+            )->report(sessions: true);
+            self::assertSame($valid, $report['ready']);
+            self::assertSame($valid, $report['sessionsReady']);
+            self::assertSame($valid ? 'configured' : 'invalid', $report['configuration']['SIGNING_KEY']);
+            self::assertStringNotContainsString($key, json_encode($report, JSON_THROW_ON_ERROR));
+        }
+    }
 }

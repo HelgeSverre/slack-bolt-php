@@ -15,7 +15,13 @@ final readonly class ProjectScaffold
     public function create(string $directory, ?ProjectSetup $setup = null, ?ProjectSource $source = null): string
     {
         $setup ??= new ProjectSetup();
+        $profile = StarterProfile::from($setup->profile);
         $source ??= ProjectSource::fromOptions(null, null, null, $this->packageRoot);
+        if ($profile !== StarterProfile::Mentions && !$source->supports('0.8.0')) {
+            throw new \InvalidArgumentException(
+                'Interactive and agent starters require a dependency constraint of 0.8.0 or newer, dev-main, or --source=path. Use --profile=mentions for older packages.',
+            );
+        }
         $project = $this->resolveNewProjectPath($directory);
         $projectName = basename($project);
         if (!mkdir($project, 0775, true) && !is_dir($project)) {
@@ -35,44 +41,24 @@ final readonly class ProjectScaffold
             'minimum-stability' => 'dev',
             'prefer-stable' => true,
         ]);
-        $this->write(
-            "{$project}/.env.example",
-            "SLACK_BOT_TOKEN=xoxb-replace-me\nSLACK_SIGNING_SECRET=replace-me\nSLACK_BOT_USER_ID=\nSLACK_BOT_ID=\nSLACK_IGNORE_SELF=true\nSLACK_ATTACH_FUNCTION_TOKEN=true\n\n# Optional Socket Mode. An app-level xapp token is required only for `bolt socket:serve`.\nSLACK_APP_TOKEN=\n\n# Optional multi-workspace OAuth. Set all three to enable.\nSLACK_CLIENT_ID=\nSLACK_CLIENT_SECRET=\nSLACK_OAUTH_REDIRECT_URI=\nSLACK_BOT_SCOPES=app_mentions:read,chat:write\nSLACK_USER_SCOPES=\n# Store outside public/. Default: .thunder-bolt/oauth\nSLACK_INSTALLATION_STORE_PATH=\n\n# Context: file (default), sqlite, memory, or disabled.\nSLACK_CONTEXT_STORE=file\n# File directory or SQLite database path; default storage stays outside public/.\nSLACK_CONTEXT_STORE_PATH=\n\n# Durable named jobs; default .thunder-bolt/jobs/queue.sqlite. Requires pdo_sqlite.\nSLACK_JOB_STORE_PATH=\n",
-        );
-        $this->write("{$project}/.gitignore", "/vendor/\n/.env\n/.thunder-bolt/\n");
-        $this->write(
-            "{$project}/slack-manifest.yaml",
-            "_metadata:\n  major_version: 1\ndisplay_information:\n  name: Thunder Bolt App\nfeatures:\n  bot_user:\n    display_name: Thunder Bolt\noauth_config:\n  scopes:\n    bot:\n      - app_mentions:read\n      - chat:write\nsettings:\n  # Set true before running `bolt socket:serve`; HTTP remains the default transport.\n  socket_mode_enabled: false\n  event_subscriptions:\n    request_url: https://example.test/slack/events\n    bot_events:\n      - app_mention\n",
-        );
-        $environment = file_get_contents("{$project}/.env.example");
-        if ($environment === false) {
-            throw new RuntimeException('Unable to read the generated environment template.');
-        }
-        if ($setup->authorization === 'oauth') {
-            $environment = str_replace('SLACK_BOT_TOKEN=xoxb-replace-me', 'SLACK_BOT_TOKEN=', $environment);
-        }
-        if ($setup->transport === 'socket') {
-            $environment = str_replace('SLACK_APP_TOKEN=', 'SLACK_APP_TOKEN=xapp-replace-me', $environment);
-            $manifest = file_get_contents("{$project}/slack-manifest.yaml");
-            if ($manifest === false) {
-                throw new RuntimeException('Unable to read the generated Slack manifest.');
-            }
-            $manifest = str_replace('socket_mode_enabled: false', 'socket_mode_enabled: true', $manifest);
-            $manifest = str_replace("    request_url: https://example.test/slack/events\n", '', $manifest);
-            $this->write("{$project}/slack-manifest.yaml", $manifest);
-        }
-        $this->write("{$project}/.env.example", $environment);
+        $this->write("{$project}/.env.example", $this->environment($setup, $profile));
+        $this->write("{$project}/.gitignore", "/vendor/\n/.env\n/.thunder-bolt/\n/.bolt-key*\n");
+        $this->write("{$project}/slack-manifest.yaml", $profile->manifest($setup));
         $this->write(
             "{$project}/config/setup.config.php",
             "<?php\n\ndeclare(strict_types=1);\n\nuse Thunder\\Bolt\\Console\\ProjectSetup;\n\nreturn new ProjectSetup(transport: "
             . var_export($setup->transport, true)
             . ', authorization: '
             . var_export($setup->authorization, true)
+            . ', profile: '
+            . var_export($setup->profile, true)
             . ");\n",
         );
         $this->write("{$project}/README.md", $this->projectReadme($setup, $source));
         $this->copyStub('public-index.php.stub', "{$project}/public/index.php");
-        $this->copyStub('mention-listener.php.stub', "{$project}/app/Listeners/GreetOnMention.php");
+        foreach ($profile->files() as $target => $stub) {
+            $this->write("{$project}/{$target}", strtr($this->stub($stub), ['{{ class }}' => 'WorkspaceAgent']));
+        }
         $this->write(
             "{$project}/bolt",
             "#!/usr/bin/env php\n<?php\n\ndeclare(strict_types=1);\n\nrequire __DIR__ . '/vendor/autoload.php';\nrequire __DIR__ . '/vendor/helgesverre/slack-bolt/bin/bolt';\n",
@@ -80,6 +66,53 @@ final readonly class ProjectScaffold
         chmod("{$project}/bolt", 0755);
 
         return $project;
+    }
+
+    private function environment(ProjectSetup $setup, StarterProfile $profile): string
+    {
+        $botToken = match ($setup->authorization) {
+            'token' => 'xoxb-replace-me',
+            default => '',
+        };
+        $appToken = $setup->transport === 'socket' ? 'xapp-replace-me' : '';
+        $scopes = implode(',', $profile->scopes());
+
+        return <<<ENV
+            # Use production error rendering by default. Set local only for trusted debugging.
+            ENVIRONMENT=production
+            # Public browser routes need the actual HTTPS origin here.
+            BASE_URI=http://127.0.0.1:8000
+            # Applies to HTTP and CLI; relative paths resolve from the project root.
+            BOLT_RUNTIME_PATH=
+            # Optional custom browser forms/sessions; Slack OAuth does not need this key.
+            # Run: php bolt key:generate, then php bolt doctor --sessions
+            SIGNING_KEY=
+            SLACK_BOT_TOKEN={$botToken}
+            SLACK_SIGNING_SECRET=replace-me
+            SLACK_BOT_USER_ID=
+            SLACK_BOT_ID=
+            SLACK_IGNORE_SELF=true
+            SLACK_ATTACH_FUNCTION_TOKEN=true
+
+            # Socket Mode requires connections:write on this app-level token.
+            SLACK_APP_TOKEN={$appToken}
+
+            # OAuth requires all three values and an HTTPS installation/callback route.
+            SLACK_CLIENT_ID=
+            SLACK_CLIENT_SECRET=
+            SLACK_OAUTH_REDIRECT_URI=
+            SLACK_BOT_SCOPES={$scopes}
+            SLACK_USER_SCOPES=
+            # Optional override; default: BOLT_RUNTIME_PATH/oauth.
+            SLACK_INSTALLATION_STORE_PATH=
+
+            # Context: file, sqlite, memory, or disabled. Default: BOLT_RUNTIME_PATH/conversations.
+            SLACK_CONTEXT_STORE=file
+            SLACK_CONTEXT_STORE_PATH=
+            # Default: BOLT_RUNTIME_PATH/jobs/queue.sqlite. Requires pdo_sqlite.
+            SLACK_JOB_STORE_PATH=
+
+            ENV;
     }
 
     private function projectReadme(ProjectSetup $setup, ProjectSource $source): string
@@ -101,7 +134,8 @@ final readonly class ProjectScaffold
                     . '`. Keep access to that repository available.'
                     : 'This project uses a local Composer path repository. Keep the framework checkout available while developing.'
             );
-        return "# Your Slack app\n\nThis app uses {$setup->transport} delivery and {$setup->authorization} authorization.\n\n1. Run composer install.\n2. Copy .env.example to .env and fill in your app credentials.\n3. {$authorization}\n4. {$transport}\n5. Run php bolt doctor, then {$setup->startCommand()}.\n\nNever commit .env. {$sourceNote}\n\n## Background work\n\nUse php bolt make:job MyJob to scaffold an explicit named job. Run php bolt jobs:work in a separate process when dispatching durable jobs; SQLite requires pdo_sqlite. Configuration readiness does not prove a worker is running.\n\n## Useful commands\n\n- php bolt doctor --format=json\n- php bolt status --format=json --require=jobs\n- php bolt listener:list\n- php bolt make:listener MyListener --event=app_mention\n- php bolt make:job MyJob\n\nThe onboarding defaults live in config/setup.config.php. For an HTTP readiness check alongside Socket Mode, use php bolt doctor --transport=http.\n";
+        $profile = StarterProfile::from($setup->profile);
+        return "# Your Slack app\n\nStarter: {$profile->value}. {$profile->instructions()}\n\nThis app uses {$setup->transport} delivery and {$setup->authorization} authorization.\n\n1. Run composer install.\n2. Copy .env.example to .env and fill in your app credentials.\n3. {$authorization}\n4. {$transport}\n5. Run php bolt doctor, then {$setup->startCommand()}.\n\nNever commit .env. {$sourceNote}\n\n## Runtime and browser routes\n\nSet BOLT_RUNTIME_PATH to a writable private directory outside public/. HTTP and CLI resolve it identically; production can use /var/lib/my-slack-app without making the release writable. Existing projects must update public/index.php to Bootstrap::boot(dirname(__DIR__)). Relative store overrides also resolve from the project root.\n\nCustom routes preserve returned status/body/headers, including 4xx/5xx. Thrown exceptions use Tempest renderers. Keep ENVIRONMENT=production when handling credentials. For custom browser sessions, run php bolt key:generate, then php bolt doctor --sessions. Existing keys are preserved; --force rotates the key and invalidates encrypted cookies. Manage production keys externally. Slack OAuth is stateless and needs no SIGNING_KEY.\n\n## Background work\n\nUse php bolt make:job MyJob to scaffold an explicit named job. Run php bolt jobs:work in a separate process when dispatching durable jobs; SQLite requires pdo_sqlite. Configuration readiness does not prove a worker is running.\n\n## Useful commands\n\n- php bolt doctor --format=json\n- php bolt status --format=json --require=jobs\n- php bolt listener:list\n- php bolt make:listener MyListener --event=app_mention\n- php bolt make:job MyJob\n\nThe onboarding defaults live in config/setup.config.php. For an HTTP readiness check alongside Socket Mode, use php bolt doctor --transport=http.\n";
     }
 
     public function listener(string $root, string $name, string $kind, string $selector, ?string $type = null): string

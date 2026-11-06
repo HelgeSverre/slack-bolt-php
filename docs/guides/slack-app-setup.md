@@ -26,7 +26,7 @@ The app-level `xapp` token opens a WebSocket. It does not authorize bot messages
 
 ![Slack app-creation options with Paste a manifest selected](../images/slack/create-paste-manifest.png)
 
-The generated starter only needs `app_mentions:read`, `chat:write` and the `app_mention` event. The large [playground manifest](../../examples/hello-bolt/slack-manifest.yaml) is a development reference with Agent View configuration. It still requires workspace-specific setup, installation and separate custom-function prerequisites; it is not a production permission baseline. [Slack app manifests](https://docs.slack.dev/app-manifests/)
+The default mention starter only needs `app_mentions:read`, `chat:write` and the `app_mention` event. The unreleased `interactive` and `agent` profiles generate different scopes and settings; use the manifest for your [selected starter](getting-started.md#create-a-project). The large [playground manifest](../../examples/hello-bolt/slack-manifest.yaml) is a development reference with Agent View configuration. It still requires workspace-specific setup, installation and separate custom-function prerequisites; it is not a production permission baseline. [Slack app manifests](https://docs.slack.dev/app-manifests/)
 
 Slack currently mixes `api.slack.com/apps/...` pages with `app.slack.com/app-settings/...` pages. Navigate by the sidebar names below rather than constructing URLs containing your workspace and app IDs.
 
@@ -35,7 +35,7 @@ Slack currently mixes `api.slack.com/apps/...` pages with `app.slack.com/app-set
 For a single-workspace app:
 
 1. Open **OAuth & Permissions** and review **Scopes → Bot Token Scopes**.
-2. Add the two starter scopes above if importing the manifest did not already add them.
+2. Add your selected starter's scopes if importing its manifest did not already add them.
 3. Open **Install App** and install into the development workspace. If Slack presents a new consent screen after configuration changes, review it before approving.
 4. Obtain the **Bot User OAuth Token** from the installation/OAuth page and put it in your application's private `.env` as `SLACK_BOT_TOKEN`.
 

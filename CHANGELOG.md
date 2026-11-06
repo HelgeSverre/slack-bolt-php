@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Shared `Bootstrap` for HTTP and CLI with `BOLT_RUNTIME_PATH`, private-directory checks and consistent project-relative store paths; no release-local symlink is needed for new entry points.
+- Preserve intentional application HTTP error responses, including their bodies and headers, while keeping exception rendering and route-binding 404 handling.
+- Optional `doctor --sessions` and non-rotating `key:generate` with explicit `--force`, algorithm-aware keys, atomic private writes and no key output.
+- Coherent `bolt new --profile=mentions|interactive|agent` starters, with matching classes, scopes, events, OAuth redirects and transport-specific manifest URLs.
+- Typed slash-command `triggerId`, complete command testing fixtures, expanded generated-project and browser-session smoke checks, and runtime/extensibility documentation.
+
 ## v0.8.0 — 2026-11-05
 
 - Update locked Symfony Filesystem and YAML dependencies to patched v8.1.11 releases.

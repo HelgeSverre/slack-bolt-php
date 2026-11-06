@@ -181,6 +181,7 @@ final class BoltTest
             'channel_id' => $channel,
             'team_id' => $team,
             'response_url' => 'https://example.test/response',
+            'trigger_id' => 'TRIGGER_TEST',
         ], form: true)->assertStatus(200);
     }
 

@@ -2,13 +2,19 @@
 
 declare(strict_types=1);
 
-use Tempest\Core\Tempest;
+use Thunder\Bolt\Bootstrap;
 use Tempest\Router\HttpApplication;
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
-Tempest::boot(
-    root: dirname(__DIR__),
-    discoveryLocations: is_dir(dirname(__DIR__).'/config') ? [new \Tempest\Discovery\DiscoveryLocation('', dirname(__DIR__).'/config')] : [],
-    internalStorage: dirname(__DIR__).'/.thunder-bolt',
-)->get(HttpApplication::class)->run();
+// Older explicitly pinned packages predate the shared bootstrap. Remove this
+// fallback once all deployed environments provide Thunder\Bolt\Bootstrap.
+$root = dirname(__DIR__);
+$container = class_exists(Bootstrap::class)
+    ? Bootstrap::boot($root)
+    : \Tempest\Core\Tempest::boot(
+        root: $root,
+        discoveryLocations: is_dir($root.'/config') ? [new \Tempest\Discovery\DiscoveryLocation('', $root.'/config')] : [],
+        internalStorage: $root.'/.thunder-bolt',
+    );
+$container->get(HttpApplication::class)->run();

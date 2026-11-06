@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d28e0272cd25aa4ce330e9f292174f55",
+    "content-hash": "8e0b12beb92d08773f93b5abcbab3239",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2111,11 +2111,11 @@
         },
         {
             "name": "helgesverre/slack-bolt",
-            "version": "0.8.x-dev",
+            "version": "0.9.x-dev",
             "dist": {
                 "type": "path",
                 "url": "../..",
-                "reference": "65c3899ee26d76ec79a8e8fb7c4b0c7cb5918ab0"
+                "reference": "9d6ef2ae4c5661afb3ded036756e6eb17c189556"
             },
             "require": {
                 "amphp/amp": "^3.1",
@@ -2143,7 +2143,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "0.8.x-dev"
+                    "dev-main": "0.9.x-dev"
                 }
             },
             "autoload": {
@@ -2166,6 +2166,9 @@
                 ],
                 "test:project": [
                     "@php scripts/smoke-project.php"
+                ],
+                "test:onboarding": [
+                    "@php scripts/smoke-onboarding.php"
                 ],
                 "test:vcs-project": [
                     "@php scripts/smoke-vcs-project.php"

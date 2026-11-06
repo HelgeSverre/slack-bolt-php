@@ -20,7 +20,7 @@ If `bolt` is not on your shell's `PATH`, find Composer's global bin directory wi
 
 The generated app has a PSR-4 `App\` namespace, an `app/Listeners` directory, `config/` files discovered by Tempest, `public/index.php`, a matching `slack-manifest.yaml`, and a project-local `bolt` launcher. The default `mentions` starter uses an `app_mention` listener, `app_mentions:read`, and `chat:write`.
 
-The unreleased CLI adds `--profile`, independently of transport and authorization:
+The CLI supports `--profile`, independently of transport and authorization:
 
 | Profile | Generated experience | Bot scopes |
 | --- | --- | --- |
@@ -33,7 +33,7 @@ bolt new office-app --profile=interactive --transport=socket --no-interaction
 bolt new workspace-agent --profile=agent --auth=oauth --no-interaction
 ```
 
-Use `--source=path` from a framework checkout to try unreleased additions. Each profile generates its own listener/configuration, scopes, events and feature settings. Agent View requires workspace support; this profile targets a new app and does not migrate an existing Slack app. The example reply requires no AI account. Replace or extend the generated PHP classes as the application grows.
+Each profile generates its own listener/configuration, scopes, events and feature settings. Agent View requires workspace support; this profile targets a new app and does not migrate an existing Slack app. The example reply requires no AI account. Replace or extend the generated PHP classes as the application grows.
 
 Interactive and agent starters require dependency constraints that exclude versions before 0.8.0; older pins are rejected before creating a directory. The mention starter remains available for older supported releases. Runtime relocation and session-key commands require the newer shared bootstrap described below.
 
@@ -71,7 +71,7 @@ For OAuth, set `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`, and an exact HTTPS `SLA
 
 The generated `.gitignore` excludes `.env` and `.thunder-bolt/`. Keep credentials and state outside `public/`, never commit them, and do not paste them into issue reports or logs.
 
-The shared bootstrap supports `BOLT_RUNTIME_PATH` for state outside a read-only release. Custom browser forms can use `php bolt key:generate` and `php bolt doctor --sessions`. These unreleased additions are covered in [runtime storage and browser routes](runtime-and-browser-routes.md), including how to upgrade an existing HTTP entry point.
+The shared bootstrap supports `BOLT_RUNTIME_PATH` for state outside a read-only release. Custom browser forms can use `php bolt key:generate` and `php bolt doctor --sessions`. These additions, available since 0.9, are covered in [runtime storage and browser routes](runtime-and-browser-routes.md), including how to upgrade an existing HTTP entry point.
 
 ## Configure Slack
 

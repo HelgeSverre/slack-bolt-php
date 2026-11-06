@@ -11,7 +11,7 @@ Build Slack apps in modern PHP: typed handlers, immutable Block Kit builders, an
 
 **Experimental.** Install `helgesverre/slack-bolt` to get the latest compatible release. The PHP namespace is `Thunder\Bolt`. This is an independent framework; full Bolt JS compatibility remains a work in progress. [Parity audit](docs/research/bolt-js-parity-audit.md) · [Changes](CHANGELOG.md) · [Upgrading](UPGRADING.md).
 
-Typed UI requests, interaction fixtures and modern rich-text references are covered by the [live acceptance record](docs/research/typed-ui-live-validation.md) and [v0.8.0 verification](docs/research/v0.8-release-verification.md).
+Typed UI requests, interaction fixtures and modern rich-text references are covered by the [live acceptance record](docs/research/typed-ui-live-validation.md). Starter profiles, shared runtime storage and browser routes are covered by [v0.9.0 verification](docs/research/v0.9-release-verification.md).
 
 ## Explore the framework
 
@@ -70,7 +70,7 @@ Put Composer's global vendor bin directory on `PATH` if needed: `composer global
 | Scaffold option | Values | Default |
 | --- | --- | --- |
 | `--transport` | `http`, `socket` | `http` |
-| `--profile` (unreleased) | `mentions`, `interactive`, `agent` | `mentions` |
+| `--profile` | `mentions`, `interactive`, `agent` | `mentions` |
 | `--auth` | `token`, `oauth` | `token` |
 | `--source` | `packagist`, `path`, `vcs` | `packagist` |
 | `--repository` | HTTPS/SSH URL or absolute local Git repository | Required for `vcs` |
@@ -80,7 +80,7 @@ Generated apps use Packagist without a custom Composer repository and run indepe
 
 ## Slack configuration
 
-Import the generated `slack-manifest.yaml` into a development Slack app and install it. The default mention starter subscribes to `app_mention` with `app_mentions:read` and `chat:write`; invite it to a test channel. The unreleased interactive and agent profiles generate their own matching scopes and feature settings. [Starter profiles](docs/guides/getting-started.md#create-a-project).
+Import the generated `slack-manifest.yaml` into a development Slack app and install it. The default mention starter subscribes to `app_mention` with `app_mentions:read` and `chat:write`; invite it to a test channel. The interactive and agent profiles generate their own matching scopes and feature settings. [Starter profiles](docs/guides/getting-started.md#create-a-project).
 
 For custom account-connection pages and deployments with read-only code, see [runtime storage and browser routes](docs/guides/runtime-and-browser-routes.md): shared `BOLT_RUNTIME_PATH`, intentional HTTP error responses, and optional browser-session key setup.
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.9.0 — 2026-11-06
+
 - Shared `Bootstrap` for HTTP and CLI with `BOLT_RUNTIME_PATH`, private-directory checks and consistent project-relative store paths; no release-local symlink is needed for new entry points.
 - Preserve intentional application HTTP error responses, including their bodies and headers, while keeping exception rendering and route-binding 404 handling.
 - Optional `doctor --sessions` and non-rotating `key:generate` with explicit `--force`, algorithm-aware keys, atomic private writes and no key output.

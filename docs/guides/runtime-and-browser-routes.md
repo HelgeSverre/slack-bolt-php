@@ -1,6 +1,6 @@
 # Runtime storage and browser routes
 
-These additions are unreleased. Use the framework checkout with `bolt new app --source=path` to try them before publication. Upgrading the global CLI does not upgrade an existing app's Composer dependency.
+Available since Thunder Bolt 0.9. Upgrading the global CLI does not upgrade an existing app's Composer dependency.
 
 ## One bootstrap for HTTP and commands
 

@@ -65,9 +65,17 @@ final class CommandCatalog
             $config->commands,
             static fn(ConsoleCommand $command): bool => (
                 $command->getName() !== 'key:generate'
-                || $command->handler->getDeclaringClass()->getName() === SigningKeyCommand::class
+                || $command->handler->getDeclaringClass()->getName()
+                !== \Tempest\Cryptography\GenerateSigningKeyCommand::class
             ),
         );
+        if (!isset($config->commands['key:generate'])) {
+            $reflector = MethodReflector::fromParts(SigningKeyCommand::class, 'generate');
+            $command = $reflector->getAttribute(ConsoleCommand::class);
+            if ($command instanceof ConsoleCommand) {
+                $config->addCommand($reflector, $command);
+            }
+        }
         foreach (['generate', 'show', 'install', 'uninstall'] as $method) {
             $reflector = MethodReflector::fromParts(CompletionCommands::class, $method);
             $command = $reflector->getAttribute(ConsoleCommand::class);
